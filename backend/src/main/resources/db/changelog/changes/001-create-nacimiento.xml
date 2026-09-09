@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+  <changeSet id="001-create-nacimiento" author="renap">
+    <createTable tableName="informe_nacimiento">
+      <!-- Auditoría -->
+      <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"/>
+      <column name="estado" type="VARCHAR(20)" defaultValue="BORRADOR"/>
+
+      <!-- Sección I: Datos del que suscribe -->
+      <column name="suscribe_nombres_apellidos" type="VARCHAR(255)"/>
+      <column name="suscribe_cui_cedula" type="VARCHAR(100)"/>
+      <column name="suscribe_no_colegiado" type="VARCHAR(50)"/>
+      <column name="suscribe_no_registro_comadrona" type="VARCHAR(50)"/>
+      <column name="suscribe_quien_informa" type="TINYINT"/>
+
+      <!-- Sección II: Lugar de nacimiento -->
+      <column name="lugar_departamento" type="VARCHAR(100)"/>
+      <column name="lugar_municipio" type="VARCHAR(100)"/>
+      <column name="lugar_direccion" type="VARCHAR(255)"/>
+      <column name="lugar_ocurrio_nacimiento" type="TINYINT"/>
+
+      <!-- Sección III: Datos del niño -->
+      <column name="nino_primer_nombre" type="VARCHAR(100)"/>
+      <column name="nino_segundo_nombre" type="VARCHAR(100)"/>
+      <column name="nino_tercer_nombre" type="VARCHAR(100)"/>
+      <column name="nino_primer_apellido" type="VARCHAR(100)"/>
+      <column name="nino_segundo_apellido" type="VARCHAR(100)"/>
+      <column name="nino_fecha_nacimiento" type="DATE"/>
+      <column name="nino_hora_nacimiento" type="VARCHAR(5)"/>
+      <column name="nino_sexo" type="TINYINT"/>
+      <column name="nino_peso_libras" type="DECIMAL(5,2)"/>
+      <column name="nino_peso_onzas" type="DECIMAL(5,2)"/>
+      <column name="nino_talla_cm" type="DECIMAL(5,2)"/>
+      <column name="nino_edad_gestacional_semanas" type="TINYINT"/>
+      <column name="nino_anomalias_congenitas" type="TINYINT"/>
+      <column name="nino_tipo_parto" type="TINYINT"/>
+      <column name="nino_num_hijos_nacidos_parto" type="TINYINT"/>
+      <column name="nino_persona_atendio_parto" type="TINYINT"/>
+      <column name="nino_total_hijos_madre" type="TINYINT"/>
+      <column name="nino_hijos_nacidos_muertos" type="TINYINT"/>
+      <column name="nino_hijos_viven" type="TINYINT"/>
+
+      <!-- Sección IV: Datos de la madre -->
+      <column name="madre_primer_nombre" type="VARCHAR(100)"/>
+      <column name="madre_segundo_nombre" type="VARCHAR(100)"/>
+      <column name="madre_primer_apellido" type="VARCHAR(100)"/>
+      <column name="madre_segundo_apellido" type="VARCHAR(100)"/>
+      <column name="madre_apellido_casada" type="VARCHAR(100)"/>
+      <column name="madre_cui_cedula" type="VARCHAR(100)"/>
+      <column name="madre_edad" type="TINYINT"/>
+      <column name="madre_nacionalidad" type="VARCHAR(100)"/>
+      <column name="madre_ocupacion" type="VARCHAR(150)"/>
+      <column name="madre_direccion" type="VARCHAR(255)"/>
+      <column name="madre_zona" type="VARCHAR(20)"/>
+      <column name="madre_municipio" type="VARCHAR(100)"/>
+      <column name="madre_departamento" type="VARCHAR(100)"/>
+      <column name="madre_pueblo_pertenencia" type="TINYINT"/>
+      <column name="madre_estado_civil" type="TINYINT"/>
+      <column name="madre_escolaridad" type="TINYINT"/>
+
+      <!-- Sección V: Datos del padre -->
+      <column name="padre_primer_nombre" type="VARCHAR(100)"/>
+      <column name="padre_segundo_nombre" type="VARCHAR(100)"/>
+      <column name="padre_primer_apellido" type="VARCHAR(100)"/>
+      <column name="padre_segundo_apellido" type="VARCHAR(100)"/>
+      <column name="padre_cui_cedula" type="VARCHAR(100)"/>
+      <column name="padre_edad" type="TINYINT"/>
+      <column name="padre_nacionalidad" type="VARCHAR(100)"/>
+      <column name="padre_ocupacion" type="VARCHAR(150)"/>
+      <column name="padre_direccion" type="VARCHAR(255)"/>
+      <column name="padre_zona" type="VARCHAR(20)"/>
+      <column name="padre_municipio" type="VARCHAR(100)"/>
+      <column name="padre_departamento" type="VARCHAR(100)"/>
+      <column name="padre_pueblo_pertenencia" type="TINYINT"/>
+      <column name="padre_estado_civil" type="TINYINT"/>
+      <column name="padre_escolaridad" type="TINYINT"/>
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>

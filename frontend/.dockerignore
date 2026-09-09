@@ -1,0 +1,8 @@
+node_modules
+dist
+
+# Archivos .env locales — NO deben incluirse en el build de Docker.
+# El Dockerfile define sus propios ARGs/ENVs con los valores de producción.
+.env.local
+.env.*.local
+.env.development

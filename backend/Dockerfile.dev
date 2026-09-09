@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════════
+# Dockerfile.dev - Backend Spring Boot para DESARROLLO
+# ═══════════════════════════════════════════════════════════════════
+# Incluye Maven y Spring Boot DevTools para hot reload automático
+# ═══════════════════════════════════════════════════════════════════
+
+FROM maven:3.9-eclipse-temurin-21
+
+WORKDIR /app
+
+# Copiar archivos de configuración de Maven
+COPY pom.xml .
+
+# Descargar dependencias (esta capa se cachea si pom.xml no cambia)
+RUN mvn dependency:go-offline -B
+
+# Copiar código fuente (se sobrescribe con el volumen en desarrollo)
+COPY src ./src
+
+# Exponer puertos
+EXPOSE 8080 5005
+
+# El comando se define en docker-compose.override.yml
+# Por defecto: mvn spring-boot:run con debug habilitado
+

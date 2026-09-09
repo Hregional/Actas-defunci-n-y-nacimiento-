@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: renap-backend
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # JWKS endpoint de Keycloak — valida la firma de todos los tokens
+          jwk-set-uri: ${KEYCLOAK_URL:https://sso.hro.gob.gt}/realms/${KEYCLOAK_REALM:Hospital-O}/protocol/openid-connect/certs
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/renap_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Guatemala
+    username: ${DB_USERNAME:renap_user}
+    password: ${DB_PASSWORD:renap_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
+    open-in-view: false
+
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:false}
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+  error:
+    include-message: always
+    include-binding-errors: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.renap: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ── Integración Keycloak + API de RH ──────────────────────────────────────
+keycloak:
+  url: ${KEYCLOAK_URL:https://sso.hro.gob.gt}
+  realm: ${KEYCLOAK_REALM:Hospital-O}
+  client-id: ${KEYCLOAK_CLIENT_ID:sistema-actas}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:changeme}
+  # UUID interno del client sistema-actas-frontend en Keycloak.
+  # Se obtiene de la URL al abrir el client en la consola de Keycloak.
+  # Configurable via variable de entorno KEYCLOAK_FRONTEND_CLIENT_UUID.
+  frontend-client-uuid: ${KEYCLOAK_FRONTEND_CLIENT_UUID:d670e581-567a-4bba-afdc-43a6b0f94590}
+
+rh-api:
+  base-url: ${RH_API_URL:https://localhost}
+  connect-timeout-ms: 5000
+  read-timeout-ms: 10000
+  # En desarrollo local, Cloudflare bloquea peticiones - usar datos mock
+  use-mock-data: ${RH_API_USE_MOCK:true}

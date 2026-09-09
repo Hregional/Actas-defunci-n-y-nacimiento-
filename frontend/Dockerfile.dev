@@ -1,0 +1,26 @@
+# ═══════════════════════════════════════════════════════════════════
+# Dockerfile.dev - Frontend React/Vite para DESARROLLO
+# ═══════════════════════════════════════════════════════════════════
+# Incluye Vite dev server con HMR (Hot Module Replacement)
+# Los cambios en el código se reflejan instantáneamente en el navegador
+# ═══════════════════════════════════════════════════════════════════
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias (esta capa se cachea si package.json no cambia)
+RUN npm ci
+
+# Copiar código fuente (se sobrescribe con el volumen en desarrollo)
+COPY . .
+
+# Exponer puerto de Vite dev server
+EXPOSE 5173
+
+# El comando se define en docker-compose.override.yml
+# Por defecto: npm run dev -- --host 0.0.0.0
+

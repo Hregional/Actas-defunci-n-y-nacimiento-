@@ -1,0 +1,29 @@
+# ── Secretos — NUNCA subir al repo ───────────────────────────────
+.env
+
+# ── Dependencias ──────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+
+# ── Build outputs ─────────────────────────────────────────────────
+frontend/dist/
+backend/target/
+
+# ── Logs ──────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── IDE ───────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/settings.json
+
+# ── OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docker volumes locales ────────────────────────────────────────
+mysql_data/
+
+# ── init.sql ya no se usa: las tablas las crea Liquibase ─────────
+docker/mysql/init.sql

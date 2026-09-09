@@ -1,0 +1,91 @@
+services:
+  # ── MySQL ──────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.3
+    container_name: renap-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_DATABASE: renap_db
+      MYSQL_USER: renap_user
+      MYSQL_PASSWORD: renap_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - renap-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "renap_user", "-prenap_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+
+  # ── Backend Spring Boot ────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: renap-backend
+    restart: unless-stopped
+    # Permitir acceso a red del host para APIs internas
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      DB_USERNAME: renap_user
+      DB_PASSWORD: renap_pass
+      LIQUIBASE_ENABLED: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-https://sso.hro.gob.gt}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-Hospital-O}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-sistema-actas}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-changeme}
+      KEYCLOAK_FRONTEND_CLIENT_UUID: ${KEYCLOAK_FRONTEND_CLIENT_UUID:-d670e581-567a-4bba-afdc-43a6b0f94590}
+      RH_API_URL: ${RH_API_URL:-https://asistencia.hro.gob.gt}
+      RH_API_USE_MOCK: ${RH_API_USE_MOCK:-true}
+    ports:
+      - "9090:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - renap-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # ── Frontend React ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Ya NO necesita build args — la config se inyecta en runtime
+    container_name: renap-frontend
+    restart: unless-stopped
+    environment:
+      # Estos valores se inyectan en /config.js al arrancar el contenedor
+      KEYCLOAK_URL:    ${KEYCLOAK_URL:-https://sso.hro.gob.gt}
+      KEYCLOAK_REALM:  ${KEYCLOAK_REALM:-Hospital-O}
+      KEYCLOAK_CLIENT: ${VITE_KEYCLOAK_CLIENT:-sistema-actas-frontend}
+    ports:
+      - "3001:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - renap-net
+
+volumes:
+  mysql_data:
+
+networks:
+  renap-net:
+    driver: bridge

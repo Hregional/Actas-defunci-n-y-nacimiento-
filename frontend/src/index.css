@@ -1,0 +1,33 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  /* Elimina el rebote al llegar al borde (rubber-band effect en trackpad) */
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Restaurar selección de texto en campos de formulario */
+input, textarea, [contenteditable] {
+  user-select: text;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img, svg, video {
+  max-width: 100%;
+}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+  <changeSet id="002-create-defuncion" author="renap">
+    <createTable tableName="informe_defuncion">
+      <!-- Auditoría -->
+      <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"/>
+      <column name="estado" type="VARCHAR(20)" defaultValue="BORRADOR"/>
+
+      <!-- Sección I: Información General -->
+      <column name="info_quien_informa_nombres" type="VARCHAR(255)"/>
+      <column name="info_documento_identificacion" type="VARCHAR(100)"/>
+      <column name="info_quien_informa_tipo" type="TINYINT"/>
+      <column name="info_no_colegiado" type="VARCHAR(50)"/>
+      <column name="info_fecha_defuncion" type="DATE"/>
+      <column name="info_hora_defuncion" type="VARCHAR(5)"/>
+      <column name="info_lugar_direccion" type="VARCHAR(255)"/>
+      <column name="info_lugar_municipio" type="VARCHAR(100)"/>
+      <column name="info_lugar_departamento" type="VARCHAR(100)"/>
+
+      <!-- Sección II: Datos del fallecido -->
+      <column name="fallecido_nombre_completo" type="VARCHAR(255)"/>
+      <column name="fallecido_sexo" type="TINYINT"/>
+      <column name="fallecido_edad_horas" type="SMALLINT"/>
+      <column name="fallecido_edad_dias" type="SMALLINT"/>
+      <column name="fallecido_edad_meses" type="SMALLINT"/>
+      <column name="fallecido_edad_anos" type="SMALLINT"/>
+      <column name="fallecido_doc_numero" type="VARCHAR(100)"/>
+      <column name="fallecido_doc_libro" type="VARCHAR(50)"/>
+      <column name="fallecido_doc_folio" type="VARCHAR(50)"/>
+      <column name="fallecido_doc_partida" type="VARCHAR(50)"/>
+      <column name="fallecido_lugar_nac_pais" type="VARCHAR(100)"/>
+      <column name="fallecido_lugar_nac_departamento" type="VARCHAR(100)"/>
+      <column name="fallecido_lugar_nac_municipio" type="VARCHAR(100)"/>
+      <column name="fallecido_nacionalidad" type="VARCHAR(100)"/>
+      <column name="fallecido_ocupacion" type="VARCHAR(150)"/>
+      <column name="fallecido_estado_civil" type="TINYINT"/>
+      <column name="fallecido_pueblo_pertenencia" type="TINYINT"/>
+      <column name="fallecido_residencia_direccion" type="VARCHAR(255)"/>
+      <column name="fallecido_residencia_municipio" type="VARCHAR(100)"/>
+      <column name="fallecido_residencia_departamento" type="VARCHAR(100)"/>
+      <column name="fallecido_escolaridad" type="TINYINT"/>
+
+      <!-- Sección III: Mujeres en edad fértil -->
+      <column name="fertil_muerte_durante" type="TINYINT"/>
+
+      <!-- Sección IV: Causa de defunción -->
+      <column name="causa_i_a" type="TEXT"/>
+      <column name="causa_i_a_intervalo" type="VARCHAR(100)"/>
+      <column name="causa_i_b" type="TEXT"/>
+      <column name="causa_i_b_intervalo" type="VARCHAR(100)"/>
+      <column name="causa_i_c" type="TEXT"/>
+      <column name="causa_i_c_intervalo" type="VARCHAR(100)"/>
+      <column name="causa_i_d" type="TEXT"/>
+      <column name="causa_i_d_intervalo" type="VARCHAR(100)"/>
+      <column name="causa_ii" type="TEXT"/>
+
+      <!-- Sección V: Defunciones accidentales y violentas -->
+      <column name="accidental_fue_presunto" type="TINYINT"/>
+      <column name="accidental_lugar_lesion" type="TINYINT"/>
+      <column name="accidental_ocurrio_trabajo" type="TINYINT"/>
+      <column name="accidental_fue_transito" type="TINYINT"/>
+      <column name="accidental_arma_produjo" type="VARCHAR(255)"/>
+
+      <!-- Sección VI: Datos de la defunción fetal (mortinato) -->
+      <column name="mortinato_madre_nombre" type="VARCHAR(255)"/>
+      <column name="mortinato_madre_doc_numero" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_doc_libro" type="VARCHAR(50)"/>
+      <column name="mortinato_madre_doc_folio" type="VARCHAR(50)"/>
+      <column name="mortinato_madre_doc_partida" type="VARCHAR(50)"/>
+      <column name="mortinato_madre_lugar_nac_pais" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_lugar_nac_departamento" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_lugar_nac_municipio" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_edad" type="TINYINT"/>
+      <column name="mortinato_madre_estado_civil" type="TINYINT"/>
+      <column name="mortinato_madre_pueblo_pertenencia" type="TINYINT"/>
+      <column name="mortinato_madre_residencia_direccion" type="VARCHAR(255)"/>
+      <column name="mortinato_madre_residencia_municipio" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_residencia_departamento" type="VARCHAR(100)"/>
+      <column name="mortinato_madre_ocupacion" type="VARCHAR(150)"/>
+      <column name="mortinato_madre_sabe_leer" type="TINYINT"/>
+      <column name="mortinato_madre_escolaridad" type="TINYINT"/>
+      <column name="mortinato_madre_nacionalidad" type="VARCHAR(100)"/>
+      <column name="mortinato_embarazos_nacidos_vivos" type="TINYINT"/>
+      <column name="mortinato_embarazos_nacidos_muertos" type="TINYINT"/>
+      <column name="mortinato_feto_sexo" type="TINYINT"/>
+      <column name="mortinato_feto_murio" type="TINYINT"/>
+      <column name="mortinato_parto_fue" type="TINYINT"/>
+      <column name="mortinato_clase_parto" type="TINYINT"/>
+      <column name="mortinato_via_parto" type="TINYINT"/>
+      <column name="mortinato_semanas_gestacion" type="TINYINT"/>
+      <column name="mortinato_causas_fetales" type="TEXT"/>
+      <column name="mortinato_causas_maternas" type="TEXT"/>
+
+      <!-- Sección VII: Otros datos de la defunción -->
+      <column name="otros_hubo_necropsia" type="TINYINT"/>
+      <column name="otros_clase_asistencia" type="TINYINT"/>
+      <column name="otros_lugar_defuncion" type="TINYINT"/>
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>

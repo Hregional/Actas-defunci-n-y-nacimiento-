@@ -1,0 +1,19 @@
+# Normalizar line endings al hacer checkout
+* text=auto
+
+# Archivos que deben usar LF siempre (scripts, configs de Linux/Docker)
+*.sh text eol=lf
+Dockerfile text eol=lf
+Dockerfile.dev text eol=lf
+docker-entrypoint.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.sql text eol=lf
+
+# Archivos binarios — no tocar line endings
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

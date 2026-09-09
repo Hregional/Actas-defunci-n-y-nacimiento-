@@ -1,0 +1,69 @@
+# ═══════════════════════════════════════════════════════════════════
+# docker-compose.override.yml - MODO DESARROLLO
+# ═══════════════════════════════════════════════════════════════════
+# Este archivo se carga automáticamente junto con docker-compose.yml
+# Sobrescribe las configuraciones para habilitar HOT RELOAD.
+#
+# Para usar modo desarrollo:
+#   docker-compose up
+#
+# Para usar modo producción (ignorando este archivo):
+#   docker-compose -f docker-compose.yml up
+# ═══════════════════════════════════════════════════════════════════
+
+services:
+  # ── Backend: Spring Boot DevTools con hot reload ──────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev  # Dockerfile específico para desarrollo
+    volumes:
+      # Monta el código fuente para que los cambios se reflejen
+      - ./backend/src:/app/src:ro
+      - ./backend/pom.xml:/app/pom.xml:ro
+      # Cache de Maven para no descargar dependencias cada vez
+      - maven_cache:/root/.m2
+    environment:
+      # Activa Spring Boot DevTools
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    command: ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005"]
+    ports:
+      - "9090:8080"
+      - "5005:5005"  # Puerto de debug remoto
+
+  # ── Frontend: Vite dev server con HMR (Hot Module Replacement) ─
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev  # Dockerfile específico para desarrollo
+    volumes:
+      # Monta el código fuente para hot reload
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      # Excluir node_modules del host (usar el del contenedor)
+      - /app/node_modules
+    environment:
+      # Variables de Vite
+      VITE_API_URL: /api
+      # API_TARGET es leída por vite.config.ts en Node.js (no por el cliente)
+      API_TARGET: http://backend:8080
+      # También mantenemos VITE_API_BASE_URL como fallback
+      VITE_API_BASE_URL: http://backend:8080
+      VITE_KEYCLOAK_URL: ${KEYCLOAK_URL:-https://sso.hro.gob.gt}
+      VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-Hospital-O}
+      VITE_KEYCLOAK_CLIENT: ${VITE_KEYCLOAK_CLIENT:-sistema-actas-frontend}
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "4200"]
+    ports:
+      - "4200:4200"  # Mapeo: localhost:4200 → contenedor:4200
+    depends_on:
+      - backend
+
+volumes:
+  maven_cache:  # Cache de Maven para desarrollo
+
