@@ -23,10 +23,16 @@ export default defineConfig({
       '/api': {
         target: API_TARGET,
         changeOrigin: true,
-        // Log para confirmar que el proxy funciona
+        // Forzar re-resolución DNS en cada petición para evitar
+        // ECONNREFUSED cuando el backend se reinicia en Docker
+        ws: false,
         configure: (proxy) => {
-          proxy.on('error', (err) => {
+          proxy.on('error', (err, _req, res) => {
             console.error('[proxy] error:', err.message)
+            if ('writeHead' in res) {
+              res.writeHead(502, { 'Content-Type': 'application/json' })
+              res.end(JSON.stringify({ error: 'Backend no disponible', detail: err.message }))
+            }
           })
           proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[proxy] →', req.method, req.url, '→', API_TARGET)

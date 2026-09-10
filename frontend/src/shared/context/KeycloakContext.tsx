@@ -140,14 +140,25 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
         token:       keycloak.token,
         tokenParsed: keycloak.tokenParsed as Record<string, unknown> | undefined,
         logout:      () => {
-          // Eliminar slash final para coincidir con lo registrado en Keycloak
-          const redirectUri = window.location.origin.replace(/\/$/, '');
-          console.log('[Keycloak] Logout redirectUri:', redirectUri);
-          keycloak.logout({ redirectUri });
+          const redirectUri = window.location.origin.replace(/\/$/, ''); // sin slash final
+          const idToken     = keycloak.idToken; // guardar ANTES de que logout lo limpie
+          const base        = (keycloak.authServerUrl ?? 'https://sso.hro.gob.gt').replace(/\/+$/, '');
+          const realm       = keycloak.realm    ?? 'Hospital-O';
+          const clientId    = keycloak.clientId ?? 'sistema-actas-frontend';
+
+          // Construir la URL manualmente — keycloak-js v26 a veces añade trailing
+          // slash al post_logout_redirect_uri ignorando el valor que le pasamos.
+          // Construyéndola nosotros tenemos control total del valor exacto.
+          let url = `${base}/realms/${realm}/protocol/openid-connect/logout`
+            + `?client_id=${encodeURIComponent(clientId)}`
+            + `&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+          if (idToken) url += `&id_token_hint=${idToken}`;
+
+          window.location.href = url;
         },
         updateToken: () => keycloak.updateToken(60),
       }}
-    >
+    >{}
       {children}
     </KeycloakContext.Provider>
   )
