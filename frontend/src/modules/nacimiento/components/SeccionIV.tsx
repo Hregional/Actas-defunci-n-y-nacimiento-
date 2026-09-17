@@ -23,19 +23,19 @@ import { DEPARTAMENTOS_GUATEMALA } from '@/shared/data/guatemala'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
 
 const PUEBLO_OPTIONS = [
-  { value: 1, label: '1. Maya' }, { value: 2, label: '2. Garífuna' },
-  { value: 3, label: '3. Xinka' }, { value: 4, label: '4. Mestizo / Ladino' },
-  { value: 5, label: '5. Otro' },
+  { value: 1, label: 'Maya' }, { value: 2, label: 'Garífuna' },
+  { value: 3, label: 'Xinka' }, { value: 4, label: 'Mestizo / Ladino' },
+  { value: 5, label: 'Otro' },
 ]
 const ESTADO_CIVIL_MADRE = [
-  { value: 1, label: '1. Soltera' }, { value: 2, label: '2. Casada' },
-  { value: 3, label: '3. Unida' }, { value: 4, label: '4. Viuda' },
-  { value: 5, label: '5. Divorciada' }, { value: 6, label: '6. Unión no declarada' },
+  { value: 1, label: 'Soltera' }, { value: 2, label: 'Casada' },
+  { value: 3, label: 'Unida' }, { value: 4, label: 'Viuda' },
+  { value: 5, label: 'Divorciada' }, { value: 6, label: 'Unión no declarada' },
 ]
 const ESCOLARIDAD_OPTIONS = [
-  { value: 1, label: '1. Ninguna' }, { value: 2, label: '2. Primaria' },
-  { value: 3, label: '3. Básico' }, { value: 4, label: '4. Diversificado' },
-  { value: 5, label: '5. Universitario' },
+  { value: 1, label: 'Ninguna' }, { value: 2, label: 'Primaria' },
+  { value: 3, label: 'Básico' }, { value: 4, label: 'Diversificado' },
+  { value: 5, label: 'Universitario' },
 ]
 
 export default function SeccionIV() {

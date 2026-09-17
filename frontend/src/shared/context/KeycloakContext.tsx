@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { Box, CircularProgress, Typography, Button, Alert } from '@mui/material'
 import keycloak from '@/shared/auth/keycloak'
+import { doLogout } from '@/shared/auth/logout'
 
 interface KeycloakContextValue {
   /** true si Keycloak terminó de inicializar */
@@ -57,14 +58,18 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
         setAuthenticated(auth)
         setInitialized(true)
 
-        // Refrescar el token 60 s antes de que expire
+        // Refrescar el token antes de que expire.
+        // Se ejecuta cada 60s y renueva si el token expira en menos de 120s.
+        // Si el usuario regresa después de inactividad larga, updateToken
+        // lo renueva automáticamente usando el refresh_token de Keycloak.
         if (auth) {
-          setInterval(() => {
-            keycloak.updateToken(60).catch(() => {
+          const refreshInterval = setInterval(() => {
+            keycloak.updateToken(120).catch(() => {
               console.warn('[Keycloak] No se pudo refrescar el token — cerrando sesión')
-              keycloak.logout()
+              clearInterval(refreshInterval)
+              doLogout()
             })
-          }, 30_000)
+          }, 60_000)
         }
       })
       .catch((err) => {
@@ -139,23 +144,7 @@ export function KeycloakProvider({ children }: { children: ReactNode }) {
         authenticated,
         token:       keycloak.token,
         tokenParsed: keycloak.tokenParsed as Record<string, unknown> | undefined,
-        logout:      () => {
-          const redirectUri = window.location.origin.replace(/\/$/, ''); // sin slash final
-          const idToken     = keycloak.idToken; // guardar ANTES de que logout lo limpie
-          const base        = (keycloak.authServerUrl ?? 'https://sso.hro.gob.gt').replace(/\/+$/, '');
-          const realm       = keycloak.realm    ?? 'Hospital-O';
-          const clientId    = keycloak.clientId ?? 'sistema-actas-frontend';
-
-          // Construir la URL manualmente — keycloak-js v26 a veces añade trailing
-          // slash al post_logout_redirect_uri ignorando el valor que le pasamos.
-          // Construyéndola nosotros tenemos control total del valor exacto.
-          let url = `${base}/realms/${realm}/protocol/openid-connect/logout`
-            + `?client_id=${encodeURIComponent(clientId)}`
-            + `&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
-          if (idToken) url += `&id_token_hint=${idToken}`;
-
-          window.location.href = url;
-        },
+        logout:      () => doLogout(),
         updateToken: () => keycloak.updateToken(60),
       }}
     >{}

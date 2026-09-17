@@ -11,11 +11,11 @@ import { useCurrentUser } from '@/shared/context/UserContext'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
 
 const QUIEN_INFORMA_LABELS: Record<number, string> = {
-  1: '1. Médico',
-  2: '2. Personal de enfermería',
-  3: '3. Personal institucional',
-  4: '4. Comadrona',
-  5: '5. Autoridad Local',
+  1: 'Médico',
+  2: 'Personal de enfermería',
+  3: 'Personal institucional',
+  4: 'Comadrona',
+  5: 'Autoridad Local',
 }
 
 export default function SeccionI() {

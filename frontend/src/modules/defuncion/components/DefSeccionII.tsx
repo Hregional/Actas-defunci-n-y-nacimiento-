@@ -11,21 +11,21 @@ import DeptoMuniSelector from '@/shared/components/common/DeptoMuniSelector'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 const ESTADO_CIVIL_OPTIONS = [
-  { value: 1, label: '1. Soltero(a)' }, { value: 2, label: '2. Casado(a)' },
-  { value: 3, label: '3. Unido(a)' },   { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Soltero(a)' }, { value: 2, label: 'Casado(a)' },
+  { value: 3, label: 'Unido(a)' },   { value: 9, label: 'Ignorado' },
 ]
 const PUEBLO_OPTIONS = [
-  { value: 1, label: '1. Maya' }, { value: 2, label: '2. Garífuna' },
-  { value: 3, label: '3. Xinka' }, { value: 4, label: '4. Mestizo, Ladino' },
-  { value: 5, label: '5. Ninguno' }, { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Maya' }, { value: 2, label: 'Garífuna' },
+  { value: 3, label: 'Xinka' }, { value: 4, label: 'Mestizo, Ladino' },
+  { value: 5, label: 'Ninguno' }, { value: 9, label: 'Ignorado' },
 ]
 const ESCOLARIDAD_OPTIONS = [
-  { value: 0, label: '0. Ninguna' },
-  { value: 1, label: '1. Primaria incompleta' }, { value: 2, label: '2. Primaria completa' },
-  { value: 3, label: '3. Básico incompleto' },   { value: 4, label: '4. Básico completo' },
-  { value: 5, label: '5. Diversificado incompleto' }, { value: 6, label: '6. Diversificado completo' },
-  { value: 7, label: '7. Universitario incompleto' }, { value: 8, label: '8. Universitario completo' },
-  { value: 9, label: '9. Ignorado' },
+  { value: 0, label: 'Ninguna' },
+  { value: 1, label: 'Primaria incompleta' }, { value: 2, label: 'Primaria completa' },
+  { value: 3, label: 'Básico incompleto' },   { value: 4, label: 'Básico completo' },
+  { value: 5, label: 'Diversificado incompleto' }, { value: 6, label: 'Diversificado completo' },
+  { value: 7, label: 'Universitario incompleto' }, { value: 8, label: 'Universitario completo' },
+  { value: 9, label: 'Ignorado' },
 ]
 
 export default function DefSeccionII() {
@@ -52,9 +52,9 @@ export default function DefSeccionII() {
               <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>7. Sexo *</FormLabel>
               <RadioGroup row {...field} value={field.value ?? ''}
                 onChange={(e) => field.onChange(Number(e.target.value))}>
-                <FormControlLabel value={1} control={<Radio size="small" />} label="1. Hombre" />
-                <FormControlLabel value={2} control={<Radio size="small" />} label="2. Mujer" />
-                <FormControlLabel value={9} control={<Radio size="small" />} label="9. Ignorado" />
+                <FormControlLabel value={1} control={<Radio size="small" />} label="Hombre" />
+                <FormControlLabel value={2} control={<Radio size="small" />} label="Mujer" />
+                <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
               </RadioGroup>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
             </FormControl>

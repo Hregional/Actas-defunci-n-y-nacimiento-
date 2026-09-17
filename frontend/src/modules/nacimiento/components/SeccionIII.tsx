@@ -37,13 +37,13 @@ const TIPO_PARTO_OPTS = [
 ]
 
 const PERSONA_OPTIONS = [
-  { value: 1, label: '1. Médico' },
-  { value: 2, label: '2. Personal de enfermería' },
-  { value: 3, label: '3. Paramédico' },
-  { value: 4, label: '4. Comadrona' },
-  { value: 5, label: '5. Empírica' },
-  { value: 6, label: '6. Ninguna' },
-  { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Médico' },
+  { value: 2, label: 'Personal de enfermería' },
+  { value: 3, label: 'Paramédico' },
+  { value: 4, label: 'Comadrona' },
+  { value: 5, label: 'Empírica' },
+  { value: 6, label: 'Ninguna' },
+  { value: 9, label: 'Ignorado' },
 ]
 
 export default function SeccionIII() {

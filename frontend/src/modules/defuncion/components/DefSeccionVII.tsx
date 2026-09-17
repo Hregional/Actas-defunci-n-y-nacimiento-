@@ -7,16 +7,16 @@ import SectionCard from '@/shared/components/common/SectionCard'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 const ASISTENCIA_OPTIONS = [
-  { value: 1, label: '1. Médica' }, { value: 2, label: '2. Paramédica' },
-  { value: 3, label: '3. Comadrona' }, { value: 4, label: '4. Empírica' },
-  { value: 5, label: '5. Ninguna' }, { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Médica' }, { value: 2, label: 'Paramédica' },
+  { value: 3, label: 'Comadrona' }, { value: 4, label: 'Empírica' },
+  { value: 5, label: 'Ninguna' }, { value: 9, label: 'Ignorado' },
 ]
 const LUGAR_DEFUNCION_OPTIONS = [
-  { value: 1, label: '1. Hospital Público' }, { value: 2, label: '2. Hospital Privado' },
-  { value: 3, label: '3. Otros servicios de salud pública' }, { value: 4, label: '4. IGSS' },
-  { value: 5, label: '5. Vía Pública' }, { value: 6, label: '6. Domicilio' },
-  { value: 7, label: '7. Lugar de trabajo' }, { value: 8, label: '8. Otro' },
-  { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Hospital Público' }, { value: 2, label: 'Hospital Privado' },
+  { value: 3, label: 'Otros servicios de salud pública' }, { value: 4, label: 'IGSS' },
+  { value: 5, label: 'Vía Pública' }, { value: 6, label: 'Domicilio' },
+  { value: 7, label: 'Lugar de trabajo' }, { value: 8, label: 'Otro' },
+  { value: 9, label: 'Ignorado' },
 ]
 
 export default function DefSeccionVII() {
@@ -32,8 +32,8 @@ export default function DefSeccionVII() {
               <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>39. Hubo necropsia *</FormLabel>
               <RadioGroup row {...field} value={field.value ?? ''}
                 onChange={(e) => field.onChange(Number(e.target.value))}>
-                <FormControlLabel value={1} control={<Radio size="small" />} label="1. Sí" />
-                <FormControlLabel value={2} control={<Radio size="small" />} label="2. No" />
+                <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
+                <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
               </RadioGroup>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
             </FormControl>

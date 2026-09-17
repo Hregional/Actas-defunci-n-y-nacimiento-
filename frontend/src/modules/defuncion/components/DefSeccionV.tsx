@@ -8,23 +8,23 @@ import SectionCard from '@/shared/components/common/SectionCard'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 const PRESUNTO_OPTIONS = [
-  { value: 1, label: '1. Suicidio' },
-  { value: 2, label: '2. Homicidio' },
-  { value: 3, label: '3. Accidente' },
-  { value: 9, label: '9. Ignorado' },
+  { value: 1, label: 'Suicidio' },
+  { value: 2, label: 'Homicidio' },
+  { value: 3, label: 'Accidente' },
+  { value: 9, label: 'Ignorado' },
 ]
 
 const LUGAR_LESION_OPTIONS = [
-  { value: 0, label: '0. Vivienda' },
-  { value: 1, label: '1. Institución residencial' },
-  { value: 2, label: '2. Escuela u oficina pública' },
-  { value: 3, label: '3. Áreas deportivas' },
-  { value: 4, label: '4. Calle o carretera (vía pública)' },
-  { value: 5, label: '5. Área comercial o de servicios' },
-  { value: 6, label: '6. Área industrial (taller, fábrica u obra)' },
-  { value: 7, label: '7. Granja (rancho o parcela)' },
-  { value: 8, label: '8. Otro' },
-  { value: 9, label: '9. Ignorado' },
+  { value: 0, label: 'Vivienda' },
+  { value: 1, label: 'Institución residencial' },
+  { value: 2, label: 'Escuela u oficina pública' },
+  { value: 3, label: 'Áreas deportivas' },
+  { value: 4, label: 'Calle o carretera (vía pública)' },
+  { value: 5, label: 'Área comercial o de servicios' },
+  { value: 6, label: 'Área industrial (taller, fábrica u obra)' },
+  { value: 7, label: 'Granja (rancho o parcela)' },
+  { value: 8, label: 'Otro' },
+  { value: 9, label: 'Ignorado' },
 ]
 
 export default function DefSeccionV() {
@@ -97,9 +97,9 @@ export default function DefSeccionV() {
                   19.2 Ocurrió en el desempeño de su trabajo
                 </FormLabel>
                 <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="1. Sí" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="2. No" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="9. Ignorado" />
+                  <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
+                  <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
+                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
                 </RadioGroup>
               </FormControl>
             )}
@@ -116,9 +116,9 @@ export default function DefSeccionV() {
                   19.3 Fue accidente de tránsito
                 </FormLabel>
                 <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="1. Sí" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="2. No" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="9. Ignorado" />
+                  <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
+                  <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
+                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
                 </RadioGroup>
               </FormControl>
             )}

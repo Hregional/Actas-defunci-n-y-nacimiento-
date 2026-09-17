@@ -15,9 +15,9 @@ import { INSTITUCION }    from '@/shared/constants/institucion'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 const QUIEN_INFORMA_OPTIONS = [
-  { value: 1, label: '1. Médico' },
-  { value: 2, label: '2. Paramédico' },
-  { value: 3, label: '3. Autoridad' },
+  { value: 1, label: 'Médico' },
+  { value: 2, label: 'Paramédico' },
+  { value: 3, label: 'Autoridad' },
 ]
 
 export default function DefSeccionI() {
