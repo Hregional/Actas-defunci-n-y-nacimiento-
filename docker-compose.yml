@@ -76,7 +76,7 @@ services:
       KEYCLOAK_REALM:  ${KEYCLOAK_REALM:-Hospital-O}
       KEYCLOAK_CLIENT: ${VITE_KEYCLOAK_CLIENT:-sistema-actas-frontend}
     ports:
-      - "3001:80"
+      - "${FRONTEND_PORT:-4200}:80"
     depends_on:
       backend:
         condition: service_healthy
