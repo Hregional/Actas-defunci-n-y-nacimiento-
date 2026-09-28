@@ -28,6 +28,12 @@ public interface InformeNacimientoMapper {
     @Mapping(target = "ninoNombreCompleto", expression = "java(buildNombreCompleto(entity))")
     @Mapping(target = "ninoSexo", source = "ninoSexo")
     @Mapping(target = "suscribeNombresApellidos", source = "suscribeNombresApellidos")
+    @Mapping(target = "madrePrimerNombre",    source = "madrePrimerNombre")
+    @Mapping(target = "madreSegundoNombre",   source = "madreSegundoNombre")
+    @Mapping(target = "madrePrimerApellido",  source = "madrePrimerApellido")
+    @Mapping(target = "madreSegundoApellido", source = "madreSegundoApellido")
+    @Mapping(target = "madreApellidoCasada",  source = "madreApellidoCasada")
+    @Mapping(target = "madreCuiCedula",       source = "madreCuiCedula")
     InformeNacimientoListDTO toListDTO(InformeNacimiento entity);
 
     List<InformeNacimientoListDTO> toListDTOs(List<InformeNacimiento> entities);

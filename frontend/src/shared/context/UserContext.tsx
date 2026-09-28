@@ -75,10 +75,15 @@ const UserContext = createContext<UserContextValue>({
 })
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { authenticated, tokenParsed } = useKeycloak()
+  const { authenticated, tokenParsed, initialized } = useKeycloak()
   const [usuario, setUsuario] = useState<UsuarioSuscriptor>(ESTADO_INICIAL)
 
   useEffect(() => {
+    // Esperar a que Keycloak termine de inicializar
+    if (!initialized) {
+      return
+    }
+
     if (!authenticated || !tokenParsed) {
       setUsuario((p) => ({ ...p, cargando: false }))
       return
@@ -132,7 +137,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       cargando:         false,
       advertencia,
     }))
-  }, [authenticated, tokenParsed])
+  }, [authenticated, tokenParsed, initialized])
 
   const actualizarCampoEditable = (
     campo: 'noColegiado' | 'noRegistroComadrona',

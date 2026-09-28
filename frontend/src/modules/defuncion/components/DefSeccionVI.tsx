@@ -4,14 +4,15 @@ import {
   FormHelperText, FormLabel, RadioGroup, FormControlLabel, Radio,
   Typography, Divider, Alert,
 } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import Diversity3Icon from '@mui/icons-material/Diversity3'
 import SectionCard from '@/shared/components/common/SectionCard'
+import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 const ESTADO_CIVIL_OPTIONS = [
-  { value: 1, label: 'Soltero(a)' },
-  { value: 2, label: 'Casado(a)' },
-  { value: 3, label: 'Unido(a)' },
-  { value: 9, label: 'Ignorado' },
+  { value: 1, label: 'Soltera', icon: <PersonIcon sx={{ fontSize: 20 }} />, color: '#9C27B0' },
+  { value: 2, label: 'Casada', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#E91E63' },
 ]
 
 const PUEBLO_OPTIONS = [
@@ -113,24 +114,29 @@ export default function DefSeccionVI() {
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        {/* Estado civil en tarjetas */}
+        <Grid item xs={12}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+            24. ESTADO CIVIL
+          </Typography>
           <Controller
             name="mortinatoMadreEstadoCivil"
             control={control}
             render={({ field, fieldState }) => (
-              <FormControl error={!!fieldState.error} fullWidth size="small">
-                <InputLabel>24. Estado civil</InputLabel>
-                <Select {...field} value={field.value ?? ''} label="24. Estado civil"
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
-                  {ESTADO_CIVIL_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
-                </Select>
-                {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
-              </FormControl>
+              <CardOptionGroup
+                label=""
+                options={ESTADO_CIVIL_OPTIONS}
+                value={field.value ?? null}
+                onChange={field.onChange}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="sm"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={12}>
           <Controller
             name="mortinatoMadrePuebloPertenencia"
             control={control}
@@ -139,7 +145,6 @@ export default function DefSeccionVI() {
                 <InputLabel>25. Pueblo de pertenencia</InputLabel>
                 <Select {...field} value={field.value ?? ''} label="25. Pueblo de pertenencia"
                   onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
                   {PUEBLO_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
                 </Select>
                 {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
@@ -153,13 +158,13 @@ export default function DefSeccionVI() {
             26. Residencia
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Dirección exacta" {...register('mortinatoMadreResidenciaDireccion')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 255 }} />
+        <Grid item xs={12}>
+          <TextField label="Dirección exacta" {...register('mortinatoMadreResidenciaDireccion')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 150 }} />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <TextField label="Municipio" {...register('mortinatoMadreResidenciaMunicipio')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <TextField label="Departamento" {...register('mortinatoMadreResidenciaDepartamento')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
         </Grid>
 
@@ -191,7 +196,6 @@ export default function DefSeccionVI() {
                 <InputLabel>29. Escolaridad</InputLabel>
                 <Select {...field} value={field.value ?? ''} label="29. Escolaridad"
                   onChange={(e) => field.onChange(e.target.value !== '' ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
                   {ESCOLARIDAD_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
                 </Select>
                 {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}

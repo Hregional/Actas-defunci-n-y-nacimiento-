@@ -1,13 +1,13 @@
 /**
  * CSS compartido para los previews de impresión.
- * - Formato hoja legal (oficio)
+ * - Formato hoja carta (letter) fijo — no se afecta al cambiar escala en el diálogo de impresión
  * - Color negro (excepto logos que van a color)
  * - Frente en página 1, reverso en página 2
  * - Mismo formato para Nacimiento y Defunción
  */
 export const PRINT_CSS = `
   @page {
-    size: legal portrait;
+    size: letter portrait;
     margin: 6mm 8mm;
   }
   *, *::before, *::after {
@@ -17,9 +17,10 @@ export const PRINT_CSS = `
   }
   body {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 7.5pt;
+    font-size: 8pt;
     color: #000;
     background: #fff;
+    width: 216mm;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -78,7 +79,7 @@ export const PRINT_CSS = `
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
 
   /* ── Campo individual ──────────────────────────────────── */
@@ -88,25 +89,29 @@ export const PRINT_CSS = `
   .f-third    { flex: 0 0 calc(33.33% - 3px); }
   .f-quarter  { flex: 0 0 calc(25% - 3px); }
   .f-fifth    { flex: 0 0 calc(20% - 4px); }
+  .f-sixth    { flex: 0 0 calc(16.66% - 4px); }
 
   .f-lbl {
-    font-size: 6pt;
-    color: #000;
-    font-weight: 600;
+    font-size: 5.5pt;
+    color: #444;
+    font-weight: 400;
     display: block;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
     line-height: 1.2;
     font-family: Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   .f-val {
     border-bottom: 1.5px solid #000;
-    min-height: 14px;
-    font-size: 7.5pt;
-    padding-bottom: 1px;
+    min-height: 15px;
+    font-size: 8pt;
+    padding: 1px 0 2px;
     font-weight: 700;
     font-family: Arial, Helvetica, sans-serif;
     word-break: break-word;
     color: #000;
+    line-height: 1.3;
   }
 
   /* ── Causa de defunción ────────────────────────────────── */

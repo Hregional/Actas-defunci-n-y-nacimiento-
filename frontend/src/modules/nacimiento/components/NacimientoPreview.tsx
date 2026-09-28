@@ -68,15 +68,9 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
         <Typography variant="h6" fontWeight={700} color="white">
           Vista previa — Informe de Nacimiento
         </Typography>
-        <Box display="flex" gap={1}>
-          <Button variant="contained" startIcon={<PrintIcon />} onClick={print} size="small"
-            sx={{ bgcolor: 'white', color: '#1a1a1a', '&:hover': { bgcolor: '#f0f0f0' } }}>
-            Imprimir / PDF
-          </Button>
-          <IconButton onClick={onClose} size="small" sx={{ color: 'white' }}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color: 'white' }}>
+          <CloseIcon />
+        </IconButton>
       </Box>
 
       <DialogContent sx={{ p: 2, bgcolor: '#e8e8e8' }}>
@@ -100,54 +94,55 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
 
           <SB t="I. DATOS DEL QUE SUSCRIBE" />
           <div className="row">
-            <F l="Nombres y Apellidos" v={data.suscribeNombresApellidos} cls="f-full" />
-            <F l="Documento personal de identificación - DPI" v={data.suscribeCuiCedula} cls="f-full" />
-            <F l="No. Colegiado (si es profesional)" v={data.suscribeNoColegiado} cls="f-half" />
-            <F l="No. de Registro (si es comadrona)" v={data.suscribeNoRegistroComadrona} cls="f-half" />
+            <F l="Nombres y Apellidos" v={data.suscribeNombresApellidos} cls="f-half" />
+            <F l="Documento personal de identificación - DPI" v={data.suscribeCuiCedula} cls="f-quarter" />
+            <F l="No. Colegiado (si es profesional)" v={data.suscribeNoColegiado} cls="f-quarter" />
+          </div>
+          <div className="row">
             <F l="Quién Informa el nacimiento"
-              v={data.suscribeQuienInforma ? `${data.suscribeQuienInforma}. ${QUIEN_INFORMA[data.suscribeQuienInforma] ?? ''}` : ''}
+              v={data.suscribeQuienInforma ? QUIEN_INFORMA[data.suscribeQuienInforma] ?? '' : ''}
               cls="f-full" />
           </div>
 
           <SB t="II. DATOS DEL LUGAR DE NACIMIENTO" />
           <div className="row">
-            <F l="1. Departamento" v={data.lugarDepartamento} cls="f-half" />
-            <F l="2. Municipio" v={data.lugarMunicipio} cls="f-half" />
-            <F l="3. Dirección" v={data.lugarDireccion} cls="f-full" />
+            <F l="1. Departamento" v={data.lugarDepartamento} cls="f-third" />
+            <F l="2. Municipio" v={data.lugarMunicipio} cls="f-third" />
             <F l="4. Lugar donde ocurrió el nacimiento"
-              v={data.lugarOcurrioNacimiento ? `${data.lugarOcurrioNacimiento}. ${LUGAR_NAC[data.lugarOcurrioNacimiento] ?? ''}` : ''}
-              cls="f-full" />
+              v={data.lugarOcurrioNacimiento ? LUGAR_NAC[data.lugarOcurrioNacimiento] ?? '' : ''}
+              cls="f-third" />
+          </div>
+          <div className="row">
+            <F l="3. Dirección" v={data.lugarDireccion} cls="f-full" />
           </div>
 
           <SB t="III. DATOS DEL NIÑO (A) Y DEL NACIMIENTO" />
           <div className="row">
             <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>5. NOMBRE</span>
-            <F l="Primer nombre" v={data.ninoPrimerNombre} cls="f-third" />
-            <F l="Segundo nombre" v={data.ninoSegundoNombre} cls="f-third" />
-            <F l="Tercer nombre" v={data.ninoTercerNombre} cls="f-third" />
-            <F l="Primer apellido" v={data.ninoPrimerApellido} cls="f-half" />
-            <F l="Segundo apellido" v={data.ninoSegundoApellido} cls="f-half" />
+            <F l="Primer nombre" v={data.ninoPrimerNombre} cls="f-fifth" />
+            <F l="Segundo nombre" v={data.ninoSegundoNombre} cls="f-fifth" />
+            <F l="Tercer nombre" v={data.ninoTercerNombre} cls="f-fifth" />
+            <F l="Primer apellido" v={data.ninoPrimerApellido} cls="f-fifth" />
+            <F l="Segundo apellido" v={data.ninoSegundoApellido} cls="f-fifth" />
           </div>
           <div className="row">
-            <F l="6. Fecha de nacimiento (DD/MM/YYYY)" v={fecha} cls="f-third" />
-            <F l="7. Hora (horas y minutos)" v={data.ninoHoraNacimiento} cls="f-third" />
-            <F l="8. Sexo" v={data.ninoSexo ? `${data.ninoSexo}. ${SEXO[data.ninoSexo]}` : ''} cls="f-third" />
+            <F l="6. Fecha de nacimiento" v={fecha} cls="f-quarter" />
+            <F l="7. Hora (horas y minutos)" v={data.ninoHoraNacimiento} cls="f-quarter" />
+            <F l="8. Sexo" v={data.ninoSexo ? SEXO[data.ninoSexo] : ''} cls="f-quarter" />
+            <F l="11. Edad gestacional (semanas)" v={data.ninoEdadGestacionalSemanas?.toString()} cls="f-quarter" />
           </div>
           <div className="row">
-            <F l="9. Peso (libras)" v={data.ninoPesoLibras?.toString()} cls="f-quarter" />
+            <F l="9. Peso libras" v={data.ninoPesoLibras?.toString()} cls="f-quarter" />
             <F l="Onzas" v={data.ninoPesoOnzas?.toString()} cls="f-quarter" />
             <F l="10. Talla (cm)" v={data.ninoTallaCm?.toString()} cls="f-quarter" />
-            <F l="11. Edad gestacional (semanas)" v={data.ninoEdadGestacionalSemanas?.toString()} cls="f-quarter" />
+            <F l="14. No. hijos nacidos en el parto" v={data.ninoNumHijosNacidosParto?.toString()} cls="f-quarter" />
           </div>
           <div className="row">
             <F l="12. Anomalías congénitas visibles" v={data.ninoAnomaliasCongenitas ? ANOMALIAS[data.ninoAnomaliasCongenitas] : ''} cls="f-third" />
             <F l="13. Tipo de parto" v={data.ninoTipoParto ? TIPO_PARTO[data.ninoTipoParto] : ''} cls="f-third" />
-            <F l="14. No. hijos nacidos en el parto" v={data.ninoNumHijosNacidosParto?.toString()} cls="f-third" />
-          </div>
-          <div className="row">
             <F l="15. Persona que atendió el parto"
-              v={data.ninoPersonaAtendioElParto ? `${data.ninoPersonaAtendioElParto}. ${PERSONA_PARTO[data.ninoPersonaAtendioElParto]}` : ''}
-              cls="f-full" />
+              v={data.ninoPersonaAtendioElParto ? PERSONA_PARTO[data.ninoPersonaAtendioElParto] : ''}
+              cls="f-third" />
           </div>
           <div className="row">
             <F l="16. Total hijos de la madre (incluyendo este)" v={data.ninoTotalHijosMadre?.toString()} cls="f-third" />
@@ -165,50 +160,55 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
             <F l="Apellido de casada" v={data.madreApellidoCasada} cls="f-fifth" />
           </div>
           <div className="row">
-            <F l="18. Documento personal de identificación - DPI" v={data.madreCuiCedula} cls="f-full" />
-            <F l="19. Edad" v={data.madreEdad?.toString()} cls="f-quarter" />
+            <F l="18. DPI" v={data.madreCuiCedula} cls="f-quarter" />
+            <F l="19. Edad" v={data.madreEdad?.toString()} cls="f-sixth" />
             <F l="20. Nacionalidad" v={data.madreNacionalidad} cls="f-quarter" />
-            <F l="21. Ocupación u oficio" v={data.madreOcupacion} cls="f-half" />
+            <F l="21. Ocupación u oficio" v={data.madreOcupacion} cls="f-third" />
           </div>
           <div className="row">
             <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>22. Dirección de residencia actual</span>
             <F l="Dirección" v={data.madreDireccion} cls="f-half" />
-            <F l="Zona" v={data.madreZona} />
-            <F l="Municipio" v={data.madreMunicipio} />
-            <F l="Departamento" v={data.madreDepartamento} />
+            <F l="Zona" v={data.madreZona} cls="f-sixth" />
+            <F l="Municipio" v={data.madreMunicipio} cls="f-third" />
+            <F l="Departamento" v={data.madreDepartamento} cls="f-third" />
           </div>
           <div className="row">
-            <F l="23. Pueblo de pertenencia" v={data.madrePuebloPertenencia ? `${data.madrePuebloPertenencia}. ${PUEBLO[data.madrePuebloPertenencia]}` : ''} cls="f-third" />
+            <F l="23. Pueblo de pertenencia" v={data.madrePuebloPertenencia ? PUEBLO[data.madrePuebloPertenencia] : ''} cls="f-third" />
             <F l="24. Estado civil" v={data.madreEstadoCivil ? ESTADO_CIVIL_M[data.madreEstadoCivil] : ''} cls="f-third" />
             <F l="25. Escolaridad" v={data.madreEscolaridad ? ESCOLARIDAD[data.madreEscolaridad] : ''} cls="f-third" />
           </div>
 
-          <SB t="V. DATOS DEL PADRE" />
-          <div className="row">
-            <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>26. NOMBRE</span>
-            <F l="Primer nombre" v={data.padrePrimerNombre} cls="f-quarter" />
-            <F l="Segundo nombre" v={data.padreSegundoNombre} cls="f-quarter" />
-            <F l="Primer apellido" v={data.padrePrimerApellido} cls="f-quarter" />
-            <F l="Segundo apellido" v={data.padreSegundoApellido} cls="f-quarter" />
-          </div>
-          <div className="row">
-            <F l="27. Documento personal de identificación - DPI" v={data.padreCuiCedula} cls="f-full" />
-            <F l="28. Edad" v={data.padreEdad?.toString()} cls="f-quarter" />
-            <F l="29. Nacionalidad" v={data.padreNacionalidad} cls="f-quarter" />
-            <F l="30. Ocupación u oficio" v={data.padreOcupacion} cls="f-half" />
-          </div>
-          <div className="row">
-            <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>31. Dirección de residencia actual</span>
-            <F l="Dirección" v={data.padreDireccion} cls="f-half" />
-            <F l="Zona" v={data.padreZona} />
-            <F l="Municipio" v={data.padreMunicipio} />
-            <F l="Departamento" v={data.padreDepartamento} />
-          </div>
-          <div className="row">
-            <F l="32. Pueblo de pertenencia" v={data.padrePuebloPertenencia ? `${data.padrePuebloPertenencia}. ${PUEBLO[data.padrePuebloPertenencia]}` : ''} cls="f-third" />
-            <F l="33. Estado civil" v={data.padreEstadoCivil ? ESTADO_CIVIL_P[data.padreEstadoCivil] : ''} cls="f-third" />
-            <F l="34. Escolaridad" v={data.padreEscolaridad ? ESCOLARIDAD[data.padreEscolaridad] : ''} cls="f-third" />
-          </div>
+          {/* Sección V: Padre — solo se imprime si hay al menos un dato */}
+          {(data.padrePrimerNombre || data.padrePrimerApellido || data.padreCuiCedula) ? (
+            <>
+              <SB t="V. DATOS DEL PADRE" />
+              <div className="row">
+                <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>26. NOMBRE</span>
+                <F l="Primer nombre" v={data.padrePrimerNombre} cls="f-quarter" />
+                <F l="Segundo nombre" v={data.padreSegundoNombre} cls="f-quarter" />
+                <F l="Primer apellido" v={data.padrePrimerApellido} cls="f-quarter" />
+                <F l="Segundo apellido" v={data.padreSegundoApellido} cls="f-quarter" />
+              </div>
+              <div className="row">
+                <F l="27. DPI" v={data.padreCuiCedula} cls="f-quarter" />
+                <F l="28. Edad" v={data.padreEdad?.toString()} cls="f-sixth" />
+                <F l="29. Nacionalidad" v={data.padreNacionalidad} cls="f-quarter" />
+                <F l="30. Ocupación u oficio" v={data.padreOcupacion} cls="f-third" />
+              </div>
+              <div className="row">
+                <span className="f-lbl f-full" style={{ display: 'block', marginBottom: 2 }}>31. Dirección de residencia actual</span>
+                <F l="Dirección" v={data.padreDireccion} cls="f-half" />
+                <F l="Zona" v={data.padreZona} cls="f-sixth" />
+                <F l="Municipio" v={data.padreMunicipio} cls="f-third" />
+                <F l="Departamento" v={data.padreDepartamento} cls="f-third" />
+              </div>
+              <div className="row">
+                <F l="32. Pueblo de pertenencia" v={data.padrePuebloPertenencia ? PUEBLO[data.padrePuebloPertenencia] : ''} cls="f-third" />
+                <F l="33. Estado civil" v={data.padreEstadoCivil ? ESTADO_CIVIL_P[data.padreEstadoCivil] : ''} cls="f-third" />
+                <F l="34. Escolaridad" v={data.padreEscolaridad ? ESCOLARIDAD[data.padreEscolaridad] : ''} cls="f-third" />
+              </div>
+            </>
+          ) : null}
 
           {/* Bloque de cierre */}
           <div className="close-blk">

@@ -46,14 +46,17 @@ services:
       - ./frontend/vite.config.ts:/app/vite.config.ts
       - ./frontend/tsconfig.json:/app/tsconfig.json
       - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      # .env.local montado para que Vite lo lea y exponga VITE_* al cliente
+      - ./frontend/.env.local:/app/.env.local:ro
       # Excluir node_modules del host (usar el del contenedor)
       - /app/node_modules
     environment:
-      # Variables de Vite
-      VITE_API_URL: /api
-      # API_TARGET es leída por vite.config.ts en Node.js (no por el cliente)
+      # VITE_API_URL apunta directamente al backend expuesto en el host.
+      # Esto elimina el proxy de Vite del flujo y evita los 502 por
+      # conexiones TCP rotas entre contenedores Docker.
+      VITE_API_URL: http://localhost:9090/api
+      # API_TARGET sigue aquí por si se reactiva el proxy en el futuro
       API_TARGET: http://backend:8080
-      # También mantenemos VITE_API_BASE_URL como fallback
       VITE_API_BASE_URL: http://backend:8080
       VITE_KEYCLOAK_URL: ${KEYCLOAK_URL:-https://sso.hro.gob.gt}
       VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-Hospital-O}

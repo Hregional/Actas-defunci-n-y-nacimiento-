@@ -40,10 +40,10 @@ export default function DeptoMuniSelector({
   deptoError,
   muniError,
   deptoGrid = { xs: 12, sm: 6 },
-  muniGrid  = { xs: 12, sm: 6 },
+  muniGrid = { xs: 12, sm: 6 },
   deptoLabel = 'Departamento',
-  muniLabel  = 'Municipio',
-  required   = false,
+  muniLabel = 'Municipio',
+  required = false,
 }: Props) {
   const municipios = useMemo(() => {
     if (!deptoValue) return []

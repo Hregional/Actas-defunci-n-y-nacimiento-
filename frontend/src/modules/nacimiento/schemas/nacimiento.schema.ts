@@ -46,8 +46,8 @@ export const nacimientoSchema = z.object({
                         .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Formato HH:mm inválido')
                         .nullable().optional().or(z.literal('')),
   ninoSexo:                    z.number({ required_error: 'Seleccione sexo' }).min(1).max(2),
-  ninoPesoLibras:              z.number({ required_error: 'Requerido' }).min(0.5, 'Mínimo 0.5 lb').max(15, 'Máximo 15 lb'),
-  ninoPesoOnzas:               z.number().min(0).max(15.9).optional().nullable(),
+  ninoPesoLibras:              z.number({ required_error: 'Requerido' }).min(0.001, 'Mínimo 0.001 lb').max(15.999, 'Máximo 15.999 lb'),
+  ninoPesoOnzas:               z.number().min(0).max(999.999).optional(),
   ninoTallaCm:                 z.number({ required_error: 'Requerido' }).min(20, 'Mínimo 20 cm').max(100, 'Máximo 100 cm'),
   ninoEdadGestacionalSemanas:  z.number({ required_error: 'Requerido' }).min(1).max(45),
   ninoAnomaliasCongenitas:     z.number({ required_error: 'Indique si hubo anomalías' }).min(1).max(2),

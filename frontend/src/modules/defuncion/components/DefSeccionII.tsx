@@ -4,15 +4,23 @@ import {
   FormHelperText, FormLabel, RadioGroup, FormControlLabel, Radio,
   Typography, Divider, Box,
 } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import Diversity3Icon from '@mui/icons-material/Diversity3'
 import SectionCard from '@/shared/components/common/SectionCard'
 import DpiField from '@/shared/components/common/DpiField'
 import SmartField from '@/shared/components/common/SmartField'
 import DeptoMuniSelector from '@/shared/components/common/DeptoMuniSelector'
+import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
-const ESTADO_CIVIL_OPTIONS = [
-  { value: 1, label: 'Soltero(a)' }, { value: 2, label: 'Casado(a)' },
-  { value: 3, label: 'Unido(a)' },   { value: 9, label: 'Ignorado' },
+// Opciones según sexo
+const ESTADO_CIVIL_MASCULINO = [
+  { value: 1, label: 'Soltero', icon: <PersonIcon sx={{ fontSize: 20 }} />, color: '#2196F3' },
+  { value: 2, label: 'Casado', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#1565C0' },
+]
+const ESTADO_CIVIL_FEMENINO = [
+  { value: 1, label: 'Soltera', icon: <PersonIcon sx={{ fontSize: 20 }} />, color: '#9C27B0' },
+  { value: 2, label: 'Casada', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#E91E63' },
 ]
 const PUEBLO_OPTIONS = [
   { value: 1, label: 'Maya' }, { value: 2, label: 'Garífuna' },
@@ -22,14 +30,20 @@ const PUEBLO_OPTIONS = [
 const ESCOLARIDAD_OPTIONS = [
   { value: 0, label: 'Ninguna' },
   { value: 1, label: 'Primaria incompleta' }, { value: 2, label: 'Primaria completa' },
-  { value: 3, label: 'Básico incompleto' },   { value: 4, label: 'Básico completo' },
+  { value: 3, label: 'Básico incompleto' }, { value: 4, label: 'Básico completo' },
   { value: 5, label: 'Diversificado incompleto' }, { value: 6, label: 'Diversificado completo' },
   { value: 7, label: 'Universitario incompleto' }, { value: 8, label: 'Universitario completo' },
   { value: 9, label: 'Ignorado' },
 ]
 
 export default function DefSeccionII() {
-  const { control, formState: { errors } } = useFormContext<DefuncionFormValues>()
+  const { control, watch, formState: { errors } } = useFormContext<DefuncionFormValues>()
+  const sexo = watch('fallecidoSexo')  // Observar el sexo seleccionado
+
+  // Determinar opciones de estado civil según sexo
+  const estadoCivilOptions = sexo === 1 ? ESTADO_CIVIL_MASCULINO :
+    sexo === 2 ? ESTADO_CIVIL_FEMENINO :
+      ESTADO_CIVIL_MASCULINO  // Por defecto masculino si no hay selección
 
   return (
     <SectionCard title="II. Datos del fallecido (a)" subtitle="FALLECIÓ:">
@@ -92,7 +106,7 @@ export default function DefSeccionII() {
 
         <Grid item xs={12}><Divider /></Grid>
 
-        {/* Documento CUI */}
+        {/* Documento CUI — fila completa para que DPI no compita con otros campos */}
         <Grid item xs={12}>
           <Typography variant="caption" color="text.secondary" fontWeight={600}>
             9. Documento de Identificación *
@@ -105,19 +119,15 @@ export default function DefSeccionII() {
               error={!!fieldState.error} helperText={fieldState.error?.message} />
           )} />
         </Grid>
-        <Grid item xs={4} sm={2}>
+        <Grid item xs={12} sm={6} sx={{ display: 'flex', gap: 1 }}>
           <Controller name="fallecidoDocLibro" control={control} render={({ field }) => (
             <SmartField label="No. Libro" fieldType="alphanumeric" maxLen={50}
               value={field.value ?? ''} onChange={field.onChange} />
           )} />
-        </Grid>
-        <Grid item xs={4} sm={2}>
           <Controller name="fallecidoDocFolio" control={control} render={({ field }) => (
             <SmartField label="No. Folio" fieldType="alphanumeric" maxLen={50}
               value={field.value ?? ''} onChange={field.onChange} />
           )} />
-        </Grid>
-        <Grid item xs={4} sm={2}>
           <Controller name="fallecidoDocPartida" control={control} render={({ field }) => (
             <SmartField label="No. Partida" fieldType="alphanumeric" maxLen={50}
               value={field.value ?? ''} onChange={field.onChange} />
@@ -176,40 +186,44 @@ export default function DefSeccionII() {
           )} />
         </Grid>
 
-        {/* Estado civil, pueblo, escolaridad */}
-        <Grid item xs={12} sm={4}>
+        {/* Estado civil en tarjetas */}
+        <Grid item xs={12}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+            13. ESTADO CIVIL *
+          </Typography>
           <Controller name="fallecidoEstadoCivil" control={control} render={({ field, fieldState }) => (
-            <FormControl error={!!fieldState.error} fullWidth size="small">
-              <InputLabel>13. Estado civil *</InputLabel>
-              <Select {...field} value={field.value ?? ''} label="13. Estado civil *"
-                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
-                {ESTADO_CIVIL_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
-              </Select>
-              {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
-            </FormControl>
+            <CardOptionGroup
+              label=""
+              options={estadoCivilOptions}
+              value={field.value ?? null}
+              onChange={field.onChange}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              direction="row"
+              size="sm"
+            />
           )} />
         </Grid>
-        <Grid item xs={12} sm={4}>
+
+        {/* Pueblo y escolaridad */}
+        <Grid item xs={12} sm={6}>
           <Controller name="fallecidoPuebloPertenencia" control={control} render={({ field, fieldState }) => (
             <FormControl error={!!fieldState.error} fullWidth size="small">
               <InputLabel>14. Pueblo de pertenencia *</InputLabel>
               <Select {...field} value={field.value ?? ''} label="14. Pueblo de pertenencia *"
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {PUEBLO_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
             </FormControl>
           )} />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
           <Controller name="fallecidoEscolaridad" control={control} render={({ field, fieldState }) => (
             <FormControl error={!!fieldState.error} fullWidth size="small">
               <InputLabel>16. Escolaridad *</InputLabel>
               <Select {...field} value={field.value ?? ''} label="16. Escolaridad *"
                 onChange={(e) => field.onChange(e.target.value !== '' ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {ESCOLARIDAD_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
@@ -223,9 +237,10 @@ export default function DefSeccionII() {
             15. Residencia *
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        {/* Dirección en fila completa para dar espacio suficiente */}
+        <Grid item xs={12}>
           <Controller name="fallecidoResidenciaDireccion" control={control} render={({ field }) => (
-            <SmartField label="Dirección exacta *" fieldType="text" maxLen={255} required
+            <SmartField label="Dirección exacta *" fieldType="text" maxLen={150} required
               value={field.value ?? ''} onChange={field.onChange}
               error={!!errors.fallecidoResidenciaDireccion} helperText={errors.fallecidoResidenciaDireccion?.message} />
           )} />

@@ -47,7 +47,6 @@ export default function DefSeccionVII() {
               <InputLabel>40. Clase de asistencia recibida *</InputLabel>
               <Select {...field} value={field.value ?? ''} label="40. Clase de asistencia recibida *"
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {ASISTENCIA_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
@@ -62,7 +61,6 @@ export default function DefSeccionVII() {
               <InputLabel>41. Lugar de defunción *</InputLabel>
               <Select {...field} value={field.value ?? ''} label="41. Lugar de defunción *"
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {LUGAR_DEFUNCION_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}

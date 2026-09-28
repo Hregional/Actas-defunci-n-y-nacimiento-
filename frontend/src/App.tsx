@@ -8,6 +8,7 @@ import NacimientoFormPage from '@/modules/nacimiento/pages/NacimientoFormPage'
 import DefuncionListPage  from '@/modules/defuncion/pages/DefuncionListPage'
 import DefuncionFormPage  from '@/modules/defuncion/pages/DefuncionFormPage'
 import AdminUsuariosPage  from '@/modules/admin/pages/AdminUsuariosPage'
+import InitializationGuard from '@/shared/components/guards/InitializationGuard'
 import { useCurrentUser } from '@/shared/context/UserContext'
 import { useKeycloak } from '@/shared/context/KeycloakContext'
 
@@ -56,32 +57,34 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route index element={<Dashboard />} />
+    <InitializationGuard>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route index element={<Dashboard />} />
 
-        {/* Nacimiento */}
-        <Route path="/nacimientos"            element={<NacimientoListPage />} />
-        <Route path="/nacimientos/nuevo"      element={<NacimientoFormPage />} />
-        <Route path="/nacimientos/:id/editar" element={<NacimientoFormPage />} />
+          {/* Nacimiento */}
+          <Route path="/nacimientos"            element={<NacimientoListPage />} />
+          <Route path="/nacimientos/nuevo"      element={<NacimientoFormPage />} />
+          <Route path="/nacimientos/:id/editar" element={<NacimientoFormPage />} />
 
-        {/* Defunción */}
-        <Route path="/defunciones"            element={<DefuncionListPage />} />
-        <Route path="/defunciones/nuevo"      element={<DefuncionFormPage />} />
-        <Route path="/defunciones/:id/editar" element={<DefuncionFormPage />} />
+          {/* Defunción */}
+          <Route path="/defunciones"            element={<DefuncionListPage />} />
+          <Route path="/defunciones/nuevo"      element={<DefuncionFormPage />} />
+          <Route path="/defunciones/:id/editar" element={<DefuncionFormPage />} />
 
-        {/* Admin — solo actas-admin */}
-        <Route
-          path="/admin/usuarios"
-          element={
-            <AdminRoute>
-              <AdminUsuariosPage />
-            </AdminRoute>
-          }
-        />
+          {/* Admin — solo actas-admin */}
+          <Route
+            path="/admin/usuarios"
+            element={
+              <AdminRoute>
+                <AdminUsuariosPage />
+              </AdminRoute>
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </InitializationGuard>
   )
 }

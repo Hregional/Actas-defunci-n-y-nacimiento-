@@ -24,8 +24,8 @@ export interface MedicalNumberFieldProps
   min?: number
   /** Máximo permitido según rango clínico */
   max?: number
-  /** Número máximo de decimales (0, 1 o 2). Default: 1 */
-  decimals?: 0 | 1 | 2
+  /** Número máximo de decimales (0, 1, 2 o 3). Default: 1 */
+  decimals?: 0 | 1 | 2 | 3
   /** Unidad a mostrar a la derecha (lb, oz, cm, sem) */
   unit?: string
   /** Rango clínico descriptivo para el tooltip (ej: "0.5 – 15.0 lb") */
@@ -71,34 +71,36 @@ export default function MedicalNumberField({
     const nav  = ['Backspace','Delete','Tab','Escape','Enter','ArrowLeft','ArrowRight','Home','End']
     if (ctrl || nav.includes(e.key)) return
 
-    // Solo dígitos
+    const current = value ?? ''
+
+    // ── Dígito ──
     if (/^\d$/.test(e.key)) {
-      // Bloquear si agregar este dígito superaría el max
-      if (max !== undefined) {
-        const tentative = parseFloat((value ?? '') + e.key)
-        if (!isNaN(tentative) && tentative > max) {
-          e.preventDefault()
-          return
-        }
-      }
-      // Bloquear si ya se alcanzó el maxDigits en la parte entera
-      const intPart = (value ?? '').split('.')[0]
-      if (intPart.length >= maxDigits && !(value ?? '').includes('.')) {
+      const hasDot   = current.includes('.')
+      const intPart  = current.split('.')[0]
+
+      // Si el cursor está en la parte decimal, siempre permitir
+      // (el límite de decimales lo aplica handleChange)
+      if (hasDot) return
+
+      // Bloquear si ya se alcanzó maxDigits en la parte entera
+      if (intPart.length >= maxDigits) {
         e.preventDefault()
         return
       }
       return
     }
 
-    // Punto decimal — solo uno, y solo si decimals > 0
+    // ── Punto decimal ──
     if (e.key === '.') {
-      if (decimals === 0 || value.includes('.')) {
+      const hasDot = current.includes('.')
+      // Bloquear si no se permiten decimales o ya hay un punto
+      if (decimals === 0 || hasDot) {
         e.preventDefault()
       }
       return
     }
 
-    // Todo lo demás bloqueado
+    // Todo lo demás bloqueado (letras, símbolos, etc.)
     e.preventDefault()
   }
 

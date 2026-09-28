@@ -43,7 +43,6 @@ export default function DefSeccionIII() {
                   label="17. La muerte ocurrió durante"
                   onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                 >
-                  <MenuItem value=""><em>No aplica / Seleccionar</em></MenuItem>
                   {MUERTE_DURANTE_OPTIONS.map(o => (
                     <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
                   ))}

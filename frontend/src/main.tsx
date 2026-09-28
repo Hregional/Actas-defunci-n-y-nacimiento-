@@ -9,6 +9,7 @@ import 'dayjs/locale/es'
 import { buildTheme } from '@/theme/theme'
 import { KeycloakProvider } from '@/shared/context/KeycloakContext'
 import { UserProvider }     from '@/shared/context/UserContext'
+import ErrorBoundary from '@/shared/components/errors/ErrorBoundary'
 import App from './App.tsx'
 import './index.css'
 
@@ -59,20 +60,22 @@ function Root() {
   }, [mode])
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <KeycloakProvider>
-        <QueryClientProvider client={queryClient}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-            <UserProvider>
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-            </UserProvider>
-          </LocalizationProvider>
-        </QueryClientProvider>
-      </KeycloakProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <KeycloakProvider>
+          <QueryClientProvider client={queryClient}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+              <UserProvider>
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+              </UserProvider>
+            </LocalizationProvider>
+          </QueryClientProvider>
+        </KeycloakProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 

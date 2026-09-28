@@ -1,14 +1,14 @@
 /**
  * Sección III — Datos del niño(a) y del nacimiento
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import {
   Grid, Typography, Divider,
   FormControl, InputLabel, Select, MenuItem, FormHelperText,
+  TextField, InputAdornment,
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import dayjs from 'dayjs'
+import DateWheelField from '@/shared/components/common/DateWheelField'
 import MaleIcon          from '@mui/icons-material/Male'
 import FemaleIcon        from '@mui/icons-material/Female'
 import CheckCircleIcon   from '@mui/icons-material/CheckCircle'
@@ -49,10 +49,13 @@ const PERSONA_OPTIONS = [
 export default function SeccionIII() {
   const { control, watch, setValue } = useFormContext<NacimientoFormValues>()
 
+  // ── Estado local: kilogramos (no va al schema ni al DTO) ────────────────
+  const [pesoKg, setPesoKg] = useState('')
+
   // ── Observar campos del formulario ──────────────────────────────────────
-  const pesoLbForm    = watch('ninoPesoLibras')
-  const pesoOzForm    = watch('ninoPesoOnzas')
-  const totalHijos    = watch('ninoTotalHijosMadre')
+  const pesoLbForm     = watch('ninoPesoLibras')
+  const pesoOzForm     = watch('ninoPesoOnzas')
+  const totalHijos     = watch('ninoTotalHijosMadre')
   const nacidosMuertos = watch('ninoHijosNacidosMuertos')
 
   // Calcular "viven" automáticamente cuando cambian total o nacidos muertos
@@ -63,15 +66,24 @@ export default function SeccionIII() {
     setValue('ninoHijosViven', viven, { shouldValidate: false })
   }, [totalHijos, nacidosMuertos, setValue])
 
-  // Handlers simples SIN conversión automática
-  const handlePesoLbChange = (v: string) => {
-    const lb = parseFloat(v)
-    setValue('ninoPesoLibras', (v !== '' ? lb : null) as unknown as number, { shouldValidate: true })
-  }
-
-  const handlePesoOzChange = (v: string) => {
-    const oz = parseFloat(v)
-    setValue('ninoPesoOnzas', (v !== '' ? oz : null) as unknown as number, { shouldValidate: true })
+  // ── Conversión kg → lb al escribir en el campo kilogramos ───────────────
+  const handlePesoKgChange = (v: string) => {
+    setPesoKg(v)
+    if (v === '' || v === '.') {
+      setValue('ninoPesoLibras', null as unknown as number, { shouldValidate: false })
+      setValue('ninoPesoOnzas', null as unknown as number, { shouldValidate: false })
+      return
+    }
+    const kg = parseFloat(v)
+    if (!isNaN(kg)) {
+      // Conversión directa kg → lb: 1 kg = 1/0.45359237 lb = 2.2046226218 lb
+      const lb = Math.round(kg * 2.2046226218 * 1000) / 1000
+      setValue('ninoPesoLibras', lb, { shouldValidate: true })
+      
+      // Conversión directa kg → oz: 1 kg = 35.27396195 oz (más preciso que lb×16)
+      const oz = Math.round(kg * 35.27396195 * 1000) / 1000
+      setValue('ninoPesoOnzas', oz, { shouldValidate: true })
+    }
   }
 
   return (
@@ -81,20 +93,13 @@ export default function SeccionIII() {
         {/* ── 6. Fecha ── */}
         <Grid item xs={12} sm={5}>
           <Controller name="ninoFechaNacimiento" control={control} render={({ field, fieldState }) => (
-            <DatePicker
-              label="6. Fecha de nacimiento *"
-              value={field.value ? dayjs(field.value) : null}
-              onChange={(d) => field.onChange(d ? d.format('YYYY-MM-DD') : '')}
-              format="DD/MM/YYYY"
-              slotProps={{
-                textField: {
-                  size: 'small', fullWidth: true,
-                  error: !!fieldState.error,
-                  helperText: !field.value ? (fieldState.error?.message ?? 'Seleccione del calendario') : fieldState.error?.message,
-                  InputLabelProps: { shrink: true },
-                  inputProps: { readOnly: true },
-                },
-              }}
+            <DateWheelField
+              label="6. Fecha de nacimiento"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message ?? 'Seleccione del calendario'}
+              required
             />
           )} />
         </Grid>
@@ -130,24 +135,74 @@ export default function SeccionIII() {
 
         {/* ── 9-11. Medidas ── */}
         <Grid item xs={6} sm={3}>
+          {/* Campo auxiliar: kilogramos → convierte a libras automáticamente */}
           <MedicalNumberField
-            label="9. Peso *"
-            value={pesoLbForm != null ? String(pesoLbForm) : ''}
-            onChange={handlePesoLbChange}
-            min={0.5} max={15} decimals={1} unit="lb" maxDigits={2}
-            helperText={!pesoLbForm ? '0.5–15.0 lb' : undefined}
+            label="Peso (kg)"
+            value={pesoKg}
+            onChange={handlePesoKgChange}
+            min={0.1} max={7} decimals={3} unit="kg" maxDigits={1}
+            helperText="Ingrese en kg para convertir"
             InputLabelProps={{ shrink: true }}
           />
         </Grid>
 
         <Grid item xs={6} sm={3}>
-          <MedicalNumberField
-            label="Onzas"
-            value={pesoOzForm != null ? String(pesoOzForm) : ''}
-            onChange={handlePesoOzChange}
-            min={0} max={15.9} decimals={1} unit="oz" maxDigits={2}
-            helperText={!pesoOzForm ? '0–15.9 oz (opcional)' : undefined}
+          {/* Campo oficial: libras — solo lectura, calculado desde kg */}
+          <TextField
+            label="9. Peso (lb) *"
+            value={pesoLbForm != null ? String(pesoLbForm) : '—'}
+            size="small"
+            fullWidth
             InputLabelProps={{ shrink: true }}
+            inputProps={{ readOnly: true, style: { cursor: 'default' } }}
+            helperText={pesoLbForm != null ? 'Calculado desde kg' : 'Ingrese kg primero'}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'light'
+                    ? 'rgba(0,0,0,0.04)'
+                    : 'rgba(255,255,255,0.04)',
+                '&:hover fieldset': { borderColor: 'divider' },
+                '&.Mui-focused fieldset': { borderColor: 'divider', borderWidth: '1.5px', boxShadow: 'none' },
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.55 }}>lb</span>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={6} sm={3}>
+          {/* Campo de onzas — solo lectura, calculado desde libras */}
+          <TextField
+            label="Onzas"
+            value={pesoOzForm != null ? String(pesoOzForm) : '—'}
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ readOnly: true, style: { cursor: 'default' } }}
+            helperText={pesoOzForm != null ? 'Calculado desde lb' : 'Ingrese kg primero'}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'light'
+                    ? 'rgba(0,0,0,0.04)'
+                    : 'rgba(255,255,255,0.04)',
+                '&:hover fieldset': { borderColor: 'divider' },
+                '&.Mui-focused fieldset': { borderColor: 'divider', borderWidth: '1.5px', boxShadow: 'none' },
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.55 }}>oz</span>
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
 
@@ -159,7 +214,7 @@ export default function SeccionIII() {
               onChange={(v) => field.onChange(v !== '' ? parseFloat(v) : null)}
               min={20} max={100} decimals={1} unit="cm" maxDigits={3}
               error={!!fieldState.error}
-              helperText={!field.value ? (fieldState.error?.message ?? '20–100 cm') : fieldState.error?.message}
+              helperText={!field.value ? (fieldState.error?.message ?? 'Ej: 49.5 cm (promedio 48-52 cm)') : fieldState.error?.message}
               InputLabelProps={{ shrink: true }}
             />
           )} />
@@ -170,10 +225,10 @@ export default function SeccionIII() {
             <MedicalNumberField
               label="11. Gestación *"
               value={field.value != null ? String(field.value) : ''}
-              onChange={(v) => field.onChange(v !== '' ? parseInt(v, 10) : null)}
-              min={20} max={45} decimals={0} unit="sem"
+              onChange={(v) => field.onChange(v !== '' ? parseFloat(v) : null)}
+              min={20} max={45} decimals={3} unit="sem" maxDigits={2}
               error={!!fieldState.error}
-              helperText={!field.value ? (fieldState.error?.message ?? '20–45') : fieldState.error?.message}
+              helperText={!field.value ? (fieldState.error?.message ?? '20–45 (entero o 1-3 decimales)') : fieldState.error?.message}
               InputLabelProps={{ shrink: true }}
             />
           )} />

@@ -14,7 +14,6 @@ import SearchIcon from '@mui/icons-material/Search'
 import dayjs from 'dayjs'
 import { useNacimientoList, useNacimientoById, useEliminarNacimiento } from '../hooks/useNacimiento'
 import EstadoChip from '@/shared/components/common/EstadoChip'
-import LoadingScreen from '@/shared/components/common/LoadingScreen'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
 import NacimientoPreview from '../components/NacimientoPreview'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
@@ -29,7 +28,7 @@ export default function NacimientoListPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [previewId, setPreviewId] = useState<number | null>(null)
 
-  const { data, isLoading, isError } = useNacimientoList({ search, page, size })
+  const { data, isError } = useNacimientoList({ search, page, size })
   const { data: previewData } = useNacimientoById(previewId ?? undefined)
   const eliminar = useEliminarNacimiento()
 
@@ -39,13 +38,13 @@ export default function NacimientoListPage() {
     setDeleteId(null)
   }
 
-  if (isLoading) return <LoadingScreen message="Cargando informes de nacimiento..." />
+  // NO mostrar loading completo — mejor mostrar la tabla vacía o con skeleton
 
   return (
     <Box>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }} mb={3}>
         <TextField
-          placeholder="Buscar por nombre o apellido..."
+          placeholder="Buscar por nombre del niño o apellido..."
           value={inputValue}
           onChange={(e) => {
             const val = e.target.value
@@ -79,6 +78,7 @@ export default function NacimientoListPage() {
               <TableCell>Fecha Nacimiento</TableCell>
               <TableCell>Género</TableCell>
               <TableCell>Madre</TableCell>
+              <TableCell>DPI Madre</TableCell>
               <TableCell>Quien Registró</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Registrado</TableCell>
@@ -107,8 +107,17 @@ export default function NacimientoListPage() {
                 <TableCell>
                   {row.ninoSexo === 1 ? '♂ Hombre' : row.ninoSexo === 2 ? '♀ Mujer' : '—'}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 500 }}>
-                  {`${row.madrePrimerNombre || ''} ${row.madrePrimerApellido || ''}`.trim() || '—'}
+                <TableCell sx={{ fontSize: '0.82rem' }}>
+                  {[
+                    row.madrePrimerNombre,
+                    row.madreSegundoNombre,
+                    row.madrePrimerApellido,
+                    row.madreSegundoApellido,
+                    row.madreApellidoCasada,
+                  ].filter(Boolean).join(' ') || '—'}
+                </TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', color: 'text.secondary', fontFamily: 'monospace' }}>
+                  {row.madreCuiCedula || '—'}
                 </TableCell>
                 <TableCell sx={{ fontSize: '0.82rem' }}>
                   {row.suscribeNombresApellidos || '—'}

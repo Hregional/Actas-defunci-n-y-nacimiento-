@@ -22,23 +22,20 @@ export default function SeccionI() {
   const { usuario } = useCurrentUser()
   const { control, setValue, getValues, watch } = useFormContext<NacimientoFormValues>()
 
-  const tienesDatos = !usuario.cargando && !!usuario.nombresApellidos
+  const tienesDatos  = !usuario.cargando && !!usuario.nombresApellidos
   const quienInforma = watch('suscribeQuienInforma')
-  const esMedico = quienInforma === 1
+  const esMedico     = quienInforma === 1
 
-  // Precarga del perfil: corre UNA SOLA VEZ, solo si el nombre del formulario
-  // aún está vacío (no sobreescribe datos de un registro en edición).
   useEffect(() => {
     if (usuario.cargando) return
-    // Si el nombre ya tiene valor (puede ser del reset de edición), no tocar nada
     if (getValues('suscribeNombresApellidos')) return
 
     if (usuario.nombresApellidos)
       setValue('suscribeNombresApellidos', usuario.nombresApellidos, { shouldValidate: false })
     if (usuario.cui)
       setValue('suscribeCuiCedula', usuario.cui, { shouldValidate: false })
-    if (!getValues('suscribeQuienInforma'))
-      setValue('suscribeQuienInforma', usuario.tipoInformante || 1, { shouldValidate: false })
+    // Predeterminar siempre como Médico (1)
+    setValue('suscribeQuienInforma', 1, { shouldValidate: false })
     if (usuario.noColegiado)
       setValue('suscribeNoColegiado', usuario.noColegiado, { shouldValidate: false })
     if (usuario.noRegistroComadrona)
@@ -63,7 +60,7 @@ export default function SeccionI() {
           <Typography variant="caption">
             <strong>{usuario.nombresApellidos}</strong>
             {usuario.numeroEmpleado ? ` · Emp. ${usuario.numeroEmpleado}` : ''}
-            {' · '}{QUIEN_INFORMA_LABELS[usuario.tipoInformante || 1] ?? ''}
+            {` · ${QUIEN_INFORMA_LABELS[quienInforma ?? 1] ?? 'Médico'}`}
             {usuario.renglon ? ` · Renglón ${usuario.renglon}` : ''}
           </Typography>
         </Alert>
@@ -105,7 +102,7 @@ export default function SeccionI() {
           )} />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={6}>
           <Controller name="suscribeQuienInforma" control={control} render={({ field, fieldState }) => (
             <FormControl error={!!fieldState.error} fullWidth size="small">
               <InputLabel shrink>Quién Informa el nacimiento *</InputLabel>
@@ -132,18 +129,6 @@ export default function SeccionI() {
               label={`No. Colegiado${esMedico ? ' *' : ''}`}
               error={!!fieldState.error}
               helperText={fieldState.error?.message ?? (esMedico ? 'Requerido para médicos' : 'Opcional')}
-              InputLabelProps={{ shrink: true }}
-              inputProps={{ maxLength: 50 }}
-            />
-          )} />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <Controller name="suscribeNoRegistroComadrona" control={control} render={({ field }) => (
-            <TextField
-              {...field}
-              label="Registro comadrona"
-              helperText="Opcional — solo si aplica"
               InputLabelProps={{ shrink: true }}
               inputProps={{ maxLength: 50 }}
             />

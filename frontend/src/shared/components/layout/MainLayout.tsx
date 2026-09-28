@@ -23,9 +23,11 @@ export default function MainLayout() {
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
           minWidth: 0,
           minHeight: '100vh',
+          // Evitar desbordamiento horizontal en móvil
+          overflow: 'hidden',
         }}
       >
         <TopBar onMenuClick={() => setMobileOpen(true)} />
@@ -37,6 +39,9 @@ export default function MainLayout() {
             py: { xs: 2, sm: 3 },
             mt: '64px',
             overflowX: 'hidden',
+            // Permitir scroll vertical natural en móvil
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           <Outlet />

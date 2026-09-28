@@ -70,15 +70,9 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
         <Typography variant="h6" fontWeight={700} color="white">
           Vista previa — Informe de Defunción
         </Typography>
-        <Box display="flex" gap={1}>
-          <Button variant="contained" startIcon={<PrintIcon />} onClick={print} size="small"
-            sx={{ bgcolor:'white', color:'#1a1a1a', '&:hover':{ bgcolor:'#f0f0f0' } }}>
-            Imprimir / PDF
-          </Button>
-          <IconButton onClick={onClose} size="small" sx={{ color:'white' }}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color:'white' }}>
+          <CloseIcon />
+        </IconButton>
       </Box>
 
       <DialogContent sx={{ p:2, bgcolor:'#e8e8e8' }}>
@@ -106,18 +100,18 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
           <SB t="I. INFORMACIÓN GENERAL" />
           <div className="row">
             <F l="1. El que informa (nombres y apellidos)" v={data.infoQuienInformaNombres} cls="f-half" />
-            <F l="3. Quién informa es" v={data.infoQuienInformaTipo ? `${data.infoQuienInformaTipo}. ${QUIEN[data.infoQuienInformaTipo]??''}` : ''} cls="f-quarter" />
-            <F l="3.1 No. de colegiado" v={data.infoNoColegiado} cls="f-quarter" />
+            <F l="2. Documento de Identificación (CUI)" v={data.infoDocumentoIdentificacion} cls="f-quarter" />
+            <F l="3. Quién informa es" v={data.infoQuienInformaTipo ? QUIEN[data.infoQuienInformaTipo]??'' : ''} cls="f-quarter" />
           </div>
           <div className="row">
-            <F l="2. Documento de Identificación (CUI)" v={data.infoDocumentoIdentificacion} cls="f-half" />
-            <F l="4. Fecha de la defunción (DD/MM/YYYY)" v={fecha} cls="f-quarter" />
+            <F l="3.1 No. de colegiado" v={data.infoNoColegiado} cls="f-quarter" />
+            <F l="4. Fecha de la defunción" v={fecha} cls="f-quarter" />
             <F l="A las (hora)" v={data.infoHoraDefuncion} cls="f-quarter" />
           </div>
           <div className="row">
-            <F l="5. Lugar y dirección donde ocurrió la defunción — Dirección exacta" v={data.infoLugarDireccion} cls="f-half" />
-            <F l="Municipio" v={data.infoLugarMunicipio} cls="f-quarter" />
-            <F l="Departamento" v={data.infoLugarDepartamento} cls="f-quarter" />
+            <F l="5. Lugar y dirección donde ocurrió la defunción" v={data.infoLugarDireccion} cls="f-half" />
+            <F l="Municipio" v={data.infoLugarMunicipio} cls="f-third" />
+            <F l="Departamento" v={data.infoLugarDepartamento} cls="f-third" />
           </div>
 
           <div className="aviso">SI LA MUERTE ES FETAL, INICIE EN EL APARTADO VI. DATOS DE LA DEFUNCIÓN FETAL (MORTINATO)</div>
@@ -128,40 +122,42 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
             <F l="6. Nombre — Nombres y apellidos completos" v={data.fallecidoNombreCompleto} cls="f-full" />
           </div>
           <div className="row">
-            <F l="7. Sexo" v={data.fallecidoSexo ? `${data.fallecidoSexo}. ${SEXO[data.fallecidoSexo]??''}`:''} cls="f-quarter" />
-            <F l="8. Edad cumplida" v={edadStr} cls="f-quarter" />
-            <F l="Horas (menor de 1 día)" v={data.fallecidoEdadHoras?.toString()} cls="f-quarter" />
-            <F l="Días (menor de 1 mes)" v={data.fallecidoEdadDias?.toString()} cls="f-quarter" />
+            <F l="7. Sexo" v={data.fallecidoSexo ? SEXO[data.fallecidoSexo]??'':''} cls="f-sixth" />
+            <F l="8. Edad (años)" v={edadStr} cls="f-sixth" />
+            <F l="Horas (menor 1 día)" v={data.fallecidoEdadHoras?.toString()} cls="f-sixth" />
+            <F l="Días (menor 1 mes)" v={data.fallecidoEdadDias?.toString()} cls="f-sixth" />
+            <F l="Meses (menor 1 año)" v={data.fallecidoEdadMeses?.toString()} cls="f-sixth" />
           </div>
           <div className="row">
-            <F l="9. Documento de Identificación — No. CUI/Cédula" v={data.fallecidoDocNumero} cls="f-third" />
-            <F l="No. de Libro" v={data.fallecidoDocLibro} cls="f-third" />
-            <F l="No. de Folio" v={data.fallecidoDocFolio} cls="f-third" />
+            <F l="9. CUI/Cédula" v={data.fallecidoDocNumero} cls="f-quarter" />
+            <F l="No. de Libro" v={data.fallecidoDocLibro} cls="f-quarter" />
+            <F l="No. de Folio" v={data.fallecidoDocFolio} cls="f-quarter" />
+            <F l="No. de Partida" v={data.fallecidoDocPartida} cls="f-quarter" />
           </div>
           <div className="row">
-            <F l="10. Lugar de nacimiento — País" v={data.fallecidoLugarNacPais} cls="f-third" />
+            <F l="10. Lugar nacimiento — País" v={data.fallecidoLugarNacPais} cls="f-quarter" />
             <F l="Departamento" v={data.fallecidoLugarNacDepartamento} cls="f-third" />
             <F l="Municipio" v={data.fallecidoLugarNacMunicipio} cls="f-third" />
           </div>
           <div className="row">
-            <F l="11. Nacionalidad" v={data.fallecidoNacionalidad} cls="f-half" />
-            <F l="12. Ocupación" v={data.fallecidoOcupacion} cls="f-half" />
+            <F l="11. Nacionalidad" v={data.fallecidoNacionalidad} cls="f-quarter" />
+            <F l="12. Ocupación" v={data.fallecidoOcupacion} cls="f-quarter" />
+            <F l="13. Estado civil" v={data.fallecidoEstadoCivil ? EC[data.fallecidoEstadoCivil]??'':''} cls="f-quarter" />
+            <F l="16. Escolaridad" v={data.fallecidoEscolaridad!=null ? ESCOL[data.fallecidoEscolaridad]??'':''} cls="f-quarter" />
           </div>
           <div className="row">
-            <F l="13. Estado civil" v={data.fallecidoEstadoCivil ? `${data.fallecidoEstadoCivil}. ${EC[data.fallecidoEstadoCivil]??''}`:''} cls="f-third" />
-            <F l="14. Pueblo de pertenencia" v={data.fallecidoPuebloPertenencia ? `${data.fallecidoPuebloPertenencia}. ${PUEBLO[data.fallecidoPuebloPertenencia]??''}`:''} cls="f-third" />
-            <F l="16. Escolaridad" v={data.fallecidoEscolaridad!=null ? `${data.fallecidoEscolaridad}. ${ESCOL[data.fallecidoEscolaridad]??''}`:''} cls="f-third" />
+            <F l="14. Pueblo de pertenencia" v={data.fallecidoPuebloPertenencia ? PUEBLO[data.fallecidoPuebloPertenencia]??'':''} cls="f-quarter" />
           </div>
           <div className="row">
             <F l="15. Residencia — Dirección exacta" v={data.fallecidoResidenciaDireccion} cls="f-half" />
-            <F l="Municipio" v={data.fallecidoResidenciaMunicipio} cls="f-quarter" />
-            <F l="Departamento" v={data.fallecidoResidenciaDepartamento} cls="f-quarter" />
+            <F l="Municipio" v={data.fallecidoResidenciaMunicipio} cls="f-third" />
+            <F l="Departamento" v={data.fallecidoResidenciaDepartamento} cls="f-third" />
           </div>
 
           <SB t="III. MUJERES EN EDAD FÉRTIL" />
           <div className="row">
             <F l="17. Si la defunción corresponde a una mujer entre 10 y 54 años, la muerte ocurrió durante"
-              v={data.fertilMuerteDurante ? `${data.fertilMuerteDurante}. ${MUE_DUR[data.fertilMuerteDurante]??''}`:''} cls="f-full" />
+              v={data.fertilMuerteDurante ? MUE_DUR[data.fertilMuerteDurante]??'':''} cls="f-full" />
           </div>
 
           <SB t="IV. CAUSA DE DEFUNCIÓN" />
@@ -199,8 +195,8 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
 
           <SB t="V. DEFUNCIONES ACCIDENTALES Y VIOLENTAS" />
           <div className="row">
-            <F l="19. Fue un presunto" v={data.accidentalFuePresunto ? `${data.accidentalFuePresunto}. ${['','Suicidio','Homicidio','Accidente'][data.accidentalFuePresunto]??'Ignorado'}`:''} cls="f-quarter" />
-            <F l="19.1 Lugar donde ocurrió la lesión" v={data.accidentalLugarLesion!=null ? `${data.accidentalLugarLesion}. ${LUGAR_LES[data.accidentalLugarLesion]??''}`:''} cls="f-half" />
+            <F l="19. Fue un presunto" v={data.accidentalFuePresunto ? ['','Suicidio','Homicidio','Accidente'][data.accidentalFuePresunto]??'Ignorado':''} cls="f-quarter" />
+            <F l="19.1 Lugar donde ocurrió la lesión" v={data.accidentalLugarLesion!=null ? LUGAR_LES[data.accidentalLugarLesion]??'':''} cls="f-half" />
           </div>
           <div className="row">
             <F l="19.2 Ocurrió en el desempeño de su trabajo" v={data.accidentalOcurrioTrabajo ? ['','Sí','No','','','','','','','Ignorado'][data.accidentalOcurrioTrabajo]??'':''} cls="f-third" />
@@ -225,18 +221,18 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
           </div>
           <div className="row">
             <F l="23. Edad" v={data.mortinatoMadreEdad?.toString()} cls="f-quarter" />
-            <F l="24. Estado civil" v={data.mortinatoMadreEstadoCivil ? `${data.mortinatoMadreEstadoCivil}. ${EC[data.mortinatoMadreEstadoCivil]??''}`:''} cls="f-quarter" />
-            <F l="25. Pueblo de pertenencia" v={data.mortinatoMadrePuebloPertenencia ? `${data.mortinatoMadrePuebloPertenencia}. ${PUEBLO[data.mortinatoMadrePuebloPertenencia]??''}`:''} cls="f-half" />
+            <F l="24. Estado civil" v={data.mortinatoMadreEstadoCivil ? EC[data.mortinatoMadreEstadoCivil]??'':''} cls="f-quarter" />
+            <F l="25. Pueblo de pertenencia" v={data.mortinatoMadrePuebloPertenencia ? PUEBLO[data.mortinatoMadrePuebloPertenencia]??'':''} cls="f-half" />
           </div>
           <div className="row">
             <F l="26. Residencia — Dirección" v={data.mortinatoMadreResidenciaDireccion} cls="f-half" />
-            <F l="Municipio" v={data.mortinatoMadreResidenciaMunicipio} cls="f-quarter" />
-            <F l="Departamento" v={data.mortinatoMadreResidenciaDepartamento} cls="f-quarter" />
+            <F l="Municipio" v={data.mortinatoMadreResidenciaMunicipio} cls="f-third" />
+            <F l="Departamento" v={data.mortinatoMadreResidenciaDepartamento} cls="f-third" />
           </div>
           <div className="row">
             <F l="27. Ocupación" v={data.mortinatoMadreOcupacion} cls="f-third" />
             <F l="28. Sabe leer y escribir" v={data.mortinatoMadreSabeLeer ? ['','Sí','No','','','','','','','Ignorado'][data.mortinatoMadreSabeLeer]??'':''} cls="f-third" />
-            <F l="29. Escolaridad" v={data.mortinatoMadreEscolaridad!=null ? `${data.mortinatoMadreEscolaridad}. ${ESCOL[data.mortinatoMadreEscolaridad]??''}`:''} cls="f-third" />
+            <F l="29. Escolaridad" v={data.mortinatoMadreEscolaridad!=null ? ESCOL[data.mortinatoMadreEscolaridad]??'':''} cls="f-third" />
           </div>
           <div className="row">
             <F l="30. Nacionalidad" v={data.mortinatoMadreNacionalidad} cls="f-third" />
@@ -245,7 +241,7 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
           </div>
           <div className="row"><span className="f-lbl f-full" style={{display:'block',marginBottom:2,fontWeight:700}}>DATOS DEL FETO (MORTINATO)</span></div>
           <div className="row">
-            <F l="32. Sexo" v={data.mortinatoFetoSexo ? `${data.mortinatoFetoSexo}. ${SEXO[data.mortinatoFetoSexo]??''}`:''} cls="f-quarter" />
+            <F l="32. Sexo" v={data.mortinatoFetoSexo ? SEXO[data.mortinatoFetoSexo]??'':''} cls="f-quarter" />
             <F l="33. Murió" v={data.mortinatoFetoMurio ? ['','Antes del Parto','Durante el Parto'][data.mortinatoFetoMurio]??'':''} cls="f-quarter" />
             <F l="34. El parto fue" v={data.mortinatoPartoFue ? ['','Simple','Doble','Múltiple'][data.mortinatoPartoFue]??'':''} cls="f-quarter" />
             <F l="35. Clase de parto" v={data.mortinatoClaseParto ? ['','Eutócico','Distócico'][data.mortinatoClaseParto]??'':''} cls="f-quarter" />
@@ -262,8 +258,8 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
           <SB t="VII. OTROS DATOS DE LA DEFUNCIÓN" />
           <div className="row">
             <F l="39. Hubo necropsia" v={data.otrosHuboNecropsia ? ['','Sí','No'][data.otrosHuboNecropsia]??'':''} cls="f-quarter" />
-            <F l="40. Clase de asistencia recibida" v={data.otrosClaseAsistencia ? `${data.otrosClaseAsistencia}. ${ASIST[data.otrosClaseAsistencia]??''}`:''} cls="f-third" />
-            <F l="41. Lugar donde ocurrió la defunción" v={data.otrosLugarDefuncion ? `${data.otrosLugarDefuncion}. ${LUGAR_DEF[data.otrosLugarDefuncion]??''}`:''} cls="f-third" />
+            <F l="40. Clase de asistencia recibida" v={data.otrosClaseAsistencia ? ASIST[data.otrosClaseAsistencia]??'':''} cls="f-third" />
+            <F l="41. Lugar donde ocurrió la defunción" v={data.otrosLugarDefuncion ? LUGAR_DEF[data.otrosLugarDefuncion]??'':''} cls="f-third" />
           </div>
 
           {/* Cierre */}

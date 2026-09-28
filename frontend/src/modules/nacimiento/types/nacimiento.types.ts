@@ -84,7 +84,11 @@ export interface InformeNacimientoListDTO {
   lugarDepartamento: string
   lugarMunicipio: string
   madrePrimerNombre: string
+  madreSegundoNombre?: string | null
   madrePrimerApellido: string
+  madreSegundoApellido?: string | null
+  madreApellidoCasada?: string | null
+  madreCuiCedula?: string | null
   suscribeNombresApellidos?: string
   createdAt: string
 }

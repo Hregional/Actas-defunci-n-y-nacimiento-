@@ -13,10 +13,13 @@ import {
   FormHelperText, Typography, TextField,
 } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import PersonIcon from '@mui/icons-material/Person'
+import Diversity3Icon from '@mui/icons-material/Diversity3'
 import SectionCard from '@/shared/components/common/SectionCard'
 import DpiField from '@/shared/components/common/DpiField'
 import SmartField from '@/shared/components/common/SmartField'
 import DeptoMuniSelector from '@/shared/components/common/DeptoMuniSelector'
+import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
 import { cuiValido, deptoMuniDesdeCui } from '@/shared/utils/cuiValidator'
 import { DEPARTAMENTOS_GUATEMALA } from '@/shared/data/guatemala'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
@@ -27,9 +30,8 @@ const PUEBLO_OPTIONS = [
   { value: 5, label: 'Otro' },
 ]
 const ESTADO_CIVIL_PADRE = [
-  { value: 1, label: 'Soltero' }, { value: 2, label: 'Casado' },
-  { value: 3, label: 'Unido' }, { value: 4, label: 'Viudo' },
-  { value: 5, label: 'Divorciado' }, { value: 6, label: 'Unión no declarada' },
+  { value: 1, label: 'Soltero', icon: <PersonIcon sx={{ fontSize: 20 }} />, color: '#2196F3' },
+  { value: 2, label: 'Casado', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#1565C0' },
 ]
 const ESCOLARIDAD_OPTIONS = [
   { value: 1, label: 'Ninguna' }, { value: 2, label: 'Primaria' },
@@ -149,9 +151,9 @@ export default function SeccionV() {
             31. Dirección de residencia actual
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12}>
           <Controller name="padreDireccion" control={control} render={({ field }) => (
-            <SmartField label="Dirección" fieldType="text" maxLen={255}
+            <SmartField label="Dirección" fieldType="text" maxLen={150}
               value={field.value ?? ''} onChange={field.onChange} />
           )} />
         </Grid>
@@ -217,39 +219,44 @@ export default function SeccionV() {
           />
         )}
 
-        <Grid item xs={12} sm={4}>
+        {/* ── Estado civil en tarjetas ── */}
+        <Grid item xs={12}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+            33. ESTADO CIVIL
+          </Typography>
+          <Controller name="padreEstadoCivil" control={control} render={({ field, fieldState }) => (
+            <CardOptionGroup
+              label=""
+              options={ESTADO_CIVIL_PADRE}
+              value={field.value ?? null}
+              onChange={field.onChange}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              direction="row"
+              size="sm"
+            />
+          )} />
+        </Grid>
+
+        {/* ── Selects de pueblo y escolaridad ── */}
+        <Grid item xs={12} sm={6}>
           <Controller name="padrePuebloPertenencia" control={control} render={({ field, fieldState }) => (
             <FormControl error={!!fieldState.error} fullWidth size="small">
               <InputLabel>32. Pueblo de pertenencia</InputLabel>
               <Select {...field} value={field.value ?? ''} label="32. Pueblo de pertenencia"
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {PUEBLO_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
             </FormControl>
           )} />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Controller name="padreEstadoCivil" control={control} render={({ field, fieldState }) => (
-            <FormControl error={!!fieldState.error} fullWidth size="small">
-              <InputLabel>33. Estado civil</InputLabel>
-              <Select {...field} value={field.value ?? ''} label="33. Estado civil"
-                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
-                {ESTADO_CIVIL_PADRE.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
-              </Select>
-              {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
-            </FormControl>
-          )} />
-        </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
           <Controller name="padreEscolaridad" control={control} render={({ field, fieldState }) => (
             <FormControl error={!!fieldState.error} fullWidth size="small">
               <InputLabel>34. Escolaridad</InputLabel>
               <Select {...field} value={field.value ?? ''} label="34. Escolaridad"
                 onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {ESCOLARIDAD_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
               {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}

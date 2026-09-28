@@ -4,12 +4,12 @@ import {
   Grid, TextField, FormControl, InputLabel, Select, MenuItem,
   FormHelperText, Alert, Typography,
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LockOutlinedIcon  from '@mui/icons-material/LockOutlined'
 import dayjs from 'dayjs'
 import SectionCard    from '@/shared/components/common/SectionCard'
 import TimeWheelField from '@/shared/components/common/TimeWheelField'
+import DateWheelField from '@/shared/components/common/DateWheelField'
 import { useCurrentUser } from '@/shared/context/UserContext'
 import { INSTITUCION }    from '@/shared/constants/institucion'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
@@ -24,9 +24,9 @@ export default function DefSeccionI() {
   const { usuario }          = useCurrentUser()
   const { control, setValue, watch } = useFormContext<DefuncionFormValues>()
 
-  const tienesDatos = !usuario.cargando && !!usuario.nombresApellidos
+  const tienesDatos      = !usuario.cargando && !!usuario.nombresApellidos
   const quienInformaTipo = watch('infoQuienInformaTipo')
-  const esMedico = quienInformaTipo === 1
+  const esMedico         = quienInformaTipo === 1
 
   useEffect(() => {
     if (usuario.cargando) return
@@ -36,8 +36,8 @@ export default function DefSeccionI() {
       setValue('infoDocumentoIdentificacion', usuario.cui)
     if (usuario.noColegiado)
       setValue('infoNoColegiado', usuario.noColegiado)
-    const tipo = usuario.tipoInformante <= 3 ? usuario.tipoInformante : 1
-    setValue('infoQuienInformaTipo',  tipo)
+    // Predeterminar siempre como Médico (1)
+    setValue('infoQuienInformaTipo', 1)
     setValue('infoFechaDefuncion',    dayjs().format('YYYY-MM-DD'))
     setValue('infoLugarMunicipio',    INSTITUCION.MUNICIPIO)
     setValue('infoLugarDepartamento', INSTITUCION.DEPARTAMENTO)
@@ -62,7 +62,7 @@ export default function DefSeccionI() {
           <Typography variant="caption">
             <strong>{usuario.nombresApellidos}</strong>
             {usuario.numeroEmpleado ? ` · Emp. ${usuario.numeroEmpleado}` : ''}
-            {usuario.renglon        ? ` · Renglón ${usuario.renglon}`     : ''}
+            {usuario.renglon ? ` · Renglón ${usuario.renglon}` : ''}
           </Typography>
         </Alert>
       )}
@@ -93,11 +93,10 @@ export default function DefSeccionI() {
               <InputLabel>3. Quién informa es *</InputLabel>
               <Select
                 {...field}
-                value={field.value ?? ''}
+                value={field.value ?? 1}
                 label="3. Quién informa es *"
-                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 1)}
               >
-                <MenuItem value=""><em>Seleccionar</em></MenuItem>
                 {QUIEN_INFORMA_OPTIONS.map(o => (
                   <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
                 ))}
@@ -141,20 +140,13 @@ export default function DefSeccionI() {
         {/* ── Fecha defunción ── */}
         <Grid item xs={12} sm={5}>
           <Controller name="infoFechaDefuncion" control={control} render={({ field, fieldState }) => (
-            <DatePicker
-              label="4. Fecha de la defunción *"
-              value={field.value ? dayjs(field.value) : null}
-              onChange={(d) => field.onChange(d ? d.format('YYYY-MM-DD') : '')}
-              format="DD/MM/YYYY"
-              slotProps={{
-                textField: {
-                  size: 'small', fullWidth: true,
-                  error: !!fieldState.error,
-                  helperText: fieldState.error?.message ?? 'Seleccione del calendario',
-                  InputLabelProps: { shrink: true },
-                  inputProps: { readOnly: true },
-                },
-              }}
+            <DateWheelField
+              label="4. Fecha de la defunción"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message ?? 'Seleccione del calendario'}
+              required
             />
           )} />
         </Grid>

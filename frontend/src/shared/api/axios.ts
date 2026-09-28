@@ -8,7 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  timeout: 15000,
+  timeout: 10000, // 10 segundos — más rápido para fallar y mostrar error
 })
 
 // ── Request interceptor: adjunta el token Bearer ──────────────────────────────
@@ -40,13 +40,32 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Errores de red o timeout (backend no disponible)
+    if (!error.response) {
+      // Error de red (ECONNREFUSED, ETIMEDOUT, etc.) o timeout
+      const message = error.code === 'ECONNABORTED'
+        ? 'El servidor está tardando demasiado en responder. Reintentando...'
+        : 'No se puede conectar con el servidor. Verificando disponibilidad...'
+      console.warn('[API] Error de conexión:', error.message)
+      return Promise.reject(new Error(message))
+    }
+
+    // Error 401 - No autorizado
+    if (error.response.status === 401) {
       // Solo hacer logout si hay una sesión activa.
       // Evita el loop: 401 -> doLogout -> redirect -> 401 -> doLogout...
       if (keycloak.didInitialize && keycloak.authenticated) {
         doLogout()
       }
     }
+
+    // Error 404 - No encontrado (incluir código en el mensaje para detectarlo en hooks)
+    if (error.response.status === 404) {
+      const message = `404: ${error.response?.data?.message || 'Registro no encontrado'}`
+      return Promise.reject(new Error(message))
+    }
+
+    // Otros errores HTTP
     const message =
       error.response?.data?.message ||
       error.response?.data?.errors ||
