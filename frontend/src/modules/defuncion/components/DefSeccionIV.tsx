@@ -50,7 +50,7 @@ export default function DefSeccionIV() {
   const { register } = useFormContext<DefuncionFormValues>()
 
   return (
-    <SectionCard title="IV. Causa de defunción">
+    <SectionCard title="IV. Causa de defunción" variant="defuncion">
       <Box mb={2}>
         <Typography variant="body2" color="text.secondary">
           <strong>18. Causas de defunción</strong>

@@ -22,6 +22,7 @@ export default function DefSeccionIII() {
     <SectionCard
       title="III. Mujeres en edad fértil"
       subtitle="Aplica únicamente si el fallecido(a) es mujer entre 10 y 54 años"
+      variant="defuncion"
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
