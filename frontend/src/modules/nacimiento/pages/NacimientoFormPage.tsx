@@ -16,6 +16,7 @@ import { nacimientoApi } from '../api/nacimiento.api'
 import { useNacimientoById, useCrearNacimiento, useActualizarNacimiento } from '../hooks/useNacimiento'
 import { useCurrentUser } from '@/shared/context/UserContext'
 import { INSTITUCION } from '@/shared/constants/institucion'
+import { cuiValido } from '@/shared/utils/cuiValidator'
 import SeccionI from '../components/SeccionI'
 import SeccionIII from '../components/SeccionIII'
 import SeccionIV from '../components/SeccionIV'
@@ -114,6 +115,10 @@ export default function NacimientoFormPage() {
     console.log(`[NacimientoForm] activeStep cambió a: ${activeStep} (${STEPS[activeStep]})`)
     // CRÍTICO: Al cambiar de paso, resetear allowSubmit para prevenir auto-submit
     setAllowSubmit(false)
+    // Scroll al inicio del contenido después de que React renderice el nuevo paso
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
   }, [activeStep])
 
   useEffect(() => {
@@ -175,7 +180,6 @@ export default function NacimientoFormPage() {
     if (fields.length === 0) {
       console.log(`[NacimientoForm] Paso ${activeStep} sin campos requeridos. Avanzando directamente.`)
       setActiveStep((prev) => prev + 1)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
     // Validar usando safeParse del schema — NO toca el estado del formulario
@@ -224,6 +228,27 @@ export default function NacimientoFormPage() {
       }
     }
 
+    // Validación especial paso 2 (Sección IV - Madre): Si NO hay DPI guatemalteco válido,
+    // departamento y municipio deben seleccionarse manualmente
+    if (activeStep === 2) {
+      const dpiMadre = currentValues.madreCuiCedula
+      const esGuatemalteco = dpiMadre && dpiMadre.replace(/\s/g, '').length === 13 && cuiValido(dpiMadre)
+      
+      if (!esGuatemalteco) {
+        // Sin DPI guatemalteco, validar que departamento y municipio estén completos
+        if (!currentValues.madreDepartamento || currentValues.madreDepartamento.trim() === '') {
+          if (!missingFields.includes('Departamento de la madre')) {
+            missingFields.push('Departamento de la madre')
+          }
+        }
+        if (!currentValues.madreMunicipio || currentValues.madreMunicipio.trim() === '') {
+          if (!missingFields.includes('Municipio de la madre')) {
+            missingFields.push('Municipio de la madre')
+          }
+        }
+      }
+    }
+
     if (missingFields.length > 0) {
       const msg = missingFields.length === 1
         ? `Falta completar: ${missingFields[0]}`
@@ -235,12 +260,10 @@ export default function NacimientoFormPage() {
 
     console.log(`[NacimientoForm] Validación pasada. Avanzando de paso ${activeStep} a ${activeStep + 1}`)
     setActiveStep((prev) => prev + 1)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleBack = () => {
     setActiveStep((prev) => prev - 1)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const onSubmit = async (data: NacimientoFormValues) => {
@@ -331,7 +354,6 @@ export default function NacimientoFormPage() {
 
     // Navegar al paso con error
     setActiveStep(targetStep)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
 
     // Mostrar cuál campo tiene error
     const fieldLabels: Partial<Record<keyof NacimientoFormValues, string>> = {
@@ -383,47 +405,73 @@ export default function NacimientoFormPage() {
         <Paper
           elevation={0}
           sx={{
-            p: { xs: 1.5, sm: 2 }, mb: 2.5,
+            p: { xs: 2, sm: 2.5 }, mb: 3,
+            border: 1, borderColor: 'divider',
             borderRadius: 3,
-            overflow: 'hidden',
-            position: 'relative',
-            background: 'linear-gradient(127deg, #0B1437 0%, #1a237e 55%, #0BC5EA 100%)',
+            background: 'linear-gradient(135deg, #0057B8 0%, #00A8CC 60%, #26C6DA 100%)',
             color: 'white',
+            boxShadow: '0 6px 30px rgba(0, 87, 184, 0.3)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: '-30%',
+              left: '-10%',
+              width: '250px',
+              height: '250px',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)',
+              borderRadius: '50%',
+            },
           }}
         >
-          {/* Círculos decorativos */}
-          <Box sx={{
-            position: 'absolute', right: -30, top: -30,
-            width: 120, height: 120, borderRadius: '50%',
-            background: 'rgba(11,197,234,0.12)', pointerEvents: 'none',
-          }} />
-          <Box sx={{
-            position: 'absolute', right: 60, bottom: -40,
-            width: 90, height: 90, borderRadius: '50%',
-            background: 'rgba(67,97,238,0.18)', pointerEvents: 'none',
-          }} />
           <Box sx={{ position: 'relative', zIndex: 1 }}>
-            <Typography variant="h6" fontWeight={800} align="center" sx={{ letterSpacing: '0.06em' }}>
+            <Typography variant="h6" fontWeight={800} align="center" sx={{ 
+              letterSpacing: '0.08em',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+            }}>
               REPÚBLICA DE GUATEMALA
             </Typography>
-            <Typography variant="subtitle2" align="center" sx={{ opacity: 0.80, fontWeight: 600 }}>
+            <Typography variant="subtitle2" align="center" sx={{ 
+              opacity: 0.95, 
+              mt: 0.5,
+              fontWeight: 600,
+            }}>
               INFORME DE NACIMIENTO
             </Typography>
           </Box>
         </Paper>
 
         {/* Stepper */}
-        <Paper elevation={0} sx={{ p: 1.5, mb: 2.5, border: 1, borderColor: 'divider', borderRadius: 2 }}>
-          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 1 }}>
+        <Paper elevation={0} sx={{ 
+          p: 2, mb: 3, 
+          border: 1, borderColor: 'divider', borderRadius: 2.5,
+          background: 'linear-gradient(180deg, rgba(0, 168, 204, 0.03) 0%, rgba(0, 87, 184, 0.06) 50%, rgba(0, 48, 135, 0.03) 100%)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
+        }}>
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 1.5 }}>
             {STEPS.map((label) => (
               <Step key={label}>
                 <StepLabel>{!isMobile ? label : ''}</StepLabel>
               </Step>
             ))}
           </Stepper>
-          <LinearProgress variant="determinate" value={progress} />
+          <LinearProgress 
+            variant="determinate" 
+            value={progress}
+            sx={{
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: 'rgba(0, 168, 204, 0.1)',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 3,
+                background: 'linear-gradient(90deg, #0057B8 0%, #00A8CC 50%, #26C6DA 100%)',
+              },
+            }}
+          />
           {isMobile && (
-            <Typography variant="caption" color="text.secondary" align="center" display="block" mt={0.5}>
+            <Typography variant="caption" color="text.secondary" align="center" display="block" mt={1} fontWeight={600}>
               {STEPS[activeStep]}
             </Typography>
           )}

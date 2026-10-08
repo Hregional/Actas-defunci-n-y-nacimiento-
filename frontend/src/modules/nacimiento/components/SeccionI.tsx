@@ -45,7 +45,7 @@ export default function SeccionI() {
   }, [usuario.cargando])
 
   return (
-    <SectionCard title="I. Datos del que suscribe">
+    <SectionCard title="I. Datos del que suscribe" variant="nacimiento">
 
       {usuario.cargando ? (
         <Alert severity="info" sx={{ mb: 2, py: 0.5 }}>

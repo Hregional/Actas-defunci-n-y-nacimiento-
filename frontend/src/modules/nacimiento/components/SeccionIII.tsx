@@ -87,7 +87,7 @@ export default function SeccionIII() {
   }
 
   return (
-    <SectionCard title="III. Datos del niño (a) y del nacimiento">
+    <SectionCard title="III. Datos del niño (a) y del nacimiento" variant="nacimiento">
       <Grid container spacing={2}>
 
         {/* ── 6. Fecha ── */}
@@ -358,7 +358,7 @@ export default function SeccionIII() {
           <Controller name="ninoHijosViven" control={control} render={({ field }) => (
             <MedicalNumberField
               label="Viven"
-              value={field.value != null ? String(field.value) : '0'}
+              value={field.value != null ? String(field.value) : ''}
               onChange={() => {}}
               min={0} max={99} decimals={0} maxDigits={2}
               disabled

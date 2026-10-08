@@ -6,7 +6,7 @@ import PrintIcon from '@mui/icons-material/Print'
 import CloseIcon from '@mui/icons-material/Close'
 import dayjs from 'dayjs'
 import { usePrint } from '@/shared/hooks/usePrint'
-import { PRINT_CSS } from '@/shared/styles/printStyles'
+import { PRINT_CSS_NACIMIENTO } from '@/shared/styles/printStyles'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
 
 /* ── Catálogos ─────────────────────────────────────────── */
@@ -63,7 +63,9 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
       {/* Cabecera del modal */}
       <Box sx={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider', bgcolor: '#1a1a1a',
+        px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider',
+        background: 'linear-gradient(90deg, #003087 0%, #0057B8 50%, #00A8CC 100%)',
+        boxShadow: '0 2px 12px rgba(0, 48, 135, 0.3)',
       }}>
         <Typography variant="h6" fontWeight={700} color="white">
           Vista previa — Informe de Nacimiento
@@ -74,11 +76,15 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
       </Box>
 
       <DialogContent sx={{ p: 2, bgcolor: '#e8e8e8' }}>
-        <style>{PRINT_CSS}</style>
-        <Box ref={printRef} sx={{
-          bgcolor: 'white', p: 1.5, border: '1px solid #ccc',
-          maxWidth: 740, mx: 'auto', fontFamily: 'Arial, sans-serif', fontSize: '0.72rem',
-        }}>
+        <style>{PRINT_CSS_NACIMIENTO}</style>
+        <div className="form-container">
+          <Box ref={printRef} sx={{
+            bgcolor: 'white',
+            border: '1px solid #bbb',
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '0.72rem',
+            '@media print': { border: 'none' },
+          }}>
 
           {/* ════════════ FRENTE — PÁGINA 1 ════════════ */}
           <div className="form-header">
@@ -243,17 +249,19 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
 
           {/* Huellas */}
           <div className="huellas-wrap">
-            <div style={{ flex: 2 }}>
-              <p className="fp-plantar-lbl">IMPRESIÓN PLANTAR DEL RECIÉN NACIDO(A). (PIE DERECHO)</p>
-              <div className="fp-plantar" style={{ height: 110 }} />
+            {/* Columna izquierda: huella plantar grande */}
+            <div className="fp-plantar-col">
+              <p className="fp-plantar-lbl">Impresión plantar del recién nacido(a)<br />(Pie derecho)</p>
+              <div className="fp-plantar" />
             </div>
-            <div className="fp-small-col" style={{ flex: 1 }}>
-              <div>
-                <p className="fp-small-lbl">IMPRESIÓN DEL DEDO PULGAR<br />DERECHO DEL RECIÉN NACIDO(A)</p>
+            {/* Columna derecha: dos huellas de pulgar */}
+            <div className="fp-small-col">
+              <div className="fp-small-item">
+                <p className="fp-small-lbl">Impresión del dedo pulgar derecho<br />del recién nacido(a)</p>
                 <div className="fp-small" />
               </div>
-              <div>
-                <p className="fp-small-lbl">IMPRESIÓN DEL DEDO PULGAR<br />DERECHO DE LA MADRE</p>
+              <div className="fp-small-item">
+                <p className="fp-small-lbl">Impresión del dedo pulgar derecho<br />de la madre</p>
                 <div className="fp-small" />
               </div>
             </div>
@@ -332,10 +340,16 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
             </div>
           </div>
 
-        </Box>
+          </Box>
+        </div>
       </DialogContent>
 
-      <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+      <DialogActions sx={{ px: 2, pb: 2, gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ flex: 1, minWidth: 200 }}>
+          💡 Para mejor resultado: en el diálogo de impresión seleccione{' '}
+          <strong>Papel: Oficio / Legal (8.5" × 14")</strong>.
+          Si imprime en Carta, el contenido se reduce automáticamente.
+        </Typography>
         <Button onClick={onClose} variant="outlined">Cerrar</Button>
         <Button onClick={print} variant="contained" startIcon={<PrintIcon />}>
           Imprimir / Generar PDF
