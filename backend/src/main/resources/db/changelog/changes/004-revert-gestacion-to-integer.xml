@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!--
+        Corrección: Las semanas de gestación son enteros (1-45).
+        El cambio anterior a DECIMAL(4,3) era incorrecto — ese tipo solo permite
+        valores hasta 9.999, lo que causa DataIntegrityViolationException al guardar
+        valores como 38 (semanas normales).
+        Se revierte a TINYINT que admite 0-127, suficiente para 1-45 semanas.
+    -->
+    <changeSet id="004-revert-gestacion-integer" author="system">
+
+        <!-- nacimiento: nino_edad_gestacional_semanas -->
+        <modifyDataType
+            tableName="informe_nacimiento"
+            columnName="nino_edad_gestacional_semanas"
+            newDataType="TINYINT"/>
+
+        <!-- defuncion: mortinato_semanas_gestacion -->
+        <modifyDataType
+            tableName="informe_defuncion"
+            columnName="mortinato_semanas_gestacion"
+            newDataType="TINYINT"/>
+
+    </changeSet>
+</databaseChangeLog>

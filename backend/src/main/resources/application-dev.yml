@@ -1,19 +1,35 @@
+# Configuración específica para desarrollo local
+# Activa con: --spring.profiles.active=dev
+
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_URL:https://sso.hro.gob.gt}/realms/${KEYCLOAK_REALM:Hospital-O}/protocol/openid-connect/certs
+
   datasource:
-    url: jdbc:mysql://localhost:3308/renap_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Guatemala
-    username: renap_user
-    password: renap_pass
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/renap_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Guatemala}
+    username: ${DB_USERNAME:renap_user}
+    password: ${DB_PASSWORD:renap_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: validate
+server:
+  port: 9090
 
-  liquibase:
-    enabled: false
+# Configuración FHIR con valores por defecto
+fhir:
+  server:
+    url: ${FHIR_SERVER_URL:https://openhim-qa-router.hro.gob.gt/fhir}
+    username: ${FHIR_USERNAME:postman}
+    password: ${FHIR_PASSWORD:Hospital0.}
+  cache:
+    enabled: true
+    ttl-minutes: 30
+    max-entries: 500
 
+# Habilitar debug para FHIR
 logging:
   level:
-    com.renap: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.renap.modules.fhir: DEBUG
+    ca.uhn.fhir: INFO

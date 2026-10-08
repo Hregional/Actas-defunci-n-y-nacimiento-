@@ -3,7 +3,7 @@ package com.renap.modules.defuncion.service;
 import com.renap.modules.defuncion.dto.InformeDefuncionDTO;
 import com.renap.modules.defuncion.dto.InformeDefuncionListDTO;
 import com.renap.modules.defuncion.entity.InformeDefuncion;
-import com.renap.modules.defuncion.mapper.InformeDefuncionMapper;
+import com.renap.modules.defuncion.mapper.InformeDefuncionMapperTemp;
 import com.renap.modules.defuncion.repository.InformeDefuncionRepository;
 import com.renap.shared.exception.ResourceNotFoundException;
 import com.renap.shared.response.PageResponse;
@@ -27,7 +27,7 @@ public class InformeDefuncionServiceImpl implements InformeDefuncionService {
     private static final Set<String> ESTADOS_VALIDOS = Set.of("BORRADOR", "COMPLETADO", "ENVIADO");
 
     private final InformeDefuncionRepository repository;
-    private final InformeDefuncionMapper mapper;
+    private final InformeDefuncionMapperTemp mapper;
 
     @Override
     public PageResponse<InformeDefuncionListDTO> buscar(String search, String estado, Pageable pageable) {

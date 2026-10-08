@@ -32,16 +32,16 @@ public class InformeDefuncion {
     private String estado = "BORRADOR";
 
     // Sección I: Información general
-    @Column(name = "info_quien_informa_nombres")
+    @Column(name = "info_quien_informa_nombres", length = 255)
     private String infoQuienInformaNombres;
 
-    @Column(name = "info_documento_identificacion")
+    @Column(name = "info_documento_identificacion", length = 100)
     private String infoDocumentoIdentificacion;
 
     @Column(name = "info_quien_informa_tipo")
     private Integer infoQuienInformaTipo;
 
-    @Column(name = "info_no_colegiado")
+    @Column(name = "info_no_colegiado", length = 50)
     private String infoNoColegiado;
 
     @Column(name = "info_fecha_defuncion")
@@ -50,17 +50,17 @@ public class InformeDefuncion {
     @Column(name = "info_hora_defuncion", length = 5)
     private String infoHoraDefuncion;
 
-    @Column(name = "info_lugar_direccion")
+    @Column(name = "info_lugar_direccion", length = 255)
     private String infoLugarDireccion;
 
-    @Column(name = "info_lugar_municipio")
+    @Column(name = "info_lugar_municipio", length = 100)
     private String infoLugarMunicipio;
 
-    @Column(name = "info_lugar_departamento")
+    @Column(name = "info_lugar_departamento", length = 100)
     private String infoLugarDepartamento;
 
     // Sección II: Datos del fallecido
-    @Column(name = "fallecido_nombre_completo")
+    @Column(name = "fallecido_nombre_completo", length = 255)
     private String fallecidoNombreCompleto;
 
     @Column(name = "fallecido_sexo")
@@ -78,31 +78,31 @@ public class InformeDefuncion {
     @Column(name = "fallecido_edad_anos")
     private Integer fallecidoEdadAnos;
 
-    @Column(name = "fallecido_doc_numero")
+    @Column(name = "fallecido_doc_numero", length = 13)
     private String fallecidoDocNumero;
 
-    @Column(name = "fallecido_doc_libro")
+    @Column(name = "fallecido_doc_libro", length = 50)
     private String fallecidoDocLibro;
 
-    @Column(name = "fallecido_doc_folio")
+    @Column(name = "fallecido_doc_folio", length = 50)
     private String fallecidoDocFolio;
 
-    @Column(name = "fallecido_doc_partida")
+    @Column(name = "fallecido_doc_partida", length = 50)
     private String fallecidoDocPartida;
 
-    @Column(name = "fallecido_lugar_nac_pais")
+    @Column(name = "fallecido_lugar_nac_pais", length = 100)
     private String fallecidoLugarNacPais;
 
-    @Column(name = "fallecido_lugar_nac_departamento")
+    @Column(name = "fallecido_lugar_nac_departamento", length = 100)
     private String fallecidoLugarNacDepartamento;
 
-    @Column(name = "fallecido_lugar_nac_municipio")
+    @Column(name = "fallecido_lugar_nac_municipio", length = 100)
     private String fallecidoLugarNacMunicipio;
 
-    @Column(name = "fallecido_nacionalidad")
+    @Column(name = "fallecido_nacionalidad", length = 100)
     private String fallecidoNacionalidad;
 
-    @Column(name = "fallecido_ocupacion")
+    @Column(name = "fallecido_ocupacion", length = 150)
     private String fallecidoOcupacion;
 
     @Column(name = "fallecido_estado_civil")
@@ -111,13 +111,13 @@ public class InformeDefuncion {
     @Column(name = "fallecido_pueblo_pertenencia")
     private Integer fallecidoPuebloPertenencia;
 
-    @Column(name = "fallecido_residencia_direccion")
+    @Column(name = "fallecido_residencia_direccion", length = 255)
     private String fallecidoResidenciaDireccion;
 
-    @Column(name = "fallecido_residencia_municipio")
+    @Column(name = "fallecido_residencia_municipio", length = 100)
     private String fallecidoResidenciaMunicipio;
 
-    @Column(name = "fallecido_residencia_departamento")
+    @Column(name = "fallecido_residencia_departamento", length = 100)
     private String fallecidoResidenciaDepartamento;
 
     @Column(name = "fallecido_escolaridad")
@@ -131,25 +131,25 @@ public class InformeDefuncion {
     @Column(name = "causa_i_a", columnDefinition = "TEXT")
     private String causaIa;
 
-    @Column(name = "causa_i_a_intervalo")
+    @Column(name = "causa_i_a_intervalo", length = 100)
     private String causaIaIntervalo;
 
     @Column(name = "causa_i_b", columnDefinition = "TEXT")
     private String causaIb;
 
-    @Column(name = "causa_i_b_intervalo")
+    @Column(name = "causa_i_b_intervalo", length = 100)
     private String causaIbIntervalo;
 
     @Column(name = "causa_i_c", columnDefinition = "TEXT")
     private String causaIc;
 
-    @Column(name = "causa_i_c_intervalo")
+    @Column(name = "causa_i_c_intervalo", length = 100)
     private String causaIcIntervalo;
 
     @Column(name = "causa_i_d", columnDefinition = "TEXT")
     private String causaId;
 
-    @Column(name = "causa_i_d_intervalo")
+    @Column(name = "causa_i_d_intervalo", length = 100)
     private String causaIdIntervalo;
 
     @Column(name = "causa_ii", columnDefinition = "TEXT")
@@ -168,32 +168,32 @@ public class InformeDefuncion {
     @Column(name = "accidental_fue_transito")
     private Integer accidentalFueTransito;
 
-    @Column(name = "accidental_arma_produjo")
+    @Column(name = "accidental_arma_produjo", length = 255)
     private String accidentalArmaProdujo;
 
     // Sección VI: Datos de la defunción fetal (mortinato)
-    @Column(name = "mortinato_madre_nombre")
+    @Column(name = "mortinato_madre_nombre", length = 255)
     private String mortinatoMadreNombre;
 
-    @Column(name = "mortinato_madre_doc_numero")
+    @Column(name = "mortinato_madre_doc_numero", length = 13)
     private String mortinatoMadreDocNumero;
 
-    @Column(name = "mortinato_madre_doc_libro")
+    @Column(name = "mortinato_madre_doc_libro", length = 50)
     private String mortinatoMadreDocLibro;
 
-    @Column(name = "mortinato_madre_doc_folio")
+    @Column(name = "mortinato_madre_doc_folio", length = 50)
     private String mortinatoMadreDocFolio;
 
-    @Column(name = "mortinato_madre_doc_partida")
+    @Column(name = "mortinato_madre_doc_partida", length = 50)
     private String mortinatoMadreDocPartida;
 
-    @Column(name = "mortinato_madre_lugar_nac_pais")
+    @Column(name = "mortinato_madre_lugar_nac_pais", length = 100)
     private String mortinatoMadreLugarNacPais;
 
-    @Column(name = "mortinato_madre_lugar_nac_departamento")
+    @Column(name = "mortinato_madre_lugar_nac_departamento", length = 100)
     private String mortinatoMadreLugarNacDepartamento;
 
-    @Column(name = "mortinato_madre_lugar_nac_municipio")
+    @Column(name = "mortinato_madre_lugar_nac_municipio", length = 100)
     private String mortinatoMadreLugarNacMunicipio;
 
     @Column(name = "mortinato_madre_edad")
@@ -205,16 +205,16 @@ public class InformeDefuncion {
     @Column(name = "mortinato_madre_pueblo_pertenencia")
     private Integer mortinatoMadrePuebloPertenencia;
 
-    @Column(name = "mortinato_madre_residencia_direccion")
+    @Column(name = "mortinato_madre_residencia_direccion", length = 255)
     private String mortinatoMadreResidenciaDireccion;
 
-    @Column(name = "mortinato_madre_residencia_municipio")
+    @Column(name = "mortinato_madre_residencia_municipio", length = 100)
     private String mortinatoMadreResidenciaMunicipio;
 
-    @Column(name = "mortinato_madre_residencia_departamento")
+    @Column(name = "mortinato_madre_residencia_departamento", length = 100)
     private String mortinatoMadreResidenciaDepartamento;
 
-    @Column(name = "mortinato_madre_ocupacion")
+    @Column(name = "mortinato_madre_ocupacion", length = 150)
     private String mortinatoMadreOcupacion;
 
     @Column(name = "mortinato_madre_sabe_leer")
@@ -223,7 +223,7 @@ public class InformeDefuncion {
     @Column(name = "mortinato_madre_escolaridad")
     private Integer mortinatoMadreEscolaridad;
 
-    @Column(name = "mortinato_madre_nacionalidad")
+    @Column(name = "mortinato_madre_nacionalidad", length = 100)
     private String mortinatoMadreNacionalidad;
 
     @Column(name = "mortinato_embarazos_nacidos_vivos")

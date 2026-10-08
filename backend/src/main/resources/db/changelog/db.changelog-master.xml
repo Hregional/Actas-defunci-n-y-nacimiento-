@@ -7,5 +7,7 @@
 
   <include file="classpath:db/changelog/changes/001-create-nacimiento.xml"/>
   <include file="classpath:db/changelog/changes/002-create-defuncion.xml"/>
+  <include file="classpath:db/changelog/changes/003-fhir-compliance-corrections.xml"/>
+  <include file="classpath:db/changelog/changes/004-revert-gestacion-to-integer.xml"/>
 
 </databaseChangeLog>

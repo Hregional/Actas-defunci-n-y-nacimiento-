@@ -33,48 +33,48 @@ public class InformeNacimiento {
     private String estado = "BORRADOR";
 
     // Sección I: Datos del que suscribe
-    @Column(name = "suscribe_nombres_apellidos")
+    @Column(name = "suscribe_nombres_apellidos", length = 255)
     private String suscribeNombresApellidos;
 
-    @Column(name = "suscribe_cui_cedula")
+    @Column(name = "suscribe_cui_cedula", length = 13)
     private String suscribeCuiCedula;
 
-    @Column(name = "suscribe_no_colegiado")
+    @Column(name = "suscribe_no_colegiado", length = 50)
     private String suscribeNoColegiado;
 
-    @Column(name = "suscribe_no_registro_comadrona")
+    @Column(name = "suscribe_no_registro_comadrona", length = 50)
     private String suscribeNoRegistroComadrona;
 
     @Column(name = "suscribe_quien_informa")
     private Integer suscribeQuienInforma;
 
     // Sección II: Lugar de nacimiento
-    @Column(name = "lugar_departamento")
+    @Column(name = "lugar_departamento", length = 100)
     private String lugarDepartamento;
 
-    @Column(name = "lugar_municipio")
+    @Column(name = "lugar_municipio", length = 100)
     private String lugarMunicipio;
 
-    @Column(name = "lugar_direccion")
+    @Column(name = "lugar_direccion", length = 255)
     private String lugarDireccion;
 
     @Column(name = "lugar_ocurrio_nacimiento")
     private Integer lugarOcurrioNacimiento;
 
     // Sección III: Datos del niño
-    @Column(name = "nino_primer_nombre")
+    @Column(name = "nino_primer_nombre", length = 100)
     private String ninoPrimerNombre;
 
-    @Column(name = "nino_segundo_nombre")
+    @Column(name = "nino_segundo_nombre", length = 100)
     private String ninoSegundoNombre;
 
-    @Column(name = "nino_tercer_nombre")
+    @Column(name = "nino_tercer_nombre", length = 100)
     private String ninoTercerNombre;
 
-    @Column(name = "nino_primer_apellido")
+    @Column(name = "nino_primer_apellido", length = 100)
     private String ninoPrimerApellido;
 
-    @Column(name = "nino_segundo_apellido")
+    @Column(name = "nino_segundo_apellido", length = 100)
     private String ninoSegundoApellido;
 
     @Column(name = "nino_fecha_nacimiento")
@@ -120,43 +120,43 @@ public class InformeNacimiento {
     private Integer ninoHijosViven;
 
     // Sección IV: Datos de la madre
-    @Column(name = "madre_primer_nombre")
+    @Column(name = "madre_primer_nombre", length = 100)
     private String madrePrimerNombre;
 
-    @Column(name = "madre_segundo_nombre")
+    @Column(name = "madre_segundo_nombre", length = 100)
     private String madreSegundoNombre;
 
-    @Column(name = "madre_primer_apellido")
+    @Column(name = "madre_primer_apellido", length = 100)
     private String madrePrimerApellido;
 
-    @Column(name = "madre_segundo_apellido")
+    @Column(name = "madre_segundo_apellido", length = 100)
     private String madreSegundoApellido;
 
-    @Column(name = "madre_apellido_casada")
+    @Column(name = "madre_apellido_casada", length = 100)
     private String madreApellidoCasada;
 
-    @Column(name = "madre_cui_cedula")
+    @Column(name = "madre_cui_cedula", length = 13)
     private String madreCuiCedula;
 
     @Column(name = "madre_edad")
     private Integer madreEdad;
 
-    @Column(name = "madre_nacionalidad")
+    @Column(name = "madre_nacionalidad", length = 100)
     private String madreNacionalidad;
 
-    @Column(name = "madre_ocupacion")
+    @Column(name = "madre_ocupacion", length = 150)
     private String madreOcupacion;
 
-    @Column(name = "madre_direccion")
+    @Column(name = "madre_direccion", length = 255)
     private String madreDireccion;
 
-    @Column(name = "madre_zona")
+    @Column(name = "madre_zona", length = 20)
     private String madreZona;
 
-    @Column(name = "madre_municipio")
+    @Column(name = "madre_municipio", length = 100)
     private String madreMunicipio;
 
-    @Column(name = "madre_departamento")
+    @Column(name = "madre_departamento", length = 100)
     private String madreDepartamento;
 
     @Column(name = "madre_pueblo_pertenencia")
@@ -169,40 +169,40 @@ public class InformeNacimiento {
     private Integer madreEscolaridad;
 
     // Sección V: Datos del padre
-    @Column(name = "padre_primer_nombre")
+    @Column(name = "padre_primer_nombre", length = 100)
     private String padrePrimerNombre;
 
-    @Column(name = "padre_segundo_nombre")
+    @Column(name = "padre_segundo_nombre", length = 100)
     private String padreSegundoNombre;
 
-    @Column(name = "padre_primer_apellido")
+    @Column(name = "padre_primer_apellido", length = 100)
     private String padrePrimerApellido;
 
-    @Column(name = "padre_segundo_apellido")
+    @Column(name = "padre_segundo_apellido", length = 100)
     private String padreSegundoApellido;
 
-    @Column(name = "padre_cui_cedula")
+    @Column(name = "padre_cui_cedula", length = 13)
     private String padreCuiCedula;
 
     @Column(name = "padre_edad")
     private Integer padreEdad;
 
-    @Column(name = "padre_nacionalidad")
+    @Column(name = "padre_nacionalidad", length = 100)
     private String padreNacionalidad;
 
-    @Column(name = "padre_ocupacion")
+    @Column(name = "padre_ocupacion", length = 150)
     private String padreOcupacion;
 
-    @Column(name = "padre_direccion")
+    @Column(name = "padre_direccion", length = 255)
     private String padreDireccion;
 
-    @Column(name = "padre_zona")
+    @Column(name = "padre_zona", length = 20)
     private String padreZona;
 
-    @Column(name = "padre_municipio")
+    @Column(name = "padre_municipio", length = 100)
     private String padreMunicipio;
 
-    @Column(name = "padre_departamento")
+    @Column(name = "padre_departamento", length = 100)
     private String padreDepartamento;
 
     @Column(name = "padre_pueblo_pertenencia")

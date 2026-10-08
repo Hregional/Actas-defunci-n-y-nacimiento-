@@ -3,7 +3,7 @@ package com.renap.modules.nacimiento.service;
 import com.renap.modules.nacimiento.dto.InformeNacimientoDTO;
 import com.renap.modules.nacimiento.dto.InformeNacimientoListDTO;
 import com.renap.modules.nacimiento.entity.InformeNacimiento;
-import com.renap.modules.nacimiento.mapper.InformeNacimientoMapper;
+import com.renap.modules.nacimiento.mapper.InformeNacimientoMapperTemp;
 import com.renap.modules.nacimiento.repository.InformeNacimientoRepository;
 import com.renap.shared.exception.ResourceNotFoundException;
 import com.renap.shared.response.PageResponse;
@@ -27,7 +27,7 @@ public class InformeNacimientoServiceImpl implements InformeNacimientoService {
     private static final Set<String> ESTADOS_VALIDOS = Set.of("BORRADOR", "COMPLETADO", "ENVIADO");
 
     private final InformeNacimientoRepository repository;
-    private final InformeNacimientoMapper mapper;
+    private final InformeNacimientoMapperTemp mapper;
 
     @Override
     public PageResponse<InformeNacimientoListDTO> buscar(String search, String estado, Pageable pageable) {

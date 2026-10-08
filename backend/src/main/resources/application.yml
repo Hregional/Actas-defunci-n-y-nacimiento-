@@ -81,3 +81,14 @@ rh-api:
   read-timeout-ms: 10000
   # En desarrollo local, Cloudflare bloquea peticiones - usar datos mock
   use-mock-data: ${RH_API_USE_MOCK:true}
+
+# ── Integración FHIR (OpenHIM) ────────────────────────────────────────────
+fhir:
+  server:
+    url: ${FHIR_SERVER_URL:https://openhim-qa-router.hro.gob.gt/fhir}
+    username: ${FHIR_USERNAME:postman}
+    password: ${FHIR_PASSWORD:Hospital0.}
+  cache:
+    enabled: true
+    ttl-minutes: 30
+    max-entries: 500
