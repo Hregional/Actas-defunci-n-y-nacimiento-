@@ -2,11 +2,14 @@ import { forwardRef } from 'react'
 import { TextField, InputAdornment, type TextFieldProps } from '@mui/material'
 import ErrorIcon from '@mui/icons-material/Error'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { cuiMensajeError } from '@/shared/utils/cuiValidator'
 
 interface DpiFieldProps extends Omit<TextFieldProps, 'onChange' | 'value'> {
   value: string
   onChange: (val: string) => void
+  /** Cuando true, el campo queda solo lectura (no editable) */
+  readOnly?: boolean
 }
 
 /**
@@ -17,11 +20,11 @@ interface DpiFieldProps extends Omit<TextFieldProps, 'onChange' | 'value'> {
  * - Muestra mensaje descriptivo del error específico
  */
 const DpiField = forwardRef<HTMLDivElement, DpiFieldProps>(
-  ({ value, onChange, label = 'DPI / CUI', disabled, ...props }, ref) => {
+  ({ value, onChange, label = 'DPI / CUI', disabled, readOnly = false, ...props }, ref) => {
     const raw     = (value ?? '').replace(/\s/g, '')
     const isEmpty = raw.length === 0
     const errorMsg = cuiMensajeError(raw)
-    const isError  = !isEmpty && errorMsg !== null
+    const isError  = !isEmpty && errorMsg !== null && !readOnly
     const isValid  = !isEmpty && errorMsg === null
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,36 +53,76 @@ const DpiField = forwardRef<HTMLDivElement, DpiFieldProps>(
     }
 
     const helperText =
-      // Si viene error externo del schema Zod, ese tiene prioridad
-      (props.error && props.helperText)
-        ? props.helperText
-        : props.helperText ??
-          (isError
-            ? errorMsg
-            : isValid
-            ? 'DPI válido'
-            : '13 dígitos — sin letras ni espacios')
+      readOnly
+        ? (props.helperText ?? 'Del buscador FHIR — no editable')
+        // Si viene error externo del schema Zod, ese tiene prioridad
+        : (props.error && props.helperText)
+          ? props.helperText
+          : props.helperText ??
+            (isError
+              ? errorMsg
+              : isValid
+              ? 'DPI válido'
+              : '13 dígitos — sin letras ni espacios')
+
+    // ── Ícono de validación propio (solo cuando no hay adorno externo) ──────────
+    // Si el padre ya pasó un endAdornment (ej: buscador FHIR con lupa), lo usamos
+    // tal cual. Si no, mostramos el ícono de éxito/error interno.
+    const externalEndAdornment = props.InputProps?.endAdornment
+
+    const ownEndAdornment = externalEndAdornment
+      ? externalEndAdornment
+      : readOnly
+      ? (
+          <InputAdornment position="end">
+            <LockOutlinedIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+          </InputAdornment>
+        )
+      : !isEmpty
+      ? (
+          <InputAdornment position="end">
+            {isValid
+              ? <CheckCircleIcon color="success" fontSize="small" />
+              : <ErrorIcon color="error" fontSize="small" />
+            }
+          </InputAdornment>
+        )
+      : undefined
+
+    // Fusionar onKeyDown: primero el nuestro (bloquea no-dígitos), luego el externo
+    const externalKeyDown = props.onKeyDown as React.KeyboardEventHandler<HTMLInputElement> | undefined
+    const mergedKeyDown = readOnly
+      ? externalKeyDown
+      : (e: React.KeyboardEvent<HTMLInputElement>) => {
+          handleKeyDown(e)
+          if (!e.defaultPrevented) externalKeyDown?.(e)
+        }
 
     return (
       <TextField
         ref={ref}
+        fullWidth
+        size="small"
         {...props}
         label={label}
         value={value ?? ''}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
+        onChange={readOnly ? undefined : handleChange}
+        onKeyDown={mergedKeyDown}
         disabled={disabled}
         error={isError || !!props.error}
         inputProps={{
           maxLength: 13,
-          inputMode: 'numeric',
-          pattern: '[0-9]*',
+          inputMode: readOnly ? undefined : 'numeric',
+          pattern: readOnly ? undefined : '[0-9]*',
           autoComplete: 'off',
+          readOnly,
         }}
         helperText={helperText}
         FormHelperTextProps={{
           sx: {
-            color: isError
+            color: readOnly
+              ? 'text.disabled'
+              : isError
               ? 'error.main'
               : isValid
               ? 'success.main'
@@ -88,26 +131,27 @@ const DpiField = forwardRef<HTMLDivElement, DpiFieldProps>(
         }}
         sx={{
           '& .MuiOutlinedInput-root': {
+            ...(readOnly && {
+              bgcolor: 'action.hover',
+              cursor: 'default',
+            }),
             '& fieldset': {
-              borderColor: isError
+              borderColor: readOnly
+                ? undefined
+                : isError
                 ? 'error.main'
                 : isValid
                 ? 'success.light'
                 : undefined,
-              borderWidth: isError || isValid ? '1.5px' : undefined,
+              borderWidth: !readOnly && (isError || isValid) ? '1.5px' : undefined,
             },
           },
           ...props.sx,
         }}
         InputProps={{
-          endAdornment: !isEmpty ? (
-            <InputAdornment position="end">
-              {isValid
-                ? <CheckCircleIcon color="success" fontSize="small" />
-                : <ErrorIcon color="error" fontSize="small" />
-              }
-            </InputAdornment>
-          ) : undefined,
+          // Fusionar con cualquier InputProps que venga del padre
+          ...props.InputProps,
+          endAdornment: ownEndAdornment,
         }}
       />
     )

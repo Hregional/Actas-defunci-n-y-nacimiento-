@@ -13,7 +13,7 @@
  * - Redirigir automáticamente cuando esté listo
  */
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Box, CircularProgress, Typography, Alert } from '@mui/material'
 import { useKeycloak } from '@/shared/context/KeycloakContext'
 import { useCurrentUser } from '@/shared/context/UserContext'
@@ -26,7 +26,6 @@ export default function InitializationGuard({ children }: InitializationGuardPro
   const { authenticated, initialized } = useKeycloak()
   const { usuario } = useCurrentUser()
   const location = useLocation()
-  const navigate = useNavigate()
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
