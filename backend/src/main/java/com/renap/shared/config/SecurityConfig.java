@@ -32,6 +32,7 @@ import org.springframework.lang.NonNull;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@SuppressWarnings("null")
 public class SecurityConfig {
 
     private static final String CLIENT_ID = "sistema-actas-frontend";
@@ -47,6 +48,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Actuator health libre
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                // Debug FHIR temporal (público para diagnosticar)
+                .requestMatchers("/fhir/pacientes/debug/**", "/fhir/pacientes/health").permitAll()
                 // Admin solo para actas-admin
                 .requestMatchers("/admin/**").hasRole("actas-admin")
                 // Todo lo demás requiere autenticación

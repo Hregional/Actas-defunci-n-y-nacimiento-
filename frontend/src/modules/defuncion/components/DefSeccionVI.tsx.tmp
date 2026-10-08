@@ -45,7 +45,6 @@ export default function DefSeccionVI() {
       subtitle="Completar solo si la muerte es fetal"
     >
       <Alert severity="info" sx={{ mb: 2 }}>
-        <strong>SI LA MUERTE ES FETAL</strong>, complete esta secciÃ³n.
         Se entiende por defunciÃ³n fetal la muerte de un producto de la concepciÃ³n, antes de su
         expulsiÃ³n o extracciÃ³n completa del cuerpo de su madre.
       </Alert>
