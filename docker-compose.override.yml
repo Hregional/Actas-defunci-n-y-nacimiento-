@@ -59,7 +59,9 @@ services:
       VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-Hospital-O}
       VITE_KEYCLOAK_CLIENT: ${VITE_KEYCLOAK_CLIENT:-sistema-actas-frontend}
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "4200"]
-    ports:
+    # !override reemplaza (no fusiona) los puertos del docker-compose.yml base,
+    # que mapea FRONTEND_PORT→80 (nginx) y chocaría con el 4200 del host
+    ports: !override
       - "4200:4200"  # Mapeo: localhost:4200 → contenedor:4200
     depends_on:
       - backend
