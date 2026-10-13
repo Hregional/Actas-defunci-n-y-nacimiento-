@@ -24,7 +24,7 @@ export default function DefuncionListPage() {
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch]         = useState('')
   const [page, setPage]             = useState(0)
-  const [size]                      = useState(10)
+  const [size]                      = useState(15)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [previewId, setPreviewId] = useState<number | null>(null)
@@ -78,8 +78,8 @@ export default function DefuncionListPage() {
               <TableCell>ID</TableCell>
               <TableCell>Fallecido(a)</TableCell>
               <TableCell>Fecha Defunción</TableCell>
-              <TableCell>Departamento</TableCell>
-              <TableCell>Municipio</TableCell>
+              <TableCell>Nacionalidad</TableCell>
+              <TableCell>Doc. Identificación</TableCell>
               <TableCell>Quien Informa</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Creado</TableCell>
@@ -106,9 +106,11 @@ export default function DefuncionListPage() {
                 <TableCell>
                   {row.infoFechaDefuncion ? dayjs(row.infoFechaDefuncion).format('DD/MM/YYYY') : '—'}
                 </TableCell>
-                <TableCell>{row.infoLugarDepartamento || '—'}</TableCell>
-                <TableCell>{row.infoLugarMunicipio || '—'}</TableCell>
-                <TableCell>{row.infoQuienInformaNombres || '—'}</TableCell>
+                <TableCell sx={{ fontSize: '0.82rem' }}>{row.fallecidoNacionalidad || '—'}</TableCell>
+                <TableCell sx={{ fontSize: '0.8rem', color: 'text.secondary', fontFamily: 'monospace' }}>
+                  {row.fallecidoDocNumero || '—'}
+                </TableCell>
+                <TableCell sx={{ fontSize: '0.82rem' }}>{row.infoQuienInformaNombres || '—'}</TableCell>
                 <TableCell><EstadoChip estado={row.estado} /></TableCell>
                 <TableCell sx={{ fontSize: '0.78rem', color: 'text.secondary' }}>
                   {dayjs(row.createdAt).format('DD/MM/YYYY HH:mm')}

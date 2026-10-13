@@ -27,6 +27,8 @@ interface CardOptionGroupProps {
   helperText?: string
   direction?: 'row' | 'col'
   size?: 'sm' | 'md' | 'lg'
+  /** Cuando true, solo muestra el estado de error si el campo fue tocado */
+  hideErrorUntilTouched?: boolean
 }
 
 export default function CardOptionGroup({
@@ -38,10 +40,14 @@ export default function CardOptionGroup({
   helperText,
   direction = 'row',
   size = 'md',
+  hideErrorUntilTouched = false,
 }: CardOptionGroupProps) {
   const theme  = useTheme()
   const isDark = theme.palette.mode === 'dark'
   const hasVal = value !== null && value !== undefined && value !== ''
+
+  // Si hideErrorUntilTouched=true, nunca mostramos error (el padre controla con isTouched)
+  const showError = hideErrorUntilTouched ? false : !!error
 
   const padMap = { sm: '8px 10px', md: '11px 14px', lg: '14px 18px' }
   const pad    = padMap[size]
@@ -55,7 +61,7 @@ export default function CardOptionGroup({
           display: 'block',
           mb: 0.75,
           fontSize: hasVal ? '0.7rem' : '0.82rem',
-          color: error
+          color: showError
             ? 'error.main'
             : hasVal
               ? 'primary.main'
@@ -82,7 +88,7 @@ export default function CardOptionGroup({
           const activeColor  = opt.color ?? theme.palette.primary.main
           const borderColor  = selected
             ? activeColor
-            : error
+            : showError
               ? theme.palette.error.main
               : isDark ? '#2D4159' : '#C8D6E8'
           const bgColor = selected
@@ -170,12 +176,12 @@ export default function CardOptionGroup({
 
       {/* helperText solo si NO hay valor (no tapa lo seleccionado) */}
       {!hasVal && helperText && (
-        <FormHelperText error={error} sx={{ mx: '2px', mt: 0.5 }}>
+        <FormHelperText error={showError} sx={{ mx: '2px', mt: 0.5 }}>
           {helperText}
         </FormHelperText>
       )}
-      {/* Siempre muestra error si hay */}
-      {hasVal && error && helperText && (
+      {/* Siempre muestra error si hay valor pero el campo tiene error */}
+      {hasVal && showError && helperText && (
         <FormHelperText error sx={{ mx: '2px', mt: 0.5 }}>
           {helperText}
         </FormHelperText>

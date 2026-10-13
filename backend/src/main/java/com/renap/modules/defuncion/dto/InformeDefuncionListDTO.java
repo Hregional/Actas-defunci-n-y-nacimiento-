@@ -11,6 +11,8 @@ public class InformeDefuncionListDTO {
     private Long id;
     private String estado;
     private String fallecidoNombreCompleto;
+    private String fallecidoNacionalidad;
+    private String fallecidoDocNumero;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate infoFechaDefuncion;
     private String infoLugarDepartamento;

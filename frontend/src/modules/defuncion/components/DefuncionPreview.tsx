@@ -277,7 +277,6 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
               Firma de la persona que extiende el informe: ____________________________________"
             </div>
           </div>
-          <p className="continua">/ CONTINÚA AL REVERSO</p>
 
           {/* ════════════ REVERSO — PÁGINA 2 ════════════ */}
           <div className="page-break" />

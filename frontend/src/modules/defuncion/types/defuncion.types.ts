@@ -99,6 +99,8 @@ export interface InformeDefuncionListDTO {
   id: number
   estado: string
   fallecidoNombreCompleto: string
+  fallecidoNacionalidad?: string
+  fallecidoDocNumero?: string
   infoFechaDefuncion: string
   infoLugarDepartamento: string
   infoLugarMunicipio: string

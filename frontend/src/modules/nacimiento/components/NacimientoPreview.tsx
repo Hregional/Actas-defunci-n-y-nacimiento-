@@ -224,7 +224,6 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
             Nota: En caso de nacer más de un niño, debe llenarse un informe de nacimiento para cada uno,
             asignándole el orden en que haya nacido.
           </p>
-          <p className="continua">/ CONTINÚA AL REVERSO</p>
 
           {/* ════════════ REVERSO — PÁGINA 2 ════════════ */}
           <div className="page-break" />
