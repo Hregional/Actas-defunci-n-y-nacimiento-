@@ -1,34 +1,39 @@
 /**
  * Tema HRO — Sistema de Informes
  *
- * Paleta teal-índigo con modo claro y oscuro.
- * Modo claro:  fondo slate azulado suave, no blanco puro.
- * Modo oscuro: fondo azul-marino profundo, no negro puro.
- *
- * La función buildTheme acepta 'light' | 'dark' para que main.tsx
- * pueda elegir según la preferencia del sistema operativo.
+ * Modo oscuro: Vision UI — azul marino profundo, gradientes eléctricos, glassmorphism.
+ * Modo claro:  Derivación limpia del mismo lenguaje visual con fondos slate claros.
  */
 import { createTheme, alpha } from '@mui/material/styles'
 import type { PaletteMode } from '@mui/material'
 
-// ── Paleta base ───────────────────────────────────────────────────────────────
-const TEAL_DARK  = '#0D7377'   // primario oscuro
-const TEAL_MAIN  = '#14A0A6'   // primario principal
-const TEAL_LIGHT = '#5ECDD1'   // primario claro
+// ── Paleta Vision UI ──────────────────────────────────────────────────────────
+// Primario: azul eléctrico / cian
+const CYAN_DARK = '#0B8FAC'
+const CYAN_MAIN = '#0BC5EA'
+const CYAN_LIGHT = '#76E4F7'
 
-const INDIGO_DARK  = '#283593'
-const INDIGO_MAIN  = '#3F51B5'
-const INDIGO_LIGHT = '#7986CB'
+// Acento: violeta/índigo para gradientes
+const VIOLET_DARK = '#3A0CA3'
+const VIOLET_MAIN = '#4361EE'
+const VIOLET_LIGHT = '#7B93FF'
 
-// Modo claro
-const LIGHT_BG_DEFAULT = '#EEF2F7'   // slate azulado suave
-const LIGHT_BG_PAPER   = '#F8FAFD'   // casi blanco con tinte frío
-const LIGHT_BG_SUBTLE  = '#E3EAF3'   // superficies alternadas
+// Fondos modo oscuro — Vision UI signature
+const DARK_BG_BODY = '#0B1437'   // fondo raíz — azul marino muy profundo
+const DARK_BG_CARD = '#111C44'   // cards y panels
+const DARK_BG_ELEVATED = '#1B254B'   // superficies elevadas, sidebar
 
-// Modo oscuro
-const DARK_BG_DEFAULT  = '#0F1923'   // azul marino muy oscuro
-const DARK_BG_PAPER    = '#162130'   // panels y cards
-const DARK_BG_ELEVATED = '#1D2D40'   // elementos elevados
+// Fondos modo claro — derivados limpios
+const LIGHT_BG_BODY = '#F4F7FE'   // fondo raíz — slate muy frío
+const LIGHT_BG_CARD = '#FFFFFF'   // cards blancas
+const LIGHT_BG_SUBTLE = '#E9EDF7'   // superficies alternadas
+
+// Gradientes reutilizables
+export const GRAD_CYAN = 'linear-gradient(127deg, #0BC5EA 0%, #4361EE 100%)'
+export const GRAD_VIOLET = 'linear-gradient(127deg, #4361EE 0%, #7B2FBE 100%)'
+export const GRAD_GREEN = 'linear-gradient(127deg, #01B574 0%, #0BC5EA 100%)'
+export const GRAD_ORANGE = 'linear-gradient(127deg, #FF6B35 0%, #F7C59F 100%)'
+export const GRAD_PINK = 'linear-gradient(127deg, #E040FB 0%, #7B2FBE 100%)'
 
 // ── Fábrica del tema ──────────────────────────────────────────────────────────
 export function buildTheme(mode: PaletteMode) {
@@ -38,79 +43,84 @@ export function buildTheme(mode: PaletteMode) {
     palette: {
       mode,
       primary: {
-        main:         TEAL_MAIN,
-        dark:         TEAL_DARK,
-        light:        TEAL_LIGHT,
+        main: CYAN_MAIN,
+        dark: CYAN_DARK,
+        light: CYAN_LIGHT,
         contrastText: '#FFFFFF',
       },
       secondary: {
-        main:         INDIGO_MAIN,
-        dark:         INDIGO_DARK,
-        light:        INDIGO_LIGHT,
+        main: VIOLET_MAIN,
+        dark: VIOLET_DARK,
+        light: VIOLET_LIGHT,
         contrastText: '#FFFFFF',
       },
-      success:  { main: '#2E7D32', light: '#66BB6A', dark: '#1B5E20' },
-      warning:  { main: '#F57C00', light: '#FFB74D', dark: '#E65100' },
-      error:    { main: '#C62828', light: '#EF5350', dark: '#8E0000' },
-      info:     { main: TEAL_MAIN, light: TEAL_LIGHT, dark: TEAL_DARK },
+      success: { main: '#01B574', light: '#4FD1A5', dark: '#008A55' },
+      warning: { main: '#FFB547', light: '#FFD180', dark: '#E08000' },
+      error: { main: '#E53E3E', light: '#FC8181', dark: '#9B2C2C' },
+      info: { main: CYAN_MAIN, light: CYAN_LIGHT, dark: CYAN_DARK },
 
       background: {
-        default: isLight ? LIGHT_BG_DEFAULT : DARK_BG_DEFAULT,
-        paper:   isLight ? LIGHT_BG_PAPER   : DARK_BG_PAPER,
+        default: isLight ? LIGHT_BG_BODY : DARK_BG_BODY,
+        paper: isLight ? LIGHT_BG_CARD : DARK_BG_CARD,
       },
 
       text: isLight
-        ? { primary: '#1A2340', secondary: '#4A5A72', disabled: '#9BAABB' }
-        : { primary: '#E8EDF5', secondary: '#9BAABB', disabled: '#4A5A72' },
+        ? { primary: '#111827', secondary: '#4B5563', disabled: '#9CA3AF' }
+        : { primary: '#FFFFFF', secondary: '#A3AED0', disabled: '#4A5568' },
 
-      divider: isLight ? '#CBD5E8' : '#243347',
+      divider: isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.06),
 
       action: {
-        hover:           alpha(TEAL_MAIN, isLight ? 0.06 : 0.12),
-        selected:        alpha(TEAL_MAIN, isLight ? 0.10 : 0.20),
-        disabledBackground: isLight ? '#E0E7EF' : '#243347',
+        hover: alpha(CYAN_MAIN, isLight ? 0.07 : 0.10),
+        selected: alpha(CYAN_MAIN, isLight ? 0.12 : 0.18),
+        disabledBackground: isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.05),
       },
     },
 
     // ── Tipografía ───────────────────────────────────────────────────────────
     typography: {
-      fontFamily: '"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif',
+      fontFamily: '"DM Sans", "Inter", "Roboto", sans-serif',
       h1: { fontSize: '1.875rem', fontWeight: 700, letterSpacing: '-0.02em' },
-      h2: { fontSize: '1.5rem',   fontWeight: 700, letterSpacing: '-0.01em' },
-      h3: { fontSize: '1.25rem',  fontWeight: 600 },
-      h4: { fontSize: '1.125rem', fontWeight: 600 },
-      h5: { fontSize: '1rem',     fontWeight: 600 },
-      h6: { fontSize: '0.938rem', fontWeight: 600 },
-      body1:    { fontSize: '0.9rem',   lineHeight: 1.6 },
-      body2:    { fontSize: '0.825rem', lineHeight: 1.5 },
-      caption:  { fontSize: '0.75rem',  lineHeight: 1.4 },
-      overline: { fontSize: '0.7rem',   letterSpacing: '0.08em', fontWeight: 600 },
-      subtitle1:{ fontWeight: 600 },
-      subtitle2:{ fontWeight: 600 },
+      h2: { fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.01em' },
+      h3: { fontSize: '1.25rem', fontWeight: 700 },
+      h4: { fontSize: '1.125rem', fontWeight: 700 },
+      h5: { fontSize: '1rem', fontWeight: 700 },
+      h6: { fontSize: '0.938rem', fontWeight: 700 },
+      body1: { fontSize: '0.875rem', lineHeight: 1.6 },
+      body2: { fontSize: '0.813rem', lineHeight: 1.5 },
+      caption: { fontSize: '0.75rem', lineHeight: 1.4 },
+      overline: { fontSize: '0.688rem', letterSpacing: '0.10em', fontWeight: 700 },
+      subtitle1: { fontWeight: 700 },
+      subtitle2: { fontWeight: 700 },
     },
 
-    shape: { borderRadius: 10 },
+    shape: { borderRadius: 16 },
 
-    // ── Sombras (más suaves y con tinte de color) ────────────────────────────
+    breakpoints: {
+      values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
+    },
+
     shadows: [
       'none',
       isLight
-        ? '0 1px 3px rgba(20,160,166,0.08), 0 1px 2px rgba(0,0,0,0.04)'
-        : '0 1px 3px rgba(0,0,0,0.30)',
+        ? '0 1px 4px rgba(27,37,75,0.06)'
+        : '0 1px 4px rgba(0,0,0,0.35)',
       isLight
-        ? '0 2px 8px rgba(20,160,166,0.10), 0 1px 3px rgba(0,0,0,0.04)'
-        : '0 2px 8px rgba(0,0,0,0.40)',
+        ? '0 2px 8px rgba(11,197,234,0.10)'
+        : '0 2px 12px rgba(0,0,0,0.45)',
       isLight
-        ? '0 4px 14px rgba(20,160,166,0.12), 0 2px 4px rgba(0,0,0,0.05)'
-        : '0 4px 14px rgba(0,0,0,0.50)',
-      isLight ? '0 6px 18px rgba(20,160,166,0.13)' : '0 6px 18px rgba(0,0,0,0.55)',
-      isLight ? '0 8px 24px rgba(20,160,166,0.14)' : '0 8px 24px rgba(0,0,0,0.58)',
-      ...Array(19).fill(isLight
-        ? '0 10px 30px rgba(20,160,166,0.15)'
-        : '0 10px 30px rgba(0,0,0,0.60)'),
+        ? '0 4px 16px rgba(11,197,234,0.12)'
+        : '0 4px 20px rgba(0,0,0,0.55)',
+      isLight ? '0 6px 20px rgba(11,197,234,0.14)' : '0 8px 26px rgba(0,0,0,0.60)',
+      isLight ? '0 8px 28px rgba(11,197,234,0.16)' : '0 12px 32px rgba(0,0,0,0.65)',
+      ...Array(19).fill(
+        isLight
+          ? '0 12px 36px rgba(11,197,234,0.18)'
+          : '0 14px 40px rgba(0,0,0,0.70)',
+      ),
     ] as ReturnType<typeof createTheme>['shadows'],
 
-    // ── Overrides de componentes ─────────────────────────────────────────────
+    // ── Overrides ────────────────────────────────────────────────────────────
     components: {
 
       // ── Button ──
@@ -118,23 +128,33 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           root: {
             textTransform: 'none',
-            fontWeight: 600,
-            borderRadius: 8,
-            padding: '7px 18px',
+            fontWeight: 700,
+            borderRadius: 12,
+            padding: '8px 20px',
             fontSize: '0.875rem',
             letterSpacing: '0.01em',
-            transition: 'all 0.18s ease',
+            transition: 'all 0.20s ease',
           },
           contained: {
-            boxShadow: `0 2px 8px ${alpha(TEAL_MAIN, 0.30)}`,
-            '&:hover': { boxShadow: `0 4px 14px ${alpha(TEAL_MAIN, 0.45)}` },
+            background: GRAD_CYAN,
+            boxShadow: `0 4px 14px ${alpha(CYAN_MAIN, 0.40)}`,
+            '&:hover': {
+              background: GRAD_CYAN,
+              boxShadow: `0 6px 20px ${alpha(CYAN_MAIN, 0.55)}`,
+              transform: 'translateY(-1px)',
+            },
           },
           outlined: {
             borderWidth: '1.5px',
-            '&:hover': { borderWidth: '1.5px' },
+            borderColor: isLight ? CYAN_MAIN : alpha(CYAN_MAIN, 0.60),
+            color: CYAN_MAIN,
+            '&:hover': {
+              borderWidth: '1.5px',
+              backgroundColor: alpha(CYAN_MAIN, 0.08),
+            },
           },
-          sizeLarge: { padding: '10px 24px', fontSize: '0.938rem' },
-          sizeSmall: { padding: '4px 12px',  fontSize: '0.8rem'   },
+          sizeLarge: { padding: '11px 28px', fontSize: '0.938rem' },
+          sizeSmall: { padding: '5px 14px', fontSize: '0.8rem' },
         },
       },
 
@@ -144,25 +164,29 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 8,
+              borderRadius: 12,
               backgroundColor: isLight
-                ? alpha('#FFFFFF', 0.7)
-                : alpha(DARK_BG_ELEVATED, 0.8),
+                ? '#FFFFFF'
+                : alpha(DARK_BG_ELEVATED, 0.70),
+              backdropFilter: isLight ? 'none' : 'blur(6px)',
               fontSize: '0.875rem',
-              backdropFilter: 'blur(4px)',
               '& fieldset': {
-                borderColor: isLight ? '#C8D6E8' : '#2D4159',
+                borderColor: isLight ? '#D1D5DB' : alpha('#FFFFFF', 0.08),
                 borderWidth: '1.5px',
               },
-              '&:hover fieldset': { borderColor: TEAL_MAIN },
+              '&:hover fieldset': { borderColor: CYAN_MAIN },
               '&.Mui-focused fieldset': {
-                borderColor: TEAL_MAIN,
+                borderColor: CYAN_MAIN,
                 borderWidth: '2px',
-                boxShadow: `0 0 0 3px ${alpha(TEAL_MAIN, 0.15)}`,
+                boxShadow: `0 0 0 3px ${alpha(CYAN_MAIN, 0.15)}`,
               },
             },
-            '& .MuiInputLabel-root': { fontSize: '0.85rem' },
-            '& .MuiInputBase-input': { padding: '8px 12px' },
+            '& .MuiInputLabel-root': { fontSize: '0.85rem', color: isLight ? '#374151' : undefined },
+            '& .MuiInputBase-input': {
+              padding: '8px 12px',
+              fontSize: 'max(16px, 0.875rem)',
+              color: isLight ? '#111827' : undefined,
+            },
           },
         },
       },
@@ -174,83 +198,91 @@ export function buildTheme(mode: PaletteMode) {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: 12,
             backgroundColor: isLight
-              ? alpha('#FFFFFF', 0.7)
-              : alpha(DARK_BG_ELEVATED, 0.8),
+              ? '#FFFFFF'
+              : alpha(DARK_BG_ELEVATED, 0.70),
+            backdropFilter: isLight ? 'none' : 'blur(6px)',
+            color: isLight ? '#111827' : undefined,
             '& fieldset': {
-              borderColor: isLight ? '#C8D6E8' : '#2D4159',
+              borderColor: isLight ? '#D1D5DB' : alpha('#FFFFFF', 0.08),
               borderWidth: '1.5px',
             },
-            '&:hover fieldset': { borderColor: TEAL_MAIN },
+            '&:hover fieldset': { borderColor: CYAN_MAIN },
             '&.Mui-focused fieldset': {
-              borderColor: TEAL_MAIN,
+              borderColor: CYAN_MAIN,
               borderWidth: '2px',
-              boxShadow: `0 0 0 3px ${alpha(TEAL_MAIN, 0.15)}`,
+              boxShadow: `0 0 0 3px ${alpha(CYAN_MAIN, 0.15)}`,
             },
           },
         },
       },
       MuiSelect: {
         styleOverrides: {
-          select: { fontSize: '0.875rem', padding: '8px 12px' },
+          select: { fontSize: 'max(16px, 0.875rem)', padding: '8px 12px' },
         },
       },
       MuiInputLabel: {
         styleOverrides: {
-          root: { fontSize: '0.85rem' },
+          root: { fontSize: '0.85rem', color: isLight ? '#374151' : undefined },
         },
       },
       MuiMenuItem: {
         styleOverrides: {
           root: {
             fontSize: '0.875rem',
+            borderRadius: 8,
+            mx: 0.5,
             '&.Mui-selected': {
-              backgroundColor: alpha(TEAL_MAIN, 0.15),
-              '&:hover': { backgroundColor: alpha(TEAL_MAIN, 0.22) },
+              backgroundColor: alpha(CYAN_MAIN, 0.15),
+              '&:hover': { backgroundColor: alpha(CYAN_MAIN, 0.22) },
             },
           },
         },
       },
 
-      // ── Card / Paper ──
+      // ── Card ──
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 14,
+            borderRadius: 20,
             backgroundImage: 'none',
-            border: `1px solid ${isLight ? '#DDE6F0' : '#243347'}`,
+            backgroundColor: isLight ? LIGHT_BG_CARD : DARK_BG_CARD,
+            border: `1px solid ${isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.06)}`,
             boxShadow: isLight
-              ? '0 2px 10px rgba(20,160,166,0.08)'
-              : '0 2px 10px rgba(0,0,0,0.35)',
+              ? '0 4px 20px rgba(27,37,75,0.06)'
+              : '0 4px 24px rgba(0,0,0,0.35)',
+            backdropFilter: isLight ? 'none' : 'blur(10px)',
           },
         },
       },
+
+      // ── Paper ──
       MuiPaper: {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: isLight ? LIGHT_BG_PAPER : DARK_BG_PAPER,
+            backgroundColor: isLight ? LIGHT_BG_CARD : DARK_BG_CARD,
           },
           elevation1: {
             boxShadow: isLight
-              ? '0 1px 5px rgba(20,160,166,0.07)'
-              : '0 1px 5px rgba(0,0,0,0.30)',
+              ? '0 2px 10px rgba(27,37,75,0.06)'
+              : '0 2px 12px rgba(0,0,0,0.40)',
           },
           elevation2: {
             boxShadow: isLight
-              ? '0 2px 10px rgba(20,160,166,0.09)'
-              : '0 2px 10px rgba(0,0,0,0.40)',
+              ? '0 4px 16px rgba(27,37,75,0.08)'
+              : '0 4px 20px rgba(0,0,0,0.50)',
           },
           elevation3: {
             boxShadow: isLight
-              ? '0 4px 16px rgba(20,160,166,0.12)'
-              : '0 4px 16px rgba(0,0,0,0.50)',
+              ? '0 6px 22px rgba(11,197,234,0.10)'
+              : '0 6px 28px rgba(0,0,0,0.55)',
           },
           elevation8: {
             boxShadow: isLight
-              ? '0 8px 28px rgba(20,160,166,0.16)'
-              : '0 8px 28px rgba(0,0,0,0.60)',
+              ? '0 8px 30px rgba(11,197,234,0.14)'
+              : '0 10px 36px rgba(0,0,0,0.65)',
           },
         },
       },
@@ -260,19 +292,24 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: isLight ? alpha(LIGHT_BG_PAPER, 0.92) : alpha(DARK_BG_PAPER, 0.92),
-            backdropFilter: 'blur(12px)',
+            backgroundColor: isLight
+              ? alpha(LIGHT_BG_CARD, 0.85)
+              : alpha(DARK_BG_CARD, 0.80),
+            backdropFilter: 'blur(20px)',
+            borderBottom: `1px solid ${isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.06)}`,
+            boxShadow: 'none',
           },
         },
       },
 
-      // ── Drawer ──
+      // ── Drawer (Sidebar) ──
       MuiDrawer: {
         styleOverrides: {
           paper: {
             backgroundImage: 'none',
-            backgroundColor: isLight ? LIGHT_BG_PAPER : DARK_BG_PAPER,
-            borderRight: `1px solid ${isLight ? '#DDE6F0' : '#243347'}`,
+            backgroundColor: isLight ? LIGHT_BG_CARD : DARK_BG_ELEVATED,
+            borderRight: `1px solid ${isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.06)}`,
+            backdropFilter: isLight ? 'none' : 'blur(20px)',
           },
         },
       },
@@ -280,11 +317,11 @@ export function buildTheme(mode: PaletteMode) {
       // ── Chip ──
       MuiChip: {
         styleOverrides: {
-          root: { borderRadius: 6, fontWeight: 600, fontSize: '0.75rem' },
+          root: { borderRadius: 8, fontWeight: 700, fontSize: '0.72rem' },
           sizeSmall: { height: 22 },
           colorPrimary: {
-            backgroundColor: alpha(TEAL_MAIN, isLight ? 0.12 : 0.25),
-            color: isLight ? TEAL_DARK : TEAL_LIGHT,
+            background: alpha(CYAN_MAIN, isLight ? 0.12 : 0.20),
+            color: isLight ? CYAN_DARK : CYAN_LIGHT,
           },
         },
       },
@@ -296,17 +333,17 @@ export function buildTheme(mode: PaletteMode) {
           head: {
             fontWeight: 700,
             backgroundColor: isLight ? LIGHT_BG_SUBTLE : DARK_BG_ELEVATED,
-            color: isLight ? '#2D3E56' : '#9BAABB',
-            fontSize: '0.78rem',
+            color: isLight ? '#707EAE' : '#A3AED0',
+            fontSize: '0.75rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.05em',
           },
         },
       },
       MuiTableRow: {
         styleOverrides: {
           root: {
-            '&:hover': { backgroundColor: alpha(TEAL_MAIN, 0.05) },
+            '&:hover': { backgroundColor: alpha(CYAN_MAIN, 0.05) },
             '&:last-child td': { borderBottom: 0 },
           },
         },
@@ -317,16 +354,16 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           label: {
             fontSize: '0.75rem',
-            '&.Mui-active':    { fontWeight: 700, color: TEAL_MAIN },
-            '&.Mui-completed': { color: '#2E7D32' },
+            '&.Mui-active': { fontWeight: 700, color: CYAN_MAIN },
+            '&.Mui-completed': { color: '#01B574' },
           },
         },
       },
       MuiStepIcon: {
         styleOverrides: {
           root: {
-            '&.Mui-active':    { color: TEAL_MAIN },
-            '&.Mui-completed': { color: '#2E7D32' },
+            '&.Mui-active': { color: CYAN_MAIN },
+            '&.Mui-completed': { color: '#01B574' },
           },
         },
       },
@@ -335,13 +372,13 @@ export function buildTheme(mode: PaletteMode) {
       MuiLinearProgress: {
         styleOverrides: {
           root: {
-            borderRadius: 4,
-            height: 5,
-            backgroundColor: alpha(TEAL_MAIN, 0.15),
+            borderRadius: 6,
+            height: 6,
+            backgroundColor: alpha(CYAN_MAIN, 0.12),
           },
           bar: {
-            borderRadius: 4,
-            background: `linear-gradient(90deg, ${TEAL_DARK} 0%, ${TEAL_MAIN} 100%)`,
+            borderRadius: 6,
+            background: GRAD_CYAN,
           },
         },
       },
@@ -349,19 +386,19 @@ export function buildTheme(mode: PaletteMode) {
       // ── Alert ──
       MuiAlert: {
         styleOverrides: {
-          root: { borderRadius: 8, fontSize: '0.85rem' },
+          root: { borderRadius: 12, fontSize: '0.85rem' },
           standardInfo: {
-            backgroundColor: isLight ? alpha(TEAL_MAIN, 0.1) : alpha(TEAL_MAIN, 0.18),
-            color: isLight ? TEAL_DARK : TEAL_LIGHT,
+            backgroundColor: isLight ? alpha(CYAN_MAIN, 0.10) : alpha(CYAN_MAIN, 0.15),
+            color: isLight ? CYAN_DARK : CYAN_LIGHT,
           },
           standardSuccess: {
-            backgroundColor: isLight ? '#E8F5E9' : alpha('#2E7D32', 0.2),
+            backgroundColor: isLight ? alpha('#01B574', 0.10) : alpha('#01B574', 0.15),
           },
           standardWarning: {
-            backgroundColor: isLight ? '#FFF8E1' : alpha('#F57C00', 0.2),
+            backgroundColor: isLight ? alpha('#FFB547', 0.10) : alpha('#FFB547', 0.15),
           },
           standardError: {
-            backgroundColor: isLight ? '#FFEBEE' : alpha('#C62828', 0.2),
+            backgroundColor: isLight ? alpha('#E53E3E', 0.10) : alpha('#E53E3E', 0.15),
           },
         },
       },
@@ -370,8 +407,10 @@ export function buildTheme(mode: PaletteMode) {
       MuiDialog: {
         styleOverrides: {
           paper: {
-            borderRadius: 16,
-            border: `1px solid ${isLight ? '#DDE6F0' : '#243347'}`,
+            borderRadius: 20,
+            border: `1px solid ${isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.08)}`,
+            backgroundColor: isLight ? LIGHT_BG_CARD : DARK_BG_ELEVATED,
+            backdropFilter: 'blur(20px)',
           },
         },
       },
@@ -381,12 +420,12 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           tooltip: {
             fontSize: '0.75rem',
-            borderRadius: 6,
-            backgroundColor: isLight ? '#1A2340' : alpha(DARK_BG_ELEVATED, 0.97),
-            border: `1px solid ${isLight ? 'transparent' : '#2D4159'}`,
+            borderRadius: 8,
+            backgroundColor: isLight ? '#1B254B' : alpha(DARK_BG_ELEVATED, 0.97),
+            border: `1px solid ${isLight ? 'transparent' : alpha('#FFFFFF', 0.08)}`,
           },
           arrow: {
-            color: isLight ? '#1A2340' : alpha(DARK_BG_ELEVATED, 0.97),
+            color: isLight ? '#1B254B' : alpha(DARK_BG_ELEVATED, 0.97),
           },
         },
       },
@@ -394,7 +433,7 @@ export function buildTheme(mode: PaletteMode) {
       // ── Divider ──
       MuiDivider: {
         styleOverrides: {
-          root: { borderColor: isLight ? '#DDE6F0' : '#243347' },
+          root: { borderColor: isLight ? '#E9EDF7' : alpha('#FFFFFF', 0.06) },
         },
       },
 
@@ -402,8 +441,8 @@ export function buildTheme(mode: PaletteMode) {
       MuiRadio: {
         styleOverrides: {
           root: {
-            color: isLight ? '#9BAABB' : '#4A5A72',
-            '&.Mui-checked': { color: TEAL_MAIN },
+            color: isLight ? '#B0BBD5' : '#4A5568',
+            '&.Mui-checked': { color: CYAN_MAIN },
             padding: '4px 6px',
           },
         },
@@ -411,8 +450,8 @@ export function buildTheme(mode: PaletteMode) {
       MuiCheckbox: {
         styleOverrides: {
           root: {
-            color: isLight ? '#9BAABB' : '#4A5A72',
-            '&.Mui-checked': { color: TEAL_MAIN },
+            color: isLight ? '#B0BBD5' : '#4A5568',
+            '&.Mui-checked': { color: CYAN_MAIN },
           },
         },
       },
@@ -422,29 +461,29 @@ export function buildTheme(mode: PaletteMode) {
         styleOverrides: {
           root: {
             fontSize: '0.82rem',
-            color: isLight ? '#4A5A72' : '#9BAABB',
-            '&.Mui-focused': { color: TEAL_MAIN },
+            color: isLight ? '#374151' : '#A3AED0',
+            '&.Mui-focused': { color: CYAN_MAIN },
           },
         },
       },
 
-      // ── CssBaseline — override global ──
+      // ── CssBaseline ──
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            backgroundColor: isLight ? LIGHT_BG_DEFAULT : DARK_BG_DEFAULT,
+            backgroundColor: isLight ? LIGHT_BG_BODY : DARK_BG_BODY,
             scrollbarWidth: 'thin',
             scrollbarColor: isLight
-              ? `${alpha(TEAL_MAIN, 0.3)} transparent`
-              : `${alpha(TEAL_MAIN, 0.2)} transparent`,
+              ? `${alpha(CYAN_MAIN, 0.25)} transparent`
+              : `${alpha(CYAN_MAIN, 0.18)} transparent`,
           },
-          '*::-webkit-scrollbar': { width: '6px', height: '6px' },
+          '*::-webkit-scrollbar': { width: '5px', height: '5px' },
           '*::-webkit-scrollbar-track': { background: 'transparent' },
           '*::-webkit-scrollbar-thumb': {
-            background: isLight ? alpha(TEAL_MAIN, 0.25) : alpha(TEAL_MAIN, 0.20),
+            background: isLight ? alpha(CYAN_MAIN, 0.22) : alpha(CYAN_MAIN, 0.18),
             borderRadius: '3px',
             '&:hover': {
-              background: isLight ? alpha(TEAL_MAIN, 0.45) : alpha(TEAL_MAIN, 0.35),
+              background: isLight ? alpha(CYAN_MAIN, 0.40) : alpha(CYAN_MAIN, 0.32),
             },
           },
         },
@@ -453,5 +492,4 @@ export function buildTheme(mode: PaletteMode) {
   })
 }
 
-// Exportación por defecto para compatibilidad con código existente (usa light)
 export default buildTheme('light')

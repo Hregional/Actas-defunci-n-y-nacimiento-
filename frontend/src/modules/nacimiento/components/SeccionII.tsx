@@ -31,7 +31,7 @@ export default function SeccionII() {
   }, [setValue])
 
   return (
-    <SectionCard title="II. Datos del lugar de nacimiento">
+    <SectionCard title="II. Datos del lugar de nacimiento" variant="nacimiento">
       <Alert
         severity="info"
         icon={<LockIcon fontSize="small" />}

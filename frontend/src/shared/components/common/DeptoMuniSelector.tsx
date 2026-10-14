@@ -40,10 +40,10 @@ export default function DeptoMuniSelector({
   deptoError,
   muniError,
   deptoGrid = { xs: 12, sm: 6 },
-  muniGrid  = { xs: 12, sm: 6 },
+  muniGrid = { xs: 12, sm: 6 },
   deptoLabel = 'Departamento',
-  muniLabel  = 'Municipio',
-  required   = false,
+  muniLabel = 'Municipio',
+  required = false,
 }: Props) {
   const municipios = useMemo(() => {
     if (!deptoValue) return []
@@ -66,7 +66,6 @@ export default function DeptoMuniSelector({
             label={`${deptoLabel}${required ? ' *' : ''}`}
             onChange={(e) => handleDeptoChange(e.target.value)}
           >
-            <MenuItem value=""><em>Seleccionar departamento</em></MenuItem>
             {DEPARTAMENTOS_GUATEMALA.map(d => (
               <MenuItem key={d.title} value={d.title}>{d.title}</MenuItem>
             ))}
@@ -83,9 +82,6 @@ export default function DeptoMuniSelector({
             label={`${muniLabel}${required ? ' *' : ''}`}
             onChange={(e) => onMuniChange(e.target.value)}
           >
-            <MenuItem value="">
-              <em>{deptoValue ? 'Seleccionar municipio' : 'Primero seleccione un departamento'}</em>
-            </MenuItem>
             {municipios.map(m => (
               <MenuItem key={m} value={m}>{m}</MenuItem>
             ))}

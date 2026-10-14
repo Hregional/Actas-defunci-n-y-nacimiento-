@@ -5,6 +5,7 @@ package com.renap.shared.integration.rh;
  * o no se puede completar la solicitud.
  */
 public class RhApiException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
     public RhApiException(String message) {
         super(message);

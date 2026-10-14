@@ -1,5 +1,6 @@
 package com.renap.shared.exception;
 
+import com.renap.shared.integration.icd.IcdApiException;
 import com.renap.shared.integration.keycloak.KeycloakTokenException;
 import com.renap.shared.integration.rh.RhApiException;
 import com.renap.shared.response.ApiResponse;
@@ -67,6 +68,14 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.error("No se pudo consultar el sistema de RH: " + ex.getMessage()));
+    }
+
+    /** Error al llamar a la API ICD (CIE-11): timeout, credenciales, error HTTP, etc. */
+    @ExceptionHandler(IcdApiException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIcdApi(IcdApiException ex) {
+        log.error("Error en API ICD: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("No se pudo consultar la CIE-11"));
     }
 
     @ExceptionHandler(Exception.class)

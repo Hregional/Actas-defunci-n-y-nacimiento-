@@ -9,324 +9,512 @@ Desarrollado para el **Hospital Regional de Occidente · Quetzaltenango, Guatema
 
 ## Requisitos previos
 
-Antes de clonar y levantar el proyecto, cada integrante del equipo necesita tener instalado:
-
 | Herramienta | Versión mínima | Descarga |
-|-------------|---------------|---------|
-| **Docker Desktop** | 4.x o superior | https://www.docker.com/products/docker-desktop |
+|---|---|---|
+| **Docker Desktop** | 4.x | https://www.docker.com/products/docker-desktop |
 | **Git** | 2.x | https://git-scm.com/downloads |
-| **Node.js** *(solo dev local sin Docker)* | 20 LTS | https://nodejs.org |
-| **Java JDK** *(solo dev local sin Docker)* | 21 | https://adoptium.net |
-| **Maven** *(solo dev local sin Docker)* | 3.9.x | https://maven.apache.org/download.cgi |
 
-> Para levantar con Docker **solo se necesita Docker Desktop y Git**.
+> Para levantar el sistema completo **solo se necesita Docker Desktop y Git**. Node.js, Java y Maven no son necesarios.
 
 ---
 
 ## Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/Hregional/Actas-defunci-n-y-nacimiento-.git
 cd RH-Informes-NacDef
 ```
 
 ---
 
-## Instalación de dependencias (primera vez — desarrollo local)
-
-> Con Docker no necesitas instalar nada manualmente. Estos pasos son solo para desarrollo local sin Docker.
-
-### Frontend — instalar dependencias
+## Configurar variables de entorno
 
 ```bash
-cd frontend
-npm install
+# Copiar el archivo de ejemplo
+copy .env.example .env
 ```
 
-### Dependencias del frontend instaladas
+Editar `.env` y reemplazar los valores de `KEYCLOAK_CLIENT_SECRET` y `DB_PASSWORD` con los reales.
+El resto de valores ya tienen defaults funcionales para el entorno del hospital.
 
-```bash
-# Todas las dependencias ya están en package.json y se instalan con npm install
-# Si necesitas reinstalar alguna en específico:
-
-# Recharts (gráficas del Dashboard)
-npm install recharts@3.0.2 --save-exact
-
-# Material UI
-npm install @mui/material@5.16.7 @mui/icons-material@5.16.7 @emotion/react @emotion/styled
-
-# MUI Date/Time Pickers
-npm install @mui/x-date-pickers@7.17.0
-
-# React Hook Form + Zod
-npm install react-hook-form@7.53.0 zod@3.23.8 @hookform/resolvers@3.9.0
-
-# TanStack Query
-npm install @tanstack/react-query@5.56.2
-
-# Axios
-npm install axios@1.7.7
-
-# DayJS (fechas)
-npm install dayjs@1.11.13
-
-# Zustand (estado global)
-npm install zustand@5.0.0
-
-# React Router
-npm install react-router-dom@6.26.2
-```
-
-### Backend — no requiere instalación manual
-
-El backend usa Maven. Las dependencias se descargan automáticamente:
-
-```bash
-cd backend
-mvn install      # descarga todas las dependencias
-# o directamente:
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-### Raíz del proyecto — no requiere instalación
-
-No hay `package.json` en la raíz. Todo se maneja por separado en `frontend/` y `backend/`.
+> **Nunca subir el `.env` al repositorio** — ya está en `.gitignore`.
 
 ---
 
-## Levantar el sistema con Docker
+## Levantar el sistema
 
-### Primera vez (BD limpia)
+### Modo desarrollo (con hot reload)
 
 ```bash
-docker-compose down -v
-docker-compose up --build
+docker compose up -d --build
 ```
 
-### Actualizaciones de código (conserva datos)
+El archivo `docker-compose.override.yml` se carga automáticamente y habilita:
+- Spring Boot DevTools (hot reload del backend al guardar código Java)
+- Vite HMR (hot reload del frontend al guardar código TypeScript/React)
+
+### Modo producción (sin hot reload)
 
 ```bash
-docker-compose down
-docker-compose up --build
-```
-
-### Levantar en segundo plano
-
-```bash
-docker-compose up -d --build
-```
-
-### Ver logs
-
-```bash
-docker-compose logs -f           # todos
-docker-compose logs -f backend   # solo backend
-docker-compose logs -f frontend  # solo frontend
+docker compose -f docker-compose.yml up -d --build
 ```
 
 ### Apagar
 
 ```bash
-docker-compose down
+docker compose down
+```
+
+### Apagar y borrar datos (BD limpia)
+
+```bash
+docker compose down -v
+```
+
+### Ver logs
+
+```bash
+docker compose logs -f             # todos los servicios
+docker compose logs -f backend     # solo backend
+docker compose logs -f frontend    # solo frontend
 ```
 
 ---
 
 ## URLs del sistema
 
+### Modo desarrollo
+
 | Servicio | URL |
-|---------|-----|
-| **Frontend** | http://localhost:3000 |
-| **Backend API** | http://localhost:8080/api |
-| **Health** | http://localhost:8080/api/actuator/health |
-| **MySQL** | localhost:**3308** · usuario: `renap_user` · pass: `renap_pass` · BD: `renap_db` |
+|---|---|
+| **Frontend** (Vite dev server) | http://localhost:4200 |
+| **Backend API** | http://localhost:9090/api |
+| **Health check** | http://localhost:9090/api/actuator/health |
+| **MySQL** | localhost:3308 · usuario: `renap_user` · BD: `renap_db` |
+| **Debug remoto Java** | localhost:5005 |
+
+### Modo producción
+
+| Servicio | URL |
+|---|---|
+| **Frontend** (Nginx) | http://localhost:3001 |
+| **Backend API** | http://localhost:9090/api |
 
 ---
 
-## Vista móvil en desarrollo
+## Arquitectura del proyecto
 
-1. Abre `http://localhost:3000` en Chrome o Edge
-2. **F12** → ícono del teléfono (o `Ctrl+Shift+M`)
-3. Selecciona: `iPhone SE`, `iPhone 14 Pro`, `Samsung Galaxy S20`, etc.
-
----
-
-## Desarrollo local sin Docker
-
-### Backend
-
-```bash
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
+RH-Informes-NacDef/
+├── backend/                    # Spring Boot 3.2 — Java 21
+│   ├── src/main/java/com/renap/
+│   │   ├── modules/
+│   │   │   ├── nacimiento/     # Informe de Nacimiento (entity, repo, service, controller, dto, mapper)
+│   │   │   ├── defuncion/      # Informe de Defunción
+│   │   │   ├── estadisticas/   # Dashboard (resumen, por mes, última semana)
+│   │   │   ├── admin/          # Gestión de usuarios vía Keycloak Admin API
+│   │   │   └── empleados/      # Proxy hacia API de RH (sistema de asistencia)
+│   │   └── shared/
+│   │       ├── config/         # SecurityConfig (JWT), WebConfig (CORS)
+│   │       ├── integration/    # KeycloakTokenService, RhApiClient
+│   │       └── response/       # ApiResponse<T>, PageResponse<T>
+│   └── src/main/resources/
+│       ├── application.yml
+│       └── db/changelog/       # Migraciones Liquibase
+│           ├── db.changelog-master.xml
+│           ├── 001-create-nacimiento.xml
+│           └── 002-create-defuncion.xml
+│
+├── frontend/                   # React 18 + Vite + TypeScript
+│   ├── src/
+│   │   ├── modules/
+│   │   │   ├── nacimiento/     # Formulario 4 pasos + lista + preview impresión
+│   │   │   ├── defuncion/      # Formulario 7 pasos + lista + preview impresión
+│   │   │   ├── estadisticas/   # Dashboard con gráficas (Vision UI)
+│   │   │   ├── admin/          # Gestión de usuarios (solo rol actas-admin)
+│   │   │   └── empleados/      # Hook para autocompletar empleados
+│   │   └── shared/
+│   │       ├── auth/           # keycloak.ts, logout.ts
+│   │       ├── context/        # KeycloakContext, UserContext
+│   │       ├── api/            # axios.ts (interceptores JWT, timeout 10s, retry inteligente)
+│   │       ├── components/     
+│   │       │   ├── common/     # DateWheelField, LoadingScreen, CardOptionGroup, etc.
+│   │       │   ├── guards/     # InitializationGuard (producción)
+│   │       │   └── errors/     # ErrorBoundary (captura errores React)
+│   │       ├── constants/      # institucion.ts (datos fijos del HRO)
+│   │       ├── styles/         # printStyles.ts (CSS hoja carta para impresión)
+│   │       └── theme/          # theme.ts (Vision UI: cyan #0BC5EA, violet #4361EE)
+│   └── .env.local              # Variables para dev (NO subir al repo)
+│
+├── docker-compose.yml          # Producción: MySQL + Backend + Frontend(Nginx)
+├── docker-compose.override.yml # Desarrollo: hot reload backend + Vite HMR
+├── .env.example                # Plantilla de variables de entorno
+└── .env                        # Variables reales (NO está en el repo)
 ```
-
-Abre http://localhost:5173 — el proxy al backend ya está configurado en `vite.config.ts`.
 
 ---
 
 ## Stack tecnológico
 
 | Capa | Tecnología | Versión |
-|------|-----------|--------|
+|---|---|---|
 | Backend | Spring Boot | 3.2.5 |
 | Lenguaje | Java | 21 |
-| Mapeo objetos | MapStruct | 1.5.5 |
-| Lombok | Lombok | 1.18.32 |
+| Seguridad | Spring Security + OAuth2 JWT (Keycloak) | — |
+| Mapeo | MapStruct + Lombok | 1.5.5 / 1.18.32 |
 | Frontend | React + Vite + TypeScript | 18 / 5 / 5 |
-| UI | Material UI (MUI) | v5 |
-| Gráficas | Recharts | 3.0.2 |
+| UI | Material UI (MUI) + Vision UI Design | v5 |
+| Gráficas | Recharts | 3.x |
 | Formularios | React Hook Form + Zod | 7 / 3 |
-| Estado servidor | TanStack Query | v5 |
-| HTTP cliente | Axios | 1.7 |
+| Estado servidor | TanStack Query (retry inteligente) | v5 |
+| HTTP cliente | Axios (timeout 10s, interceptores) | 1.7 |
 | Base de datos | MySQL | 8.3 |
 | Migraciones | Liquibase | 4.27 |
+| Servidor web (prod) | Nginx | 1.27 |
 | Contenedores | Docker + Docker Compose | — |
-| Servidor web | Nginx | 1.27 |
 
 ---
 
+## Autenticación — Keycloak
 
+El sistema usa **Keycloak** del hospital (`sso.hro.gob.gt`) para autenticación.
 
-## Funcionalidades implementadas
+- **Realm**: `Hospital-O`
+- **Client frontend**: `sistema-actas-frontend`
+- **Client backend**: `sistema-actas`
 
-### Dashboard
-- Tarjetas de estadísticas: total nacimientos, total defunciones, total general, mes actual
-- Gráfica de barras: Nacimientos vs Defunciones por mes
-- Gráfica de pastel: Distribución de informes
-- Gráfica de área: Tendencia acumulada del año
-- Gráfica de línea: Actividad de la semana actual
+### Roles disponibles
 
-### Formularios
-Ambos formularios siguen el formato oficial RENAP tal cual el PDF, sin agregar ni quitar campos.
+| Rol | Acceso |
+|---|---|
+| `actas-admin` | Acceso completo + gestión de usuarios |
+| `actas-empleado` | Solo crear y ver informes |
 
-**Informe de Nacimiento** — 4 pasos:
-1. Datos del que suscribe *(precargados del usuario activo)*
-2. Datos del niño(a) y del nacimiento *(TimePicker 24h para hora)*
-3. Datos de la madre *(DPI con validación oficial + selector Depto/Municipio)*
-4. Datos del padre *(todo opcional)*
+### Configuración requerida en Keycloak (client `sistema-actas-frontend`)
 
-**Informe de Defunción** — 7 pasos:
-1. Información general *(usuario precargado, fecha/hora actual, selector Depto/Municipio)*
-2. Datos del fallecido(a) *(DPI validado, selector Depto/Municipio)*
-3. Mujeres en edad fértil
-4. Causa de defunción *(partes I y II)*
-5. Defunciones accidentales y violentas
-6. Defunción fetal (Mortinato) *(condicional)*
-7. Otros datos *(requeridos)*
+Para desarrollo local, el cliente debe tener registradas estas URIs:
 
-### Validaciones de campos
-| Tipo | Comportamiento |
-|------|---------------|
-| DPI/CUI | Solo dígitos, máx 13, validación oficial algoritmo complemento 11 (depto, muni, dígito verificador) |
-| Nombres/apellidos | Solo letras y espacios — bloquea números y símbolos |
-| Edad, conteos | Solo dígitos enteros |
-| Peso, talla | Números decimales con punto (ej: `6.5`, `50.5`) |
-| Hora | TimePicker visual 24h |
-| Departamento/Municipio | Selector encadenado con los 22 departamentos y todos sus municipios |
+```
+Valid redirect URIs:
+  http://localhost:4200/*
 
-### Preview e Impresión
-- **Vista previa** disponible en el último paso del formulario
-- **Clic en una fila** de la lista abre la vista previa del registro
-- **Ícono de impresora** en acciones de cada fila
-- Impresión en hoja oficio (legal), **frente y reverso**:
-  - Nacimiento: frente (secciones I-V + bloque legal) + reverso (3 recuadros de huellas)
-  - Defunción: frente (secciones I-VII + timbre) + reverso (instrucciones completas de llenado)
-- Formato negro, logos a color
+Valid post logout redirect URIs:
+  http://localhost:4200
 
-### Datos institucionales fijos
+Web origins:
+  http://localhost:4200
+```
+
+---
+
+## Base de datos
+
+Las tablas se crean automáticamente con **Liquibase** al primer arranque del backend.
+No se requiere ejecutar ningún script SQL manualmente.
+
+Los changelogs están en `backend/src/main/resources/db/changelog/changes/`.
+
+Conexión directa (útil para inspeccionar):
+```
+Host: localhost
+Puerto: 3308
+Usuario: renap_user
+Contraseña: renap_pass (dev) — ver .env para producción
+BD: renap_db
+```
+
+---
+
+## Datos institucionales fijos
+
 Centralizados en `frontend/src/shared/constants/institucion.ts`:
-- Departamento: `Quetzaltenango`
-- Municipio: `Quetzaltenango`
-- Dirección: `0 Calle 36-40 Zona 8, Quetzaltenango, Guatemala`
-- Lugar de nacimiento: `Hospital público`
+
+| Constante | Valor |
+|---|---|
+| Departamento | Quetzaltenango |
+| Municipio | Quetzaltenango |
+| Dirección | 0 Calle 36-40 Zona 8, Quetzaltenango |
+| Lugar de nacimiento | Hospital público (código 1) |
 
 ---
 
-## Notas técnicas
+## API de Recursos Humanos
 
-- **Usuario activo** (mock): `frontend/src/shared/context/UserContext.tsx`.
-  Cuando exista módulo de login, solo se reemplaza el contexto.
-- **Imágenes** en `frontend/public/assets/images/` — escalable para obtenerlas de BD en el futuro.
-- **Liquibase** configurado pero desactivado por defecto (`LIQUIBASE_ENABLED=false`).
-  Las tablas las crea `docker/mysql/init.sql` al primer arranque.
-- **BD** inicializada con `docker/mysql/init.sql` al levantar el contenedor MySQL por primera vez.
+El sistema consume la API del sistema de asistencia (`asistencia.hro.gob.gt`) para buscar empleados en los formularios.
+
+### Modo mock (desarrollo local)
+
+Cloudflare bloquea peticiones desde fuera de la red del hospital, por lo que en desarrollo se usa modo mock:
+
+```env
+RH_API_USE_MOCK=true
+```
+
+### Modo real (producción / dentro de la red del hospital)
+
+```env
+RH_API_USE_MOCK=false
+RH_API_URL=https://asistencia.hro.gob.gt
+```
+
+Reiniciar el backend después de cambiar esta variable:
+```bash
+docker compose restart backend
+```
+
+---
+
+## Impresión de actas
+
+- Formato **hoja carta (letter)**, orientación vertical
+- Frente (página 1): campos del formulario
+- Reverso (página 2): instrucciones de llenado / huellas dactilares
+- La sección "Datos del Padre" en nacimiento se omite en la impresión si no tiene datos
+
+---
+
+## Funcionalidades principales
+
+### Dashboard con Vision UI Design
+- **Theme profesional**: Colores cyan (#0BC5EA) y violet (#4361EE)
+- **Tarjetas estadísticas**: Gradientes, iconos y valores numéricos en tiempo real
+- **Gráficas modernas**: Barras por mes, pastel, tendencia acumulada, actividad semanal
+- **Resumen inteligente**: Total nacimientos, defunciones, general y mes actual
+
+### Informes de Nacimiento
+- Formulario en **4 pasos** con validación por paso
+- Datos del suscriptor precargados desde el perfil de Keycloak
+- DPI con validación oficial (algoritmo complemento 11)
+- Selector encadenado Departamento → Municipio (22 departamentos + todos sus municipios)
+- Autocompletado de depto/municipio/nacionalidad al ingresar DPI guatemalteco válido
+- **Conversión automática de peso**: kg → libras y onzas (precisión 3 decimales)
+- **Talla con decimales**: Acepta valores como 49.5 cm (promedio real de bebés)
+- **Selector de fecha optimizado**: Campo de calendario con DateWheelField
+- **Estado civil simplificado**: Solo Casado/Soltero, dinámico según sexo
+- **Iconos intuitivos**: PersonIcon (soltero), Diversity3Icon (anillos entrelazados para casado)
+- **Bloqueo de auto-guardado**: No permite envío hasta completar datos obligatorios del paso actual
+- Quién informa predeterminado: **Médico**
+
+### Informes de Defunción
+- Formulario en **7 pasos** con validación por paso
+- Mismo patrón de validación y navegación que nacimiento
+- **Estado civil dinámico**: Casado/Casada o Soltero/Soltera según sexo del fallecido
+- **Bloqueo de auto-guardado**: Validación completa antes de permitir envío
+- Quién informa predeterminado: **Médico**
+
+### Edición de informes
+- Botón **Actualizar** disponible en cada paso (no solo en el último)
+- Al guardar: muestra mensaje de éxito y regresa a la lista automáticamente
+- **Detección de errores 404**: Si el registro ya no existe, redirige automáticamente con mensaje informativo
+
+### Sistema robusto para producción
+- **InitializationGuard**: Garantiza que el sistema esté completamente inicializado antes de mostrar contenido
+- **ErrorBoundary**: Captura errores de React con UI de recuperación elegante
+- **Retry inteligente**: 3 intentos con delays progresivos (1s, 2s, 4s)
+- **Sin retry innecesarios**: Detecta errores 404/403 y no reintenta
+- **Timeout optimizado**: 10 segundos para respuestas rápidas
+- **Loading optimizado**: Layout con skeletons en lugar de pantallas de bloqueo completas
+- **Manejo de errores Docker**: Sistema resiliente ante reinicios del backend
+
+### Administración de usuarios
+- Crear, editar y deshabilitar usuarios del sistema
+- Integrado con Keycloak Admin API
+- Solo accesible con rol `actas-admin`
+
+---
+
+## Mejoras recientes (v2.0)
+
+### Vision UI Design Theme
+- **Paleta de colores profesional**: Cyan (#0BC5EA) y Violet (#4361EE)
+- **Dashboard moderno**: Tarjetas con gradientes, iconos y estadísticas en tiempo real
+- **Gráficas mejoradas**: Visualización clara de datos con colores del theme
+
+### Optimizaciones de formularios
+- **Conversión automática de peso**: Kilogramos → Libras y Onzas con precisión de 3 decimales
+- **Talla con decimales**: Campo configurado para aceptar valores reales como 49.5 cm
+- **Selector de fecha mejorado**: DateWheelField con mejor UX
+- **Estado civil simplificado**: Solo 2 opciones (Casado/Soltero), dinámico según sexo
+- **Iconos intuitivos**: PersonIcon para soltero, Diversity3Icon (anillos) para casado
+- **Validación mejorada**: Bloqueo de envío hasta completar datos obligatorios en ambos modos (crear/editar)
+
+### Sistema robusto para producción
+- **InitializationGuard**: Previene errores al cargar el sistema antes de tiempo
+- **ErrorBoundary**: Captura y maneja errores de React con UI de recuperación
+- **Retry inteligente**: 3 intentos con delays progresivos (1s, 2s, 4s)
+- **Detección de errores**: No reintenta en errores 404/403, redirige con mensaje informativo
+- **Timeout optimizado**: 10 segundos en lugar de 30 para respuestas más rápidas
+- **Loading optimizado**: Skeletons en lugar de pantallas de bloqueo completas
+- **Resiliencia Docker**: Sistema estable ante reinicios del backend
+
+### Mejoras técnicas
+- **TypeScript 6.0-ready**: Configuración actualizada sin warnings de deprecación
+- **React Hooks correctos**: Todos los hooks declarados antes de early returns
+- **Axios mejorado**: Interceptores con mejor manejo de errores y timeouts
+
+---
+
+## Ramas del proyecto
+
+| Rama | Descripción |
+|---|---|
+| `main` | Rama principal estable para producción |
+| `feature/vision-ui-improvements` | Vision UI + mejoras de producción (listo para merge) |
+
+Para cambiar de rama:
+```bash
+git checkout main                              # Cambiar a main
+git checkout feature/vision-ui-improvements    # Cambiar a la rama de mejoras
+```
+
+Para ver todas las ramas:
+```bash
+git branch -a
+```
 
 ---
 
 ## Problemas comunes
 
-**Los cambios de código no se reflejan:**
+**Los cambios de código no se reflejan en el navegador:**
 ```bash
-docker-compose down -v
-docker-compose up --build
-```
-Luego en el navegador: **Ctrl+Shift+R** (hard refresh).
-
-**El backend no conecta a MySQL:**
-El `docker-compose.yml` tiene `depends_on` con healthcheck de MySQL.
-Si falla, esperar unos segundos y reintentar.
-
-**Puerto 3308 ocupado:**
-Detener MySQL local antes de levantar Docker.
-
-
-## Variables de entorno
-
-Crea un archivo `.env` en la raíz del proyecto (opcional):
-
-```bash
-# Keycloak
-KEYCLOAK_URL=https://sso.hro.gob.gt
-KEYCLOAK_REALM=Hospital-O
-KEYCLOAK_CLIENT_ID=sistema-actas
-KEYCLOAK_CLIENT_SECRET=tu-secret-aqui
-KEYCLOAK_FRONTEND_CLIENT_UUID=d670e581-567a-4bba-afdc-43a6b0f94590
-VITE_KEYCLOAK_CLIENT=sistema-actas-frontend
-
-# API de RH (asistencia)
-RH_API_URL=https://asistencia.hro.gob.gt
-# En desarrollo local, usar datos mock (Cloudflare bloquea peticiones externas)
-# En producción (dentro de la red del hospital), cambiar a false
-RH_API_USE_MOCK=true
-
-# Base de datos
-DB_USERNAME=renap_user
-DB_PASSWORD=renap_pass
+# En el navegador: Ctrl+Shift+R (recarga forzada sin caché)
+# Esto es especialmente importante después de cambios en:
+# - Theme (colores, estilos globales)
+# - Validaciones de formularios
+# - Configuración de TypeScript
 ```
 
-**Nota importante sobre `RH_API_USE_MOCK`:**
-- En **desarrollo local**: `true` (datos mock, porque Cloudflare bloquea peticiones desde fuera de la red)
-- En **producción**: `false` (datos reales, el servidor está dentro de la red del hospital)
+**Si el problema persiste (especialmente en vite.config.ts o .env.local):**
+```bash
+docker compose restart frontend
+```
 
-## Modo mock vs. API real
+**El backend no conecta a MySQL al arrancar:**
+MySQL tarda ~30 segundos en estar listo. El healthcheck de Docker Compose espera
+automáticamente. Si el backend falla, esperar y reintentar:
+```bash
+docker compose restart backend
+```
 
-### Desarrollo local (mock)
-El sistema usa datos de prueba para la búsqueda de empleados porque Cloudflare bloquea peticiones desde fuera de la red del hospital.
+**Error "Cannot access 'isLoading' before initialization" (React Hooks):**
+Este error se resolvió moviendo todos los hooks antes de los early returns en los formularios.
+Si aparece de nuevo, verificar que ningún hook se declare después de un `if` o `return` condicional.
 
-### Producción (API real)
-Cuando el sistema esté desplegado en un servidor dentro de la red del hospital:
+**Errores 404 al reiniciar Docker:**
+El sistema ahora tiene:
+- Retry inteligente con 3 intentos y delays progresivos
+- InitializationGuard que espera a que el sistema esté listo
+- Detección automática de 404 con redirección informativa
+- No debería ser necesario refrescar manualmente
 
-1. En el archivo `.env` o en las variables de entorno del servidor, configura:
-   ```bash
-   RH_API_USE_MOCK=false
-   RH_API_URL=https://asistencia.hro.gob.gt
-   ```
+**Sistema lento o carga con errores al iniciar:**
+El InitializationGuard garantiza que el sistema esté completamente inicializado antes de
+mostrar contenido. Si ves la pantalla de carga más de 30 segundos:
+```bash
+# Verificar logs del backend
+docker compose logs -f backend
 
-2. Reinicia el backend:
-   ```bash
-   docker compose restart backend
-   ```
+# Reiniciar si es necesario
+docker compose restart backend
+```
 
-3. Ahora la búsqueda de empleados consultará la API real del sistema de asistencia.
+**Error "port is already allocated" al levantar:**
+```bash
+# Verificar qué proceso usa el puerto
+netstat -ano | findstr :4200
+# O simplemente reiniciar Docker Desktop
+```
 
-### Acceso desde desarrollo local a la API real (opcional)
+**Rebuild completo (cuando hay cambios en dependencias o Dockerfile):**
+```bash
+docker compose down
+docker compose up -d --build
+```
 
-Si necesitas probar con la API real desde tu máquina local, solicita al equipo de infraestructura que agregue tu IP pública a la whitelist de Cloudflare del sistema de asistencia.
+**TypeScript warning "baseUrl is deprecated":**
+Este warning fue resuelto eliminando `baseUrl` del `tsconfig.json` y usando solo `paths`.
+El sistema es compatible con TypeScript 6.0+.
+
+**Talla no acepta decimales:**
+El campo ya está configurado como DECIMAL(5,2) en base de datos y acepta valores como 49.5.
+Si no funciona, hacer hard refresh (Ctrl+Shift+R) para limpiar caché del navegador.
+
+---
+
+## Configuraciones avanzadas
+
+### Retry Strategy (TanStack Query)
+
+El sistema usa una estrategia de retry inteligente para manejar errores de red y reinicios del backend:
+
+```typescript
+// Configuración en todos los hooks (useNacimiento, useDefuncion, useEstadisticas)
+{
+  retry: (failureCount, error) => {
+    // No reintentar en errores 404 o 403 (registro no existe o sin permisos)
+    if (error?.message?.includes('404') || error?.message?.includes('403')) {
+      return false;
+    }
+    // Máximo 3 intentos para otros errores
+    return failureCount < 3;
+  },
+  retryDelay: (attemptIndex) => {
+    // Delays progresivos: 1s, 2s, 4s
+    return Math.min(1000 * 2 ** attemptIndex, 5000);
+  }
+}
+```
+
+### Axios Timeout
+
+Timeout de 10 segundos en todas las peticiones HTTP:
+
+```typescript
+// frontend/src/shared/api/axios.ts
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000, // 10 segundos
+});
+```
+
+### Conversión de peso
+
+Constantes de conversión usadas en el sistema:
+
+```typescript
+// Kilogramos → Libras
+const LB_PER_KG = 2.2046226218;
+
+// Kilogramos → Onzas
+const OZ_PER_KG = 35.27396195;
+
+// Precisión: 3 decimales
+// Ejemplo: 3.5 kg = 7.716 lb = 123.459 oz
+```
+
+### Estado civil
+
+Simplificado a 2 opciones, dinámico según sexo:
+
+```typescript
+// Para madre/padre/fallecido masculino
+['Casado', 'Soltero']
+
+// Para madre/fallecida femenino
+['Casada', 'Soltera']
+```
+
+---
+
+## Contacto y soporte
+
+Sistema desarrollado para el **Hospital Regional de Occidente**, Quetzaltenango, Guatemala.
+
+Para reportar problemas o solicitar mejoras, contactar al equipo de desarrollo o crear un issue en el repositorio.
+
+---
+
+## Licencia
+
+Este sistema es de uso exclusivo del Hospital Regional de Occidente y el RENAP de Guatemala.

@@ -51,6 +51,11 @@ export interface InformeDefuncionDTO {
   causaId?: string | null
   causaIdIntervalo?: string | null
   causaIi?: string | null
+  causaIaCie11?: string | null
+  causaIbCie11?: string | null
+  causaIcCie11?: string | null
+  causaIdCie11?: string | null
+  causaIiCie11?: string | null
 
   // ── Sección V ──────────────────────────────────────────
   accidentalFuePresunto?: number | null

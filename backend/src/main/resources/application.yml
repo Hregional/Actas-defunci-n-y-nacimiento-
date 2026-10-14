@@ -81,3 +81,22 @@ rh-api:
   read-timeout-ms: 10000
   # En desarrollo local, Cloudflare bloquea peticiones - usar datos mock
   use-mock-data: ${RH_API_USE_MOCK:true}
+
+# ── Integración FHIR (OpenHIM) ────────────────────────────────────────────
+fhir:
+  server:
+    url: ${FHIR_SERVER_URL:https://openhim-qa-router.hro.gob.gt/fhir}
+    username: ${FHIR_USERNAME:postman}
+    password: ${FHIR_PASSWORD:}
+  cache:
+    enabled: true
+    ttl-minutes: 30
+    max-entries: 500
+
+# ── Integración ICD / CIE-11 (OpenHIM) ────────────────────────────────────
+icd-api:
+  base-url: ${ICD_API_URL:https://openhim-qa-router.hro.gob.gt/icd}
+  username: ${ICD_API_USERNAME:}
+  password: ${ICD_API_PASSWORD:}
+  release: ${ICD_API_RELEASE:2026-01}
+  language: es

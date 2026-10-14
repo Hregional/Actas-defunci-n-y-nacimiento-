@@ -129,6 +129,13 @@ public class InformeDefuncionDTO {
     private String causaIdIntervalo;
     private String causaIi;
 
+    // Códigos CIE-11 (theCode de la API ICD, ej. BA41.Z)
+    @Size(max = 50) private String causaIaCie11;
+    @Size(max = 50) private String causaIbCie11;
+    @Size(max = 50) private String causaIcCie11;
+    @Size(max = 50) private String causaIdCie11;
+    @Size(max = 50) private String causaIiCie11;
+
     // ── Sección V: Defunciones accidentales ───────────────────
     @Min(1) @Max(9)
     private Integer accidentalFuePresunto;

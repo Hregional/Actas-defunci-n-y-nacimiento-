@@ -34,6 +34,7 @@ export default function DefSeccionV() {
     <SectionCard
       title="V. Defunciones accidentales y violentas"
       subtitle="**Únicamente para fines estadísticos"
+      variant="defuncion"
     >
       <Alert severity="warning" sx={{ mb: 2 }}>
         Estos datos no prejuzgan sobre la calificación del hecho que en definitiva hicieren los

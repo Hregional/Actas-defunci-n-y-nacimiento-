@@ -48,6 +48,9 @@ services:
       KEYCLOAK_FRONTEND_CLIENT_UUID: ${KEYCLOAK_FRONTEND_CLIENT_UUID:-d670e581-567a-4bba-afdc-43a6b0f94590}
       RH_API_URL: ${RH_API_URL:-https://asistencia.hro.gob.gt}
       RH_API_USE_MOCK: ${RH_API_USE_MOCK:-true}
+      ICD_API_URL: ${ICD_API_URL:-https://openhim-qa-router.hro.gob.gt/icd}
+      ICD_API_USERNAME: ${ICD_API_USERNAME:-}
+      ICD_API_PASSWORD: ${ICD_API_PASSWORD:-}
     ports:
       - "9090:8080"
     depends_on:

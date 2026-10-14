@@ -14,7 +14,6 @@ import SearchIcon from '@mui/icons-material/Search'
 import dayjs from 'dayjs'
 import { useDefuncionList, useDefuncionById, useEliminarDefuncion } from '../hooks/useDefuncion'
 import EstadoChip from '@/shared/components/common/EstadoChip'
-import LoadingScreen from '@/shared/components/common/LoadingScreen'
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog'
 import DefuncionPreview from '../components/DefuncionPreview'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
@@ -29,7 +28,7 @@ export default function DefuncionListPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [previewId, setPreviewId] = useState<number | null>(null)
 
-  const { data, isLoading, isError } = useDefuncionList({ search, page, size })
+  const { data, isError } = useDefuncionList({ search, page, size })
   const { data: previewData } = useDefuncionById(previewId ?? undefined)
   const eliminar = useEliminarDefuncion()
 
@@ -39,7 +38,7 @@ export default function DefuncionListPage() {
     setDeleteId(null)
   }
 
-  if (isLoading) return <LoadingScreen message="Cargando informes de defunción..." />
+  // NO mostrar loading completo — mejor mostrar la tabla vacía o con skeleton
 
   return (
     <Box>

@@ -3,16 +3,19 @@ import {
   Grid, TextField, Typography, Box, Paper, Divider,
 } from '@mui/material'
 import SectionCard from '@/shared/components/common/SectionCard'
+import CausaCie11Field from './CausaCie11Field'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
 
 function CausaRow({
   label,
   fieldCausa,
+  fieldCodigo,
   fieldIntervalo,
   showDebido = true,
 }: {
   label: string
   fieldCausa: keyof DefuncionFormValues
+  fieldCodigo: keyof DefuncionFormValues
   fieldIntervalo: keyof DefuncionFormValues
   showDebido?: boolean
 }) {
@@ -21,13 +24,11 @@ function CausaRow({
     <Box mb={1.5}>
       <Typography variant="caption" color="text.secondary" fontWeight={600}>{label}</Typography>
       <Box display="flex" gap={1} alignItems="flex-start" mt={0.5} flexWrap="wrap">
-        <TextField
-          {...register(fieldCausa)}
+        <CausaCie11Field
+          fieldCausa={fieldCausa}
+          fieldCodigo={fieldCodigo}
           placeholder={showDebido ? 'Causa...' : 'Enfermedad / estado patológico...'}
-          InputLabelProps={{ shrink: true }}
           sx={{ flex: 3, minWidth: 200 }}
-          multiline
-          rows={1}
         />
         <TextField
           {...register(fieldIntervalo)}
@@ -47,13 +48,12 @@ function CausaRow({
 }
 
 export default function DefSeccionIV() {
-  const { register } = useFormContext<DefuncionFormValues>()
-
   return (
-    <SectionCard title="IV. Causa de defunción">
+    <SectionCard title="IV. Causa de defunción" variant="defuncion">
       <Box mb={2}>
         <Typography variant="body2" color="text.secondary">
-          <strong>18. Causas de defunción</strong>
+          <strong>18. Causas de defunción</strong> — al escribir se sugieren diagnósticos de la CIE-11;
+          seleccione uno para registrar su código.
         </Typography>
       </Box>
 
@@ -75,6 +75,7 @@ export default function DefSeccionIV() {
               <CausaRow
                 label="(a) Causa directa de muerte"
                 fieldCausa="causaIa"
+                fieldCodigo="causaIaCie11"
                 fieldIntervalo="causaIaIntervalo"
                 showDebido={true}
               />
@@ -83,6 +84,7 @@ export default function DefSeccionIV() {
               <CausaRow
                 label="(b)"
                 fieldCausa="causaIb"
+                fieldCodigo="causaIbCie11"
                 fieldIntervalo="causaIbIntervalo"
                 showDebido={true}
               />
@@ -91,6 +93,7 @@ export default function DefSeccionIV() {
               <CausaRow
                 label="(c)"
                 fieldCausa="causaIc"
+                fieldCodigo="causaIcCie11"
                 fieldIntervalo="causaIcIntervalo"
                 showDebido={true}
               />
@@ -99,6 +102,7 @@ export default function DefSeccionIV() {
               <CausaRow
                 label="(d) Causa básica"
                 fieldCausa="causaId"
+                fieldCodigo="causaIdCie11"
                 fieldIntervalo="causaIdIntervalo"
                 showDebido={false}
               />
@@ -122,13 +126,10 @@ export default function DefSeccionIV() {
           II. Otros estados patológicos significativos que contribuyeron a la muerte, pero no
           relacionados con la enfermedad o estado morboso que la produjo
         </Typography>
-        <TextField
-          {...register('causaIi')}
-          placeholder="Describir otros estados patológicos significativos..."
-          InputLabelProps={{ shrink: true }}
-          multiline
-          rows={3}
-          fullWidth
+        <CausaCie11Field
+          fieldCausa="causaIi"
+          fieldCodigo="causaIiCie11"
+          placeholder="Otro estado patológico significativo..."
         />
       </Paper>
     </SectionCard>

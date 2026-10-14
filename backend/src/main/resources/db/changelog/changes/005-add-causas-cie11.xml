@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!--
+        Código CIE-11 (theCode de la API ICD de la OMS, ej. BA41.Z) para cada
+        causa de defunción. El texto de la causa se sigue guardando en causa_*;
+        estas columnas quedan NULL cuando la causa se escribió a mano sin
+        seleccionar un resultado de la CIE-11.
+    -->
+    <changeSet id="005-add-causas-cie11" author="system">
+        <addColumn tableName="informe_defuncion">
+            <column name="causa_i_a_cie11" type="VARCHAR(50)" afterColumn="causa_i_a"/>
+            <column name="causa_i_b_cie11" type="VARCHAR(50)" afterColumn="causa_i_b"/>
+            <column name="causa_i_c_cie11" type="VARCHAR(50)" afterColumn="causa_i_c"/>
+            <column name="causa_i_d_cie11" type="VARCHAR(50)" afterColumn="causa_i_d"/>
+            <column name="causa_ii_cie11"  type="VARCHAR(50)" afterColumn="causa_ii"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

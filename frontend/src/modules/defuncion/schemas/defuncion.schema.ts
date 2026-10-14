@@ -23,7 +23,7 @@ export const defuncionSchema = z.object({
   infoQuienInformaNombres:    req('Nombre de quien informa es requerido').max(255),
   infoDocumentoIdentificacion: z.string().max(100).nullable().optional().or(z.literal('')),
   infoQuienInformaTipo:        z.number({ required_error: 'Seleccione quién informa' }).min(1).max(3),
-  infoNoColegiado:             z.string().max(50).nullable().optional().or(z.literal('')),
+  infoNoColegiado:             z.string().max(50).optional(),
   infoFechaDefuncion:          req('Fecha de defunción es requerida'),
   infoHoraDefuncion: z
     .string({ required_error: 'La hora de defunción es requerida' })
@@ -32,6 +32,8 @@ export const defuncionSchema = z.object({
   infoLugarDireccion:          z.string().nullable().optional().or(z.literal('')),
   infoLugarMunicipio:          z.string().nullable().optional().or(z.literal('')),
   infoLugarDepartamento:       z.string().nullable().optional().or(z.literal('')),
+  // NUEVO: Tipo de muerte (1: Normal, 2: Fetal/Mortinato)
+  infoTipoMuerte:              z.number({ required_error: 'Seleccione el tipo de muerte' }).min(1).max(2),
 
   // ── Sección II — Datos del fallecido ─────────────────────
   fallecidoNombreCompleto:    req('Nombre del fallecido es requerido').max(255),
@@ -70,6 +72,12 @@ export const defuncionSchema = z.object({
   causaId:          z.string().nullable().optional().or(z.literal('')),
   causaIdIntervalo: z.string().max(100).nullable().optional().or(z.literal('')),
   causaIi:          z.string().nullable().optional().or(z.literal('')),
+  // Códigos CIE-11 de cada causa (se llenan al seleccionar un resultado de la CIE-11)
+  causaIaCie11:     z.string().max(50).nullable().optional().or(z.literal('')),
+  causaIbCie11:     z.string().max(50).nullable().optional().or(z.literal('')),
+  causaIcCie11:     z.string().max(50).nullable().optional().or(z.literal('')),
+  causaIdCie11:     z.string().max(50).nullable().optional().or(z.literal('')),
+  causaIiCie11:     z.string().max(50).nullable().optional().or(z.literal('')),
 
   // ── Sección V — Defunciones accidentales (opcional) ──────
   accidentalFuePresunto:   z.number().min(1).max(9).optional().nullable(),

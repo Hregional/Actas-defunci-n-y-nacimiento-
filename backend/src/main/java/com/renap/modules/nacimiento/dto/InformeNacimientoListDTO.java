@@ -21,7 +21,11 @@ public class InformeNacimientoListDTO {
     private String  lugarDepartamento;
     private String  lugarMunicipio;
     private String  madrePrimerNombre;
+    private String  madreSegundoNombre;
     private String  madrePrimerApellido;
+    private String  madreSegundoApellido;
+    private String  madreApellidoCasada;
+    private String  madreCuiCedula;
     private String  suscribeNombresApellidos;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;

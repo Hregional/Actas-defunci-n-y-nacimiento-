@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-01" author="fhir-compliance">
+        <comment>FHIR Compliance: Add column length constraints to informe_nacimiento</comment>
+        
+        <!-- Sección I: Datos del que suscribe -->
+        <modifyDataType tableName="informe_nacimiento" columnName="suscribe_nombres_apellidos" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="suscribe_cui_cedula" newDataType="VARCHAR(13)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="suscribe_no_colegiado" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="suscribe_no_registro_comadrona" newDataType="VARCHAR(50)"/>
+        
+        <!-- Sección II: Lugar -->
+        <modifyDataType tableName="informe_nacimiento" columnName="lugar_departamento" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="lugar_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="lugar_direccion" newDataType="VARCHAR(255)"/>
+        
+        <!-- Sección III: Datos del niño -->
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_primer_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_segundo_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_tercer_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_primer_apellido" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_segundo_apellido" newDataType="VARCHAR(100)"/>
+        
+        <!-- CRÍTICO: Cambiar gestación de INTEGER a DECIMAL para cumplir FHIR Quantity -->
+        <modifyDataType tableName="informe_nacimiento" columnName="nino_edad_gestacional_semanas" newDataType="DECIMAL(4,3)"/>
+        
+        <!-- Sección IV: Datos de la madre -->
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_primer_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_segundo_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_primer_apellido" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_segundo_apellido" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_apellido_casada" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_cui_cedula" newDataType="VARCHAR(13)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_nacionalidad" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_ocupacion" newDataType="VARCHAR(150)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_direccion" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_zona" newDataType="VARCHAR(20)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="madre_departamento" newDataType="VARCHAR(100)"/>
+        
+        <!-- Sección V: Datos del padre -->
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_primer_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_segundo_nombre" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_primer_apellido" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_segundo_apellido" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_cui_cedula" newDataType="VARCHAR(13)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_nacionalidad" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_ocupacion" newDataType="VARCHAR(150)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_direccion" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_zona" newDataType="VARCHAR(20)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_nacimiento" columnName="padre_departamento" newDataType="VARCHAR(100)"/>
+    </changeSet>
+
+    <changeSet id="003-02" author="fhir-compliance">
+        <comment>FHIR Compliance: Add column length constraints to informe_defuncion</comment>
+        
+        <!-- Sección I: Información general -->
+        <modifyDataType tableName="informe_defuncion" columnName="info_quien_informa_nombres" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="info_documento_identificacion" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="info_no_colegiado" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="info_lugar_direccion" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="info_lugar_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="info_lugar_departamento" newDataType="VARCHAR(100)"/>
+        
+        <!-- Sección II: Datos del fallecido -->
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_nombre_completo" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_doc_numero" newDataType="VARCHAR(13)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_doc_libro" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_doc_folio" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_doc_partida" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_lugar_nac_pais" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_lugar_nac_departamento" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_lugar_nac_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_nacionalidad" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_ocupacion" newDataType="VARCHAR(150)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_residencia_direccion" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_residencia_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="fallecido_residencia_departamento" newDataType="VARCHAR(100)"/>
+        
+        <!-- Sección IV: Causa de defunción (intervalos) -->
+        <modifyDataType tableName="informe_defuncion" columnName="causa_i_a_intervalo" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="causa_i_b_intervalo" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="causa_i_c_intervalo" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="causa_i_d_intervalo" newDataType="VARCHAR(100)"/>
+        
+        <!-- Sección V: Defunciones accidentales -->
+        <modifyDataType tableName="informe_defuncion" columnName="accidental_arma_produjo" newDataType="VARCHAR(255)"/>
+        
+        <!-- Sección VI: Mortinato - Datos de la madre -->
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_nombre" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_doc_numero" newDataType="VARCHAR(13)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_doc_libro" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_doc_folio" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_doc_partida" newDataType="VARCHAR(50)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_lugar_nac_pais" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_lugar_nac_departamento" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_lugar_nac_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_residencia_direccion" newDataType="VARCHAR(255)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_residencia_municipio" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_residencia_departamento" newDataType="VARCHAR(100)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_ocupacion" newDataType="VARCHAR(150)"/>
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_madre_nacionalidad" newDataType="VARCHAR(100)"/>
+        
+        <!-- CRÍTICO: Cambiar gestación mortinato de INTEGER a DECIMAL para cumplir FHIR -->
+        <modifyDataType tableName="informe_defuncion" columnName="mortinato_semanas_gestacion" newDataType="DECIMAL(4,3)"/>
+    </changeSet>
+
+</databaseChangeLog>

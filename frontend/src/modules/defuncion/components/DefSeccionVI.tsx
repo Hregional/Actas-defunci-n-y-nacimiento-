@@ -1,17 +1,42 @@
+import { useEffect, useState } from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
 import {
-  Grid, TextField, FormControl, InputLabel, Select, MenuItem,
-  FormHelperText, FormLabel, RadioGroup, FormControlLabel, Radio,
-  Typography, Divider, Alert,
+  Grid, TextField, Typography, Divider, Alert, Box,
+  FormControl, InputLabel, Select, MenuItem, FormHelperText,
 } from '@mui/material'
+import MaleIcon from '@mui/icons-material/Male'
+import FemaleIcon from '@mui/icons-material/Female'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import PersonIcon from '@mui/icons-material/Person'
+import Diversity3Icon from '@mui/icons-material/Diversity3'
+import ChildCareIcon from '@mui/icons-material/ChildCare'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import GroupsIcon from '@mui/icons-material/Groups'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import EventIcon from '@mui/icons-material/Event'
+import ContentCutIcon from '@mui/icons-material/ContentCut'
+import PregnantWomanIcon from '@mui/icons-material/PregnantWoman'
+import CloudDoneIcon from '@mui/icons-material/CloudDone'
 import SectionCard from '@/shared/components/common/SectionCard'
+import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
+import DeptoMuniSelector from '@/shared/components/common/DeptoMuniSelector'
+import BuscadorPacienteFhir, { type ModoBusqueda } from '@/shared/components/common/BuscadorPacienteFhir'
+import { cuiValido, deptoMuniDesdeCui } from '@/shared/utils/cuiValidator'
+import { mapearDatosFhirCompleto } from '@/shared/utils/fhirMapper'
+import { DEPARTAMENTOS_GUATEMALA } from '@/shared/data/guatemala'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
+import type { PersonaFhirDTO } from '@/shared/api/fhir.api'
+
+const SEXO_FETO_OPTS = [
+  { value: 1, label: 'Hombre', icon: <MaleIcon sx={{ fontSize: 20 }} />, color: '#1565C0' },
+  { value: 2, label: 'Mujer', icon: <FemaleIcon sx={{ fontSize: 20 }} />, color: '#AD1457' },
+  { value: 9, label: 'Ignorado', icon: <HelpOutlineIcon sx={{ fontSize: 18 }} />, color: '#757575' },
+]
 
 const ESTADO_CIVIL_OPTIONS = [
-  { value: 1, label: 'Soltero(a)' },
-  { value: 2, label: 'Casado(a)' },
-  { value: 3, label: 'Unido(a)' },
-  { value: 9, label: 'Ignorado' },
+  { value: 1, label: 'Soltera', icon: <PersonIcon sx={{ fontSize: 20 }} />, color: '#9C27B0' },
+  { value: 2, label: 'Casada', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#E91E63' },
 ]
 
 const PUEBLO_OPTIONS = [
@@ -36,16 +61,205 @@ const ESCOLARIDAD_OPTIONS = [
   { value: 9, label: 'Ignorado' },
 ]
 
+const SABE_LEER_OPTIONS = [
+  { value: 1, label: 'Sí', icon: <CheckCircleIcon sx={{ fontSize: 20 }} />, color: '#4CAF50' },
+  { value: 2, label: 'No', icon: <CancelIcon sx={{ fontSize: 20 }} />, color: '#F44336' },
+  { value: 9, label: 'Ignorado', icon: <HelpOutlineIcon sx={{ fontSize: 18 }} />, color: '#9E9E9E' },
+]
+
+const MURIO_OPTIONS = [
+  { value: 1, label: 'Antes del Parto', icon: <EventIcon sx={{ fontSize: 20 }} />, color: '#FF6F00' },
+  { value: 2, label: 'Durante el Parto', icon: <PregnantWomanIcon sx={{ fontSize: 20 }} />, color: '#D32F2F' },
+]
+
+const PARTO_FUE_OPTIONS = [
+  { value: 1, label: 'Simple', icon: <ChildCareIcon sx={{ fontSize: 20 }} />, color: '#1976D2' },
+  { value: 2, label: 'Doble', icon: <Diversity3Icon sx={{ fontSize: 20 }} />, color: '#7B1FA2' },
+  { value: 3, label: 'Múltiple', icon: <GroupsIcon sx={{ fontSize: 20 }} />, color: '#C2185B' },
+]
+
+const CLASE_PARTO_OPTIONS = [
+  { value: 1, label: 'Eutócico (Normal)', icon: <CheckCircleIcon sx={{ fontSize: 20 }} />, color: '#4CAF50' },
+  { value: 2, label: 'Distócico (Complicado)', icon: <LocalHospitalIcon sx={{ fontSize: 20 }} />, color: '#F57C00' },
+]
+
+const VIA_PARTO_OPTIONS = [
+  { value: 1, label: 'Vaginal', icon: <PregnantWomanIcon sx={{ fontSize: 20 }} />, color: '#7B1FA2' },
+  { value: 2, label: 'Cesárea', icon: <ContentCutIcon sx={{ fontSize: 20 }} />, color: '#D32F2F' },
+]
+
 export default function DefSeccionVI() {
-  const { register, control } = useFormContext<DefuncionFormValues>()
+  const { register, control, watch, setValue, resetField } = useFormContext<DefuncionFormValues>()
+  
+  const [datosDeFhir, setDatosDeFhir] = useState<ModoBusqueda | false>(false)
+  
+  const dpiMadre = watch('mortinatoMadreDocNumero')  // Observar el DPI de la madre
+
+  // Detectar si el DPI es guatemalteco válido
+  const dpiGuatemalteco = dpiMadre && dpiMadre.replace(/\s/g, '').length === 13 && cuiValido(dpiMadre)
+
+  // Handler cuando se encuentra un paciente en FHIR
+  const handlePacienteEncontrado = (paciente: PersonaFhirDTO, modo: ModoBusqueda) => {
+    console.log('[DefSeccionVI] Paciente FHIR encontrado:', paciente)
+
+    // ── RESET: limpiar todos los campos antes de rellenar ──
+    setValue('mortinatoMadreDocNumero', '', { shouldValidate: false })
+    setValue('mortinatoMadreNombre', '', { shouldValidate: false })
+    resetField('mortinatoMadreEdad')
+    setValue('mortinatoMadreNacionalidad', '', { shouldValidate: false })
+    setValue('mortinatoMadreOcupacion', '', { shouldValidate: false })
+    setValue('mortinatoMadreLugarNacPais', '', { shouldValidate: false })
+    setValue('mortinatoMadreLugarNacDepartamento', '', { shouldValidate: false })
+    setValue('mortinatoMadreLugarNacMunicipio', '', { shouldValidate: false })
+    setValue('mortinatoMadreResidenciaDireccion', '', { shouldValidate: false })
+    setValue('mortinatoMadreResidenciaMunicipio', '', { shouldValidate: false })
+    setValue('mortinatoMadreResidenciaDepartamento', '', { shouldValidate: false })
+    resetField('mortinatoMadreEstadoCivil')
+    resetField('mortinatoMadrePuebloPertenencia')
+    resetField('mortinatoMadreEscolaridad')
+    resetField('mortinatoMadreSabeLeer')
+
+    // ── Autocompletar con datos del nuevo paciente ──
+    if (paciente.cui) {
+      setValue('mortinatoMadreDocNumero', paciente.cui, { shouldValidate: true })
+    }
+    
+    if (paciente.nombreCompleto) {
+      setValue('mortinatoMadreNombre', paciente.nombreCompleto, { shouldValidate: true })
+    }
+    
+    if (paciente.edad != null) {
+      setValue('mortinatoMadreEdad', paciente.edad, { shouldValidate: true })
+    }
+    
+    if (paciente.ocupacion) {
+      setValue('mortinatoMadreOcupacion', paciente.ocupacion, { shouldValidate: true })
+    }
+    
+    if (paciente.direccion) {
+      setValue('mortinatoMadreResidenciaDireccion', paciente.direccion, { shouldValidate: true })
+    }
+
+    // ── MAPEO INTELIGENTE DE DATOS FHIR ──
+    const resultadoMapeo = mapearDatosFhirCompleto({
+      departamento: paciente.departamento,
+      municipio: paciente.municipio,
+      cui: paciente.cui,
+      estadoCivil: paciente.estadoCivil,
+      puebloPertenencia: paciente.puebloPertenencia,
+      nacionalidad: paciente.nacionalidad
+    }, 'femenino') // Madre del mortinato = femenino
+    
+    // Aplicar datos mapeados a campos de madre del mortinato
+    if (resultadoMapeo.data.departamento) {
+      setValue('mortinatoMadreLugarNacDepartamento', resultadoMapeo.data.departamento, { shouldValidate: true })
+      setValue('mortinatoMadreResidenciaDepartamento', resultadoMapeo.data.departamento, { shouldValidate: true })
+    }
+    
+    if (resultadoMapeo.data.municipio) {
+      setValue('mortinatoMadreLugarNacMunicipio', resultadoMapeo.data.municipio, { shouldValidate: true })
+      setValue('mortinatoMadreResidenciaMunicipio', resultadoMapeo.data.municipio, { shouldValidate: true })
+    }
+    
+    if (resultadoMapeo.data.nacionalidad) {
+      // Para madre siempre femenino
+      const nacionalidad = resultadoMapeo.data.nacionalidad === 'Guatemalteco' ? 'Guatemalteca' : resultadoMapeo.data.nacionalidad
+      setValue('mortinatoMadreNacionalidad', nacionalidad, { shouldValidate: true })
+    }
+    
+    if (resultadoMapeo.data.estadoCivil) {
+      setValue('mortinatoMadreEstadoCivil', resultadoMapeo.data.estadoCivil, { shouldValidate: true })
+    }
+    
+    if (resultadoMapeo.data.puebloPertenencia) {
+      setValue('mortinatoMadrePuebloPertenencia', resultadoMapeo.data.puebloPertenencia, { shouldValidate: true })
+    }
+    
+    // Asumir que el lugar de nacimiento es Guatemala si no se especifica
+    if (paciente.pais) {
+      setValue('mortinatoMadreLugarNacPais', paciente.pais, { shouldValidate: true })
+    } else {
+      setValue('mortinatoMadreLugarNacPais', 'Guatemala', { shouldValidate: true })
+    }
+    
+    // Mostrar advertencias de mapeo si las hay
+    if (resultadoMapeo.warnings.length > 0) {
+      console.warn('[DefSeccionVI] Advertencias de mapeo FHIR:', resultadoMapeo.warnings)
+      resultadoMapeo.warnings.forEach(warning => {
+        console.warn(`[FHIR Mapping] ${warning}`)
+      })
+    }
+
+    setDatosDeFhir(modo)
+  }
+
+  const handleLimpiarFhir = () => {
+    setDatosDeFhir(false)
+  }
+
+  // Autocompletar depto/municipio/nacionalidad al ingresar DPI válido de la madre MANUALMENTE
+  // (NO se ejecuta si los datos vienen de FHIR, porque ya están completos)
+  useEffect(() => {
+    if (!dpiMadre || datosDeFhir) return  // ← No ejecutar si viene de FHIR
+
+    const digits = dpiMadre.replace(/\s/g, '')
+    if (digits.length !== 13 || !cuiValido(digits)) return
+
+    const info = deptoMuniDesdeCui(digits)
+    if (!info) return
+
+    // Autocompletar departamento de nacimiento de la madre
+    setValue('mortinatoMadreLugarNacDepartamento', info.depto, { shouldValidate: true })
+
+    // Autocompletar municipio de nacimiento usando el índice
+    const deptoData = DEPARTAMENTOS_GUATEMALA.find(d => d.title === info.depto)
+    if (deptoData && deptoData.mun[info.muniIndex]) {
+      setValue('mortinatoMadreLugarNacMunicipio', deptoData.mun[info.muniIndex], { shouldValidate: true })
+    }
+
+    // Fijar nacionalidad a guatemalteca
+    setValue('mortinatoMadreNacionalidad', 'Guatemalteca', { shouldValidate: true })
+  }, [dpiMadre, datosDeFhir, setValue])
 
   return (
     <SectionCard
       title="VI. Datos de la defunción fetal (Mortinato)"
       subtitle="Completar solo si la muerte es fetal"
+      variant="defuncion"
     >
+      {/* ── BÚSQUEDA FHIR ── */}
+      <Grid container spacing={1.5} sx={{ mb: 2 }}>
+        <Grid item xs={12}>
+          <BuscadorPacienteFhir
+            label="Buscar madre en RENAP por CUI/DPI"
+            onPacienteEncontrado={handlePacienteEncontrado}
+            onLimpiar={handleLimpiarFhir}
+          />
+        </Grid>
+
+        {/* Indicador de datos desde FHIR */}
+        {datosDeFhir && (
+          <Grid item xs={12}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1, 
+              p: 1.5, 
+              bgcolor: 'success.50',
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'success.200',
+            }}>
+              <CloudDoneIcon color="success" />
+              <Typography variant="body2" color="success.dark" fontWeight={600}>
+                Datos cargados desde RENAP (FHIR) — Todos los campos son editables
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+      
       <Alert severity="info" sx={{ mb: 2 }}>
-        <strong>SI LA MUERTE ES FETAL</strong>, complete esta sección.
         Se entiende por defunción fetal la muerte de un producto de la concepción, antes de su
         expulsión o extracción completa del cuerpo de su madre.
       </Alert>
@@ -57,7 +271,7 @@ export default function DefSeccionVI() {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
-            label="20. Nombres completos"
+            label="20. Nombre completo"
             {...register('mortinatoMadreNombre')}
             InputLabelProps={{ shrink: true }}
             inputProps={{ maxLength: 255 }}
@@ -70,7 +284,17 @@ export default function DefSeccionVI() {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField label="Doc. (CUI / Cédula / Otro)" {...register('mortinatoMadreDocNumero')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
+          <TextField 
+            label="Doc. (CUI / Cédula / Otro)" 
+            {...register('mortinatoMadreDocNumero')} 
+            InputLabelProps={{ shrink: true }} 
+            inputProps={{ maxLength: 100 }}
+            helperText={
+              dpiGuatemalteco
+                ? '✓ DPI guatemalteco — depto. y municipio precargados'
+                : 'Ingrese el DPI (13 dígitos) para autocompletar'
+            }
+          />
         </Grid>
         <Grid item xs={4} sm={2}>
           <TextField label="No. Libro" {...register('mortinatoMadreDocLibro')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 50 }} />
@@ -90,12 +314,30 @@ export default function DefSeccionVI() {
         <Grid item xs={12} sm={4}>
           <TextField label="País" {...register('mortinatoMadreLugarNacPais')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField label="Departamento" {...register('mortinatoMadreLugarNacDepartamento')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField label="Municipio" {...register('mortinatoMadreLugarNacMunicipio')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
-        </Grid>
+        
+        {/* Depto / Municipio — siempre editables con selector, pre-poblados desde FHIR o DPI */}
+        <Controller
+          name="mortinatoMadreLugarNacMunicipio"
+          control={control}
+          render={({ field: muni }) => (
+            <Controller
+              name="mortinatoMadreLugarNacDepartamento"
+              control={control}
+              render={({ field: depto }) => (
+                <DeptoMuniSelector
+                  deptoValue={depto.value ?? ''}
+                  muniValue={muni.value ?? ''}
+                  onDeptoChange={(v) => { depto.onChange(v); muni.onChange('') }}
+                  onMuniChange={muni.onChange}
+                  deptoGrid={{ xs: 12, sm: 4 }}
+                  muniGrid={{ xs: 12, sm: 4 }}
+                  deptoLabel="Departamento"
+                  muniLabel="Municipio"
+                />
+              )}
+            />
+          )}
+        />
 
         <Grid item xs={6} sm={3}>
           <Controller
@@ -113,24 +355,29 @@ export default function DefSeccionVI() {
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        {/* Estado civil en tarjetas */}
+        <Grid item xs={12}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+            24. ESTADO CIVIL
+          </Typography>
           <Controller
             name="mortinatoMadreEstadoCivil"
             control={control}
             render={({ field, fieldState }) => (
-              <FormControl error={!!fieldState.error} fullWidth size="small">
-                <InputLabel>24. Estado civil</InputLabel>
-                <Select {...field} value={field.value ?? ''} label="24. Estado civil"
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
-                  {ESTADO_CIVIL_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
-                </Select>
-                {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
-              </FormControl>
+              <CardOptionGroup
+                label=""
+                options={ESTADO_CIVIL_OPTIONS}
+                value={field.value ?? null}
+                onChange={field.onChange}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="sm"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
           <Controller
             name="mortinatoMadrePuebloPertenencia"
             control={control}
@@ -139,7 +386,6 @@ export default function DefSeccionVI() {
                 <InputLabel>25. Pueblo de pertenencia</InputLabel>
                 <Select {...field} value={field.value ?? ''} label="25. Pueblo de pertenencia"
                   onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
                   {PUEBLO_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
                 </Select>
                 {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
@@ -153,36 +399,41 @@ export default function DefSeccionVI() {
             26. Residencia
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Dirección exacta" {...register('mortinatoMadreResidenciaDireccion')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 255 }} />
+        <Grid item xs={12}>
+          <TextField label="Dirección exacta" {...register('mortinatoMadreResidenciaDireccion')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 150 }} />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <TextField label="Municipio" {...register('mortinatoMadreResidenciaMunicipio')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <TextField label="Departamento" {...register('mortinatoMadreResidenciaDepartamento')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField label="27. Ocupación" {...register('mortinatoMadreOcupacion')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 150 }} />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" mb={1}>
+            28. ¿Sabe leer y escribir?
+          </Typography>
           <Controller
             name="mortinatoMadreSabeLeer"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>28. Sabe leer y escribir</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label=""
+                options={SABE_LEER_OPTIONS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="sm"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={6}>
           <Controller
             name="mortinatoMadreEscolaridad"
             control={control}
@@ -191,7 +442,6 @@ export default function DefSeccionVI() {
                 <InputLabel>29. Escolaridad</InputLabel>
                 <Select {...field} value={field.value ?? ''} label="29. Escolaridad"
                   onChange={(e) => field.onChange(e.target.value !== '' ? Number(e.target.value) : null)}>
-                  <MenuItem value=""><em>Seleccionar</em></MenuItem>
                   {ESCOLARIDAD_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
                 </Select>
                 {fieldState.error && <FormHelperText>{fieldState.error.message}</FormHelperText>}
@@ -201,7 +451,12 @@ export default function DefSeccionVI() {
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <TextField label="30. Nacionalidad" {...register('mortinatoMadreNacionalidad')} InputLabelProps={{ shrink: true }} inputProps={{ maxLength: 100 }} />
+          <TextField 
+            label="30. Nacionalidad" 
+            {...register('mortinatoMadreNacionalidad')} 
+            InputLabelProps={{ shrink: true }} 
+            inputProps={{ maxLength: 100 }}
+          />
         </Grid>
         <Grid item xs={6} sm={4}>
           <Controller
@@ -237,76 +492,100 @@ export default function DefSeccionVI() {
           <Controller
             name="mortinatoFetoSexo"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>32. Sexo</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Hombre" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="Mujer" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label="32. Sexo"
+                options={SEXO_FETO_OPTS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                size="sm"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={8}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" mb={1}>
+            33. ¿Cuándo murió?
+          </Typography>
           <Controller
             name="mortinatoFetoMurio"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>33. Murió</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Antes del Parto" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="Durante el Parto" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label=""
+                options={MURIO_OPTIONS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="md"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" mb={1}>
+            34. El parto fue
+          </Typography>
           <Controller
             name="mortinatoPartoFue"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>34. El parto fue</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Simple" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="Doble" />
-                  <FormControlLabel value={3} control={<Radio size="small" />} label="Múltiple" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label=""
+                options={PARTO_FUE_OPTIONS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="md"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" mb={1}>
+            35. Clase de parto
+          </Typography>
           <Controller
             name="mortinatoClaseParto"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>35. Clase de parto</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Eutócico" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="Distócico" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label=""
+                options={CLASE_PARTO_OPTIONS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="md"
+              />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" mb={1}>
+            36. Vía del parto
+          </Typography>
           <Controller
             name="mortinatoViaParto"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>36. Vía del parto</FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Vaginal" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="Cesárea" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label=""
+                options={VIA_PARTO_OPTIONS}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="md"
+              />
             )}
           />
         </Grid>

@@ -22,6 +22,7 @@ export default function DefSeccionIII() {
     <SectionCard
       title="III. Mujeres en edad fértil"
       subtitle="Aplica únicamente si el fallecido(a) es mujer entre 10 y 54 años"
+      variant="defuncion"
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -43,7 +44,6 @@ export default function DefSeccionIII() {
                   label="17. La muerte ocurrió durante"
                   onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                 >
-                  <MenuItem value=""><em>No aplica / Seleccionar</em></MenuItem>
                   {MUERTE_DURANTE_OPTIONS.map(o => (
                     <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
                   ))}

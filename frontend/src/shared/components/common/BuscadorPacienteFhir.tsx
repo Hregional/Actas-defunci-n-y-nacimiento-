@@ -190,6 +190,7 @@ export default function BuscadorPacienteFhir({
           onChange={(e) => setHcBusqueda(e.target.value.replace(/\D/g, ''))}
           onKeyDown={handleKeyDown}
           disabled={disabled || buscando}
+          placeholder="Ej: 837871"
           inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', autoComplete: 'off' }}
           helperText={
             hcEsValido
