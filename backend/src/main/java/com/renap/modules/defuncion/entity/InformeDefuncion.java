@@ -78,7 +78,7 @@ public class InformeDefuncion {
     @Column(name = "fallecido_edad_anos")
     private Integer fallecidoEdadAnos;
 
-    @Column(name = "fallecido_doc_numero", length = 13)
+    @Column(name = "fallecido_doc_numero", length = 50)
     private String fallecidoDocNumero;
 
     @Column(name = "fallecido_doc_libro", length = 50)
@@ -191,7 +191,7 @@ public class InformeDefuncion {
     @Column(name = "mortinato_madre_nombre", length = 255)
     private String mortinatoMadreNombre;
 
-    @Column(name = "mortinato_madre_doc_numero", length = 13)
+    @Column(name = "mortinato_madre_doc_numero", length = 50)
     private String mortinatoMadreDocNumero;
 
     @Column(name = "mortinato_madre_doc_libro", length = 50)
@@ -281,4 +281,16 @@ public class InformeDefuncion {
 
     @Column(name = "otros_lugar_defuncion")
     private Integer otrosLugarDefuncion;
+
+    @Column(name = "fallecido_doc_tipo", length = 20)
+    private String fallecidoDocTipo;
+
+    @Column(name = "fallecido_pais_pasaporte", length = 10)
+    private String fallecidoPaisPasaporte;
+
+    @Column(name = "mortinato_madre_doc_tipo", length = 20)
+    private String mortinatoMadreDocTipo;
+
+    @Column(name = "mortinato_madre_pais_pasaporte", length = 10)
+    private String mortinatoMadrePaisPasaporte;
 }

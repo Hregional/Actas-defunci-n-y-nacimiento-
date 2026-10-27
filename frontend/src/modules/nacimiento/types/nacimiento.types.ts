@@ -72,6 +72,12 @@ export interface InformeNacimientoDTO {
   padrePuebloPertenencia?: number | null
   padreEstadoCivil?: number | null
   padreEscolaridad?: number | null
+
+  // ── Tipo de documento (multi-documento) ────────────────
+  madreDocTipo?: string | null
+  madrePaisPasaporte?: string | null
+  padreDocTipo?: string | null
+  padrePaisPasaporte?: string | null
 }
 
 export interface InformeNacimientoListDTO {

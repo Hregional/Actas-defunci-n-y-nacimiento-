@@ -10,5 +10,7 @@
   <include file="classpath:db/changelog/changes/003-fhir-compliance-corrections.xml"/>
   <include file="classpath:db/changelog/changes/004-revert-gestacion-to-integer.xml"/>
   <include file="classpath:db/changelog/changes/005-add-causas-cie11.xml"/>
+  <include file="classpath:db/changelog/changes/005-talla-decimal4-1.xml"/>
+  <include file="classpath:db/changelog/changes/006-documento-tipo.xml"/>
 
 </databaseChangeLog>

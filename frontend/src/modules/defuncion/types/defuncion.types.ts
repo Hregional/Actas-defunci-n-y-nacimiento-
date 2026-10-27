@@ -98,6 +98,12 @@ export interface InformeDefuncionDTO {
   otrosHuboNecropsia: number
   otrosClaseAsistencia: number
   otrosLugarDefuncion: number
+
+  // ── Tipo de documento (multi-documento) ────────────────
+  fallecidoDocTipo?: string | null
+  fallecidoPaisPasaporte?: string | null
+  mortinatoMadreDocTipo?: string | null
+  mortinatoMadrePaisPasaporte?: string | null
 }
 
 export interface InformeDefuncionListDTO {

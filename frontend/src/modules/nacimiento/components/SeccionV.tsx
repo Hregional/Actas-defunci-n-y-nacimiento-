@@ -1,10 +1,10 @@
 /**
  * Sección V — Datos del padre (todos opcionales)
  *
- * - INTEGRACIÓN FHIR: Búsqueda de paciente por CUI/DPI
+ * - Soporte multi-documento: DPI_GT, INE_MX, PASAPORTE, OTRO
+ * - INTEGRACIÓN FHIR: Búsqueda de paciente por CUI/DPI (solo DPI_GT) o Historia Clínica
  * - Autocompletado inteligente con datos de RENAP (FHIR)
- * - DPI opcional con validación
- * - Todos los campos son editables después de autocompletar
+ * - DPI opcional con validación condicional
  */
 import { useEffect, useState } from 'react'
 import { useFormContext, Controller } from 'react-hook-form'
@@ -19,11 +19,15 @@ import SectionCard from '@/shared/components/common/SectionCard'
 import DpiField from '@/shared/components/common/DpiField'
 import SmartField from '@/shared/components/common/SmartField'
 import DeptoMuniSelector from '@/shared/components/common/DeptoMuniSelector'
+import DeptoMuniMexSelector from '@/shared/components/common/DeptoMuniMexSelector'
+import DocumentoSelector from '@/shared/components/common/DocumentoSelector'
 import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
 import BuscadorPacienteFhir, { type ModoBusqueda } from '@/shared/components/common/BuscadorPacienteFhir'
 import { cuiValido, deptoMuniDesdeCui } from '@/shared/utils/cuiValidator'
 import { mapearDatosFhirCompleto } from '@/shared/utils/fhirMapper'
 import { DEPARTAMENTOS_GUATEMALA } from '@/shared/data/guatemala'
+import { getDocumentoInfo } from '@/shared/hooks/useDocumentoInfo'
+import type { TipoDocumento } from '@/shared/hooks/useDocumentoInfo'
 import type { NacimientoFormValues } from '../schemas/nacimiento.schema'
 import type { PersonaFhirDTO } from '@/shared/api/fhir.api'
 
@@ -45,18 +49,41 @@ const ESCOLARIDAD_OPTIONS = [
 export default function SeccionV() {
   const { control, watch, setValue, resetField } = useFormContext<NacimientoFormValues>()
   
+  // fhirTieneDpi: true cuando el paciente encontrado via FHIR tiene CUI guatemalteco.
+  const [fhirTieneDpi, setFhirTieneDpi] = useState(false)
+
   const [datosDeFhir, setDatosDeFhir] = useState<ModoBusqueda | false>(false)
 
   const dpi = watch('padreCuiCedula')
+  const padreDocTipo = ((watch('padreDocTipo') ?? 'DPI_GT') as TipoDocumento)
+  const padrePaisPasaporte = watch('padrePaisPasaporte') ?? undefined
+
+  const docInfo = getDocumentoInfo(padreDocTipo, padrePaisPasaporte ?? undefined)
 
   // Detectar si el DPI es guatemalteco válido
-  const dpiGuatemalteco = dpi && dpi.replace(/\s/g, '').length === 13 && cuiValido(dpi)
+  const dpiGuatemalteco = padreDocTipo === 'DPI_GT' && dpi && dpi.replace(/\s/g, '').length === 13 && cuiValido(dpi)
+
+  // Handler cuando cambia el tipo de documento
+  const handleTipoChange = (tipo: TipoDocumento) => {
+    setValue('padreDocTipo', tipo, { shouldValidate: false })
+    // Limpiar campos geográficos
+    setValue('padreDepartamento', '', { shouldValidate: false })
+    setValue('padreMunicipio', '', { shouldValidate: false })
+    setValue('padreCuiCedula', '', { shouldValidate: false })
+    // Pre-llenar nacionalidad según tipo
+    const info = getDocumentoInfo(tipo)
+    if (info.nacionalidadDefault) {
+      // Para el padre ajustar género: Mexicana → Mexicano
+      const nac = info.nacionalidadDefault === 'Mexicana' ? 'Mexicano' : info.nacionalidadDefault
+      setValue('padreNacionalidad', nac, { shouldValidate: false })
+    }
+  }
 
   // Handler cuando se encuentra un paciente en FHIR
   const handlePacienteEncontrado = (paciente: PersonaFhirDTO, modo: ModoBusqueda) => {
-    console.log('[SeccionV] Paciente FHIR encontrado:', paciente)
+    const tieneDpi = !!paciente.cui
 
-    // ── RESET: limpiar todos los campos antes de rellenar ──
+    // ── RESET ──
     setValue('padreCuiCedula', '', { shouldValidate: false })
     setValue('padrePrimerNombre', '', { shouldValidate: false })
     setValue('padreSegundoNombre', '', { shouldValidate: false })
@@ -73,36 +100,19 @@ export default function SeccionV() {
     resetField('padreEstadoCivil')
     resetField('padreEscolaridad')
 
-    // ── Autocompletar con datos del nuevo paciente ──
-    if (paciente.cui) {
-      setValue('padreCuiCedula', paciente.cui, { shouldValidate: true })
-    }
-    
-    // Nombres individuales
-    if (paciente.primerNombre) {
-      setValue('padrePrimerNombre', paciente.primerNombre, { shouldValidate: true })
-    }
-    if (paciente.segundoNombre) {
-      setValue('padreSegundoNombre', paciente.segundoNombre, { shouldValidate: true })
-    }
-    
-    // Apellidos
-    if (paciente.primerApellido) {
-      setValue('padrePrimerApellido', paciente.primerApellido, { shouldValidate: true })
-    }
-    if (paciente.segundoApellido) {
-      setValue('padreSegundoApellido', paciente.segundoApellido, { shouldValidate: true })
-    }
-    
-    if (paciente.edad != null) {
-      setValue('padreEdad', paciente.edad, { shouldValidate: true })
-    }
-    
-    if (paciente.ocupacion) {
-      setValue('padreOcupacion', paciente.ocupacion, { shouldValidate: true })
+    // ── Fijar tipo de documento ──
+    if (tieneDpi) {
+      setValue('padreDocTipo', 'DPI_GT', { shouldValidate: false })
+      setValue('padreCuiCedula', paciente.cui!, { shouldValidate: true })
     }
 
-    // ── MAPEO INTELIGENTE DE DATOS FHIR ──
+    if (paciente.primerNombre) setValue('padrePrimerNombre', paciente.primerNombre, { shouldValidate: true })
+    if (paciente.segundoNombre) setValue('padreSegundoNombre', paciente.segundoNombre, { shouldValidate: true })
+    if (paciente.primerApellido) setValue('padrePrimerApellido', paciente.primerApellido, { shouldValidate: true })
+    if (paciente.segundoApellido) setValue('padreSegundoApellido', paciente.segundoApellido, { shouldValidate: true })
+    if (paciente.edad != null) setValue('padreEdad', paciente.edad, { shouldValidate: true })
+    if (paciente.ocupacion) setValue('padreOcupacion', paciente.ocupacion, { shouldValidate: true })
+
     const resultadoMapeo = mapearDatosFhirCompleto({
       departamento: paciente.departamento,
       municipio: paciente.municipio,
@@ -110,50 +120,49 @@ export default function SeccionV() {
       estadoCivil: paciente.estadoCivil,
       puebloPertenencia: paciente.puebloPertenencia,
       nacionalidad: paciente.nacionalidad
-    }, 'masculino') // Padre = masculino
-    
-    // Aplicar datos mapeados con prefijo "padre"
-    if (resultadoMapeo.data.departamento) {
-      setValue('padreDepartamento', resultadoMapeo.data.departamento, { shouldValidate: true })
-    }
-    
-    if (resultadoMapeo.data.municipio) {
-      setValue('padreMunicipio', resultadoMapeo.data.municipio, { shouldValidate: true })
-    }
-    
-    if (resultadoMapeo.data.nacionalidad) {
-      // Para padre masculino, cambiar "Guatemalteca" por "Guatemalteco"
-      const nacionalidad = resultadoMapeo.data.nacionalidad === 'Guatemalteca' ? 'Guatemalteco' : resultadoMapeo.data.nacionalidad
-      setValue('padreNacionalidad', nacionalidad, { shouldValidate: true })
-    }
-    
-    if (resultadoMapeo.data.estadoCivil) {
-      setValue('padreEstadoCivil', resultadoMapeo.data.estadoCivil, { shouldValidate: true })
-    }
-    
-    if (resultadoMapeo.data.puebloPertenencia) {
-      setValue('padrePuebloPertenencia', resultadoMapeo.data.puebloPertenencia, { shouldValidate: true })
-    }
-    
-    // Mostrar advertencias de mapeo si las hay
-    if (resultadoMapeo.warnings.length > 0) {
-      console.warn('[SeccionV] Advertencias de mapeo FHIR:', resultadoMapeo.warnings)
-      resultadoMapeo.warnings.forEach(warning => {
-        console.warn(`[FHIR Mapping] ${warning}`)
-      })
+    }, 'masculino')
+
+    if (resultadoMapeo.data.departamento) setValue('padreDepartamento', resultadoMapeo.data.departamento, { shouldValidate: true })
+    if (resultadoMapeo.data.municipio) setValue('padreMunicipio', resultadoMapeo.data.municipio, { shouldValidate: true })
+    if (resultadoMapeo.data.estadoCivil) setValue('padreEstadoCivil', resultadoMapeo.data.estadoCivil, { shouldValidate: true })
+    if (resultadoMapeo.data.puebloPertenencia) setValue('padrePuebloPertenencia', resultadoMapeo.data.puebloPertenencia, { shouldValidate: true })
+
+    // ── Nacionalidad: si tiene DPI siempre guatemalteco; si no, usar lo que devuelva FHIR ──
+    if (tieneDpi) {
+      setValue('padreNacionalidad', 'Guatemalteco', { shouldValidate: true })
+    } else if (resultadoMapeo.data.nacionalidad) {
+      const nac = resultadoMapeo.data.nacionalidad === 'Guatemalteca' ? 'Guatemalteco' : resultadoMapeo.data.nacionalidad
+      setValue('padreNacionalidad', nac, { shouldValidate: true })
     }
 
+    if (resultadoMapeo.warnings.length > 0) {
+      console.warn('[SeccionV] Advertencias de mapeo FHIR:', resultadoMapeo.warnings)
+    }
+
+    setFhirTieneDpi(tieneDpi)
     setDatosDeFhir(modo)
   }
 
   const handleLimpiarFhir = () => {
+    setFhirTieneDpi(false)
     setDatosDeFhir(false)
   }
 
-  // Autocompletar depto/municipio/nacionalidad al ingresar DPI válido MANUALMENTE
-  // (NO se ejecuta si los datos vienen de FHIR, porque ya están completos)
+  // Pre-llenar nacionalidad al cambiar tipo de documento (solo si no hay DPI desde FHIR)
   useEffect(() => {
-    if (!dpi || datosDeFhir) return  // ← No ejecutar si viene de FHIR
+    if (fhirTieneDpi) return
+    if (docInfo.nacionalidadDefault) {
+      const nac = docInfo.nacionalidadDefault === 'Mexicana' ? 'Mexicano' : docInfo.nacionalidadDefault
+      setValue('padreNacionalidad', nac, { shouldValidate: false })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [padreDocTipo, padrePaisPasaporte])
+
+  // Autocompletar depto/municipio/nacionalidad al ingresar DPI válido MANUALMENTE
+  // Solo cuando tipo = DPI_GT
+  useEffect(() => {
+    if (padreDocTipo !== 'DPI_GT') return
+    if (!dpi || datosDeFhir) return
 
     const digits = dpi.replace(/\s/g, '')
     if (digits.length !== 13 || !cuiValido(digits)) return
@@ -161,18 +170,15 @@ export default function SeccionV() {
     const info = deptoMuniDesdeCui(digits)
     if (!info) return
 
-    // Autocompletar departamento
     setValue('padreDepartamento', info.depto, { shouldValidate: true })
 
-    // Autocompletar municipio usando el índice
     const deptoData = DEPARTAMENTOS_GUATEMALA.find(d => d.title === info.depto)
     if (deptoData && deptoData.mun[info.muniIndex]) {
       setValue('padreMunicipio', deptoData.mun[info.muniIndex], { shouldValidate: true })
     }
 
-    // Fijar nacionalidad a guatemalteco
     setValue('padreNacionalidad', 'Guatemalteco', { shouldValidate: true })
-  }, [dpi, datosDeFhir, setValue])
+  }, [dpi, datosDeFhir, padreDocTipo, setValue])
 
   return (
     <SectionCard title="V. Datos del padre" variant="nacimiento">
@@ -184,6 +190,18 @@ export default function SeccionV() {
             label="Buscar padre en RENAP por CUI/DPI"
             onPacienteEncontrado={handlePacienteEncontrado}
             onLimpiar={handleLimpiarFhir}
+            ocultarModoDpi={!docInfo.mostrarFhirDpi}
+          />
+        </Grid>
+
+        {/* ── Selector de tipo de documento ── */}
+        <Grid item xs={12}>
+          <DocumentoSelector
+            tipo={padreDocTipo}
+            onTipoChange={handleTipoChange}
+            paisPasaporte={padrePaisPasaporte ?? ''}
+            onPaisChange={(pais) => setValue('padrePaisPasaporte', pais, { shouldValidate: false })}
+            disabled={fhirTieneDpi}
           />
         </Grid>
 
@@ -237,19 +255,32 @@ export default function SeccionV() {
           )} />
         </Grid>
 
+        {/* ── 27. Documento — condicional según tipo ── */}
         <Grid item xs={12}>
           <Controller name="padreCuiCedula" control={control} render={({ field, fieldState }) => (
-            <DpiField
-              label="27. DPI"
-              value={field.value ?? ''}
-              onChange={field.onChange}
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message ?? (
-                dpiGuatemalteco
-                  ? '✓ DPI guatemalteco — depto. y municipio precargados'
-                  : 'Opcional: Ingrese el DPI (13 dígitos) para autocompletar'
-              )}
-            />
+            padreDocTipo === 'DPI_GT' ? (
+              <DpiField
+                label={`27. ${docInfo.labelNumero}`}
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message ?? (
+                  dpiGuatemalteco
+                    ? '✓ DPI guatemalteco — depto. y municipio precargados'
+                    : 'Opcional: Ingrese el DPI (13 dígitos) para autocompletar'
+                )}
+              />
+            ) : (
+              <SmartField
+                label={`27. ${docInfo.labelNumero}`}
+                fieldType="alphanumeric"
+                maxLen={docInfo.maxLengthDoc}
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              />
+            )
           )} />
         </Grid>
 
@@ -266,10 +297,11 @@ export default function SeccionV() {
               {...field}
               value={field.value ?? ''}
               label="29. Nacionalidad"
-              inputProps={{ maxLength: 100 }}
+              inputProps={{ maxLength: 100, readOnly: fhirTieneDpi }}
               InputLabelProps={{ shrink: true }}
               size="small"
               fullWidth
+              sx={fhirTieneDpi ? { '& .MuiOutlinedInput-root': { bgcolor: 'action.hover' } } : undefined}
             />
           )} />
         </Grid>
@@ -298,29 +330,87 @@ export default function SeccionV() {
           )} />
         </Grid>
 
-        {/* ── Depto / Municipio — siempre editables, pero se precargan del DPI ── */}
-        <Controller
-          name="padreMunicipio"
-          control={control}
-          render={({ field: muni }) => (
-            <Controller
-              name="padreDepartamento"
-              control={control}
-              render={({ field: depto }) => (
-                <DeptoMuniSelector
-                  deptoValue={depto.value ?? ''}
-                  muniValue={muni.value ?? ''}
-                  onDeptoChange={(v) => { depto.onChange(v); muni.onChange('') }}
-                  onMuniChange={muni.onChange}
-                  deptoGrid={{ xs: 12, sm: 2 }}
-                  muniGrid={{ xs: 12, sm: 2 }}
-                  deptoLabel="Departamento"
-                  muniLabel="Municipio"
+        {/* ── Depto / Municipio — condicional según tipo de documento ── */}
+        {docInfo.usaSelectorGT && (
+          <Controller
+            name="padreMunicipio"
+            control={control}
+            render={({ field: muni }) => (
+              <Controller
+                name="padreDepartamento"
+                control={control}
+                render={({ field: depto }) => (
+                  <DeptoMuniSelector
+                    deptoValue={depto.value ?? ''}
+                    muniValue={muni.value ?? ''}
+                    onDeptoChange={(v) => { depto.onChange(v); muni.onChange('') }}
+                    onMuniChange={muni.onChange}
+                    deptoGrid={{ xs: 12, sm: 2 }}
+                    muniGrid={{ xs: 12, sm: 2 }}
+                    deptoLabel={docInfo.labelDepto}
+                    muniLabel={docInfo.labelMuni}
+                  />
+                )}
+              />
+            )}
+          />
+        )}
+
+        {docInfo.usaSelectorMX && (
+          <Controller
+            name="padreMunicipio"
+            control={control}
+            render={({ field: muni }) => (
+              <Controller
+                name="padreDepartamento"
+                control={control}
+                render={({ field: depto }) => (
+                  <DeptoMuniMexSelector
+                    deptoValue={depto.value ?? ''}
+                    muniValue={muni.value ?? ''}
+                    onDeptoChange={(v) => { depto.onChange(v); muni.onChange('') }}
+                    onMuniChange={muni.onChange}
+                    deptoGrid={{ xs: 12, sm: 2 }}
+                    muniGrid={{ xs: 12, sm: 2 }}
+                    deptoLabel={docInfo.labelDepto}
+                    muniLabel={docInfo.labelMuni}
+                  />
+                )}
+              />
+            )}
+          />
+        )}
+
+        {!docInfo.usaSelectorGT && !docInfo.usaSelectorMX && (
+          <>
+            <Grid item xs={12} sm={3}>
+              <Controller name="padreDepartamento" control={control} render={({ field }) => (
+                <TextField
+                  {...field}
+                  value={field.value ?? ''}
+                  label={docInfo.labelDepto}
+                  size="small"
+                  fullWidth
+                  inputProps={{ maxLength: 100 }}
+                  InputLabelProps={{ shrink: true }}
                 />
-              )}
-            />
-          )}
-        />
+              )} />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <Controller name="padreMunicipio" control={control} render={({ field }) => (
+                <TextField
+                  {...field}
+                  value={field.value ?? ''}
+                  label={docInfo.labelMuni}
+                  size="small"
+                  fullWidth
+                  inputProps={{ maxLength: 100 }}
+                  InputLabelProps={{ shrink: true }}
+                />
+              )} />
+            </Grid>
+          </>
+        )}
 
         {/* ── Estado civil en tarjetas ── */}
         <Grid item xs={12}>

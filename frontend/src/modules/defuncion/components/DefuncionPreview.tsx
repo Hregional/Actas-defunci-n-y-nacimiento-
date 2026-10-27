@@ -56,7 +56,7 @@ function conCie11(causa?: string | null, codigo?: string | null) {
 interface Props { open: boolean; onClose: () => void; data: Partial<DefuncionFormValues> }
 
 export default function DefuncionPreview({ open, onClose, data }: Props) {
-  const { printRef, print } = usePrint('Informe de Defunción — HRO')
+  const { printRef, print } = usePrint('Informe de Defunción — HRO', PRINT_CSS_DEFUNCION)
 
   const fecha = data.infoFechaDefuncion ? dayjs(data.infoFechaDefuncion).format('DD/MM/YYYY') : ''
   const edadStr = (() => {
@@ -322,84 +322,6 @@ export default function DefuncionPreview({ open, onClose, data }: Props) {
               se emite el presente Informe de defunción, en ________________________________<br /><br />
               a los _______ días del mes de _______________________ del año __________________<br /><br />
               Firma de la persona que extiende el informe: ____________________________________"
-            </div>
-          </div>
-
-          {/* ════════════ REVERSO — PÁGINA 2 ════════════ */}
-          <div className="page-break" />
-
-          <div className="form-header">
-            <div className="form-header-top">
-              <img src="/assets/images/1-LogoINE.png" alt="INE" />
-              <img src="/assets/images/2-LogoRENAP.jpg" alt="RENAP" />
-              <div className="form-header-center">
-                <h1>INSTRUCCIONES PARA EL LLENADO DEL INFORME DE DEFUNCIÓN</h1>
-              </div>
-              <img src="/assets/images/3-LogoHRO.jpg" alt="HRO" />
-            </div>
-          </div>
-
-          <div className="rev-wrap" style={{ borderTop: 'none', paddingTop: 4 }}>
-            <div className="rev-section">
-              <div className="rev-sec-title">INSTRUCCIONES GENERALES:</div>
-              <div className="rev-body">
-                <div className="rev-item">• Este informe debe llenarse en forma clara con letra de molde y tinta firme o a máquina. No se aceptará con tachones, borrones, sobre escritura o cualquier tipo de alteración.</div>
-                <div className="rev-item">• No use abreviaturas.</div>
-                <div className="rev-item">• Para las preguntas de opción, anote el número que corresponde con la respuesta correcta.</div>
-                <div className="rev-item">• Para las respuestas en las que se deben anotar números (fecha, hora, colegiado, edad, CUI, etcétera), use números arábigos (1,2,3…9).</div>
-                <div className="rev-item">• Debe colocarse el timbre médico en el espacio correspondiente cuando aplique.</div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">INSTRUCCIONES ESPECÍFICAS:</div>
-              <div className="rev-body">
-                <div className="rev-item"><strong>2 DOCUMENTO DE IDENTIFICACIÓN:</strong> Los guatemaltecos y extranjeros domiciliados podrán identificarse con DPI o Cédula de vecindad acompañada de constancia RENAP. En caso que no sea posible la identificación mediante el DPI por robo, pérdida o deterioro, se aceptará certificación del DPI (consignar CUI). Los extranjeros se identificarán con pasaporte vigente; los centroamericanos también con el documento de identificación de su país. Los refugiados con la cédula de identidad de refugiado.</div>
-                <div className="rev-item"><strong>3.1 NÚMERO DE COLEGIADO:</strong> Anote el número de colegiado (si es médico(a) o enfermero(a) graduado(a)).</div>
-                <div className="rev-item"><strong>6 NOMBRE DEL FALLECIDO(A):</strong> Escriba los nombres y apellidos completos. Si se trata de un homicidio, accidente, suicidio u otra causa que impida la identificación del cadáver, anote la palabra <em>desconocido</em>. En el caso de que el fallecido(a) sea un recién nacido, anote al menos los apellidos paternos y/o maternos.</div>
-                <div className="rev-item"><strong>8 EDAD CUMPLIDA:</strong> Para menores de un día, anote la edad en horas (entre 0 y 23). Para menores de un mes, en días (entre 1 y 29). Para menores de un año, en meses (entre 1 y 11). Para los que tenían más de un año, anote solamente los años cumplidos.</div>
-                <div className="rev-item"><strong>9 DOCUMENTO DE IDENTIFICACIÓN (fallecido):</strong> La persona fallecida podrá identificarse con DPI, Cédula de vecindad o certificación de inscripción de nacimiento (consignar número de libro, folio y partida o número de CUI).</div>
-                <div className="rev-item"><strong>12 y 27 OCUPACIÓN:</strong> Anote el último oficio o trabajo. Si no trabajaba por remuneración, mencione a qué se dedicaba (rentista, jubilado, estudiante, ama de casa, etc.).</div>
-                <div className="rev-item"><strong>15 y 26 RESIDENCIA:</strong> Anote la dirección exacta (número de casa, calle, avenida, zona, nombre de ciudad/pueblo/colonia/aldea/caserío/finca/paraje), municipio y departamento de residencia durante los últimos seis meses, exceptuando períodos largos de hospitalización.</div>
-                <div className="rev-item"><strong>17 SI LA DEFUNCIÓN CORRESPONDE A UNA MUJER ENTRE 10 Y 54 AÑOS:</strong> No omita responder la pregunta.</div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">IV CAUSA DE DEFUNCIÓN:</div>
-              <div className="rev-body">
-                <div className="rev-item"><strong>18 CAUSA DE DEFUNCIÓN:</strong> El informe está diseñado para obtener información que facilitará la selección de la causa básica de la defunción. El modelo consiste de dos partes (I y II).</div>
-                <div className="rev-item">En la parte I se inscribe la causa que condujo directamente a la muerte en la línea (a) y los estados patológicos antecedentes en las líneas (b), (c) y (d). Indique la causa básica en la última línea de la secuencia.</div>
-                <div className="rev-item">En la parte II se incluye cualquier otra entidad morbosa significativa que hubiera influido desfavorablemente en el curso del proceso patológico.</div>
-              </div>
-
-              <div className="rev-example">
-                <div className="rev-ex-title">Ejemplo (Fallecido de 40 años):</div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <div style={{ flex: 3 }}>
-                    {[['(a)', 'Peritonitis', '1 día'], ['(b)', 'Absceso hepático amebiano roto a cavidad abdominal', '2 días'], ['(c)', 'Colitis amebiana', '2 meses'], ['(d)', '', '']].map(([k, v, i]) => (
-                      <div key={String(k)} className="rev-ex-row">
-                        <span className="rev-ex-key">{k}</span>
-                        <div className="rev-ex-val">{String(v)}</div>
-                        <div className="rev-ex-int">{String(i)}</div>
-                      </div>
-                    ))}
-                    <div style={{ fontSize: '5.5pt', marginTop: 3, fontStyle: 'italic' }}>II. Otros estados: Enfermedad vascular cerebral (5 años) / Cardiopatía hipertensiva (10 años)</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-body">
-                <div className="rev-item"><strong>19 FUE UN PRESUNTO:</strong> Este apartado es para especificar la intencionalidad de la muerte. Estos datos no prejuzgan sobre la calificación del hecho que en definitiva hicieren los tribunales, es únicamente para fines estadísticos.</div>
-                <div className="rev-item"><strong>19.1 LUGAR DONDE OCURRIÓ LA LESIÓN:</strong> Especifique la opción correspondiente dado que ésta puede ser diferente a la del sitio donde ocurrió la defunción.</div>
-                <div className="rev-item"><strong>VI DATOS DE LA DEFUNCIÓN FETAL (MORTINATO):</strong> Se entiende por defunción fetal la muerte de un producto de la concepción, antes de su expulsión o extracción completa del cuerpo de su madre; la muerte está indicada por el hecho de que después de la separación el feto no respira ni da ninguna otra señal de vida (latidos del corazón, pulsación del cordón umbilical, etc.).</div>
-                <div className="rev-item"><strong>21 MADRE GUATEMALTECA MENOR DE EDAD:</strong> Podrá identificarse con certificación de nacimiento (número de libro, folio y partida o número de CUI).</div>
-                <div className="rev-item"><strong>31 EN LOS EMBARAZOS ANTERIORES A ÉSTE TUVO:</strong> Del total de embarazos tenidos por la madre, anote cuántos hijos nacieron vivos (independientemente si a la fecha están vivos o no) y cuántos nacieron muertos.</div>
-                <div className="rev-item"><strong>37 SEMANAS DE GESTACIÓN:</strong> Anote la duración del embarazo en semanas completas, contando a partir de la última menstruación hasta el momento de la extracción o expulsión del producto.</div>
-                <div className="rev-item"><strong>38 CAUSAS DEL MORTINATO:</strong> Se entiende por causa fetal la muerte relacionada directamente con el feto (Ej: Asfixia perinatal, circular del cordón). Por causa maternal, la muerte fetal relacionada directamente con la madre (Ej: Eclampsia).</div>
-              </div>
             </div>
           </div>
 

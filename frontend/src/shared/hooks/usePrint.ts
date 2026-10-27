@@ -3,11 +3,18 @@ import { PRINT_CSS } from '@/shared/styles/printStyles'
 
 /**
  * Hook reutilizable para imprimir cualquier elemento del DOM.
- * Usa el CSS unificado de PRINT_CSS para garantizar que el formato
- * sea idéntico entre la vista previa en pantalla y la impresión.
+ * Abre una ventana nueva con el CSS de impresión para que el formato
+ * sea fiel al diseño. El tamaño @page está fijado (oficio 8.5"×14"),
+ * lo que bloquea el selector de escala en el diálogo de Chrome/Edge.
+ *
+ * @param title  Título de la ventana/pestaña de impresión
+ * @param css    CSS a inyectar (por defecto PRINT_CSS). Pasa el específico
+ *               del acta (PRINT_CSS_NACIMIENTO / PRINT_CSS_DEFUNCION) para
+ *               asegurarte de que el @page correcto viaje con el contenido.
  */
-export function usePrint(title = 'Informe HRO') {
+export function usePrint(title = 'Informe HRO', css?: string) {
   const printRef = useRef<HTMLDivElement>(null)
+  const printCss = css ?? PRINT_CSS
 
   const print = useCallback(() => {
     const content = printRef.current
@@ -24,7 +31,7 @@ export function usePrint(title = 'Informe HRO') {
 <head>
   <meta charset="UTF-8">
   <title>${title}</title>
-  <style>${PRINT_CSS}</style>
+  <style>${printCss}</style>
 </head>
 <body>${content.innerHTML}</body>
 </html>`)
@@ -35,7 +42,7 @@ export function usePrint(title = 'Informe HRO') {
       win.print()
       win.close()
     }, 800)
-  }, [title])
+  }, [title, printCss])
 
   return { printRef, print }
 }

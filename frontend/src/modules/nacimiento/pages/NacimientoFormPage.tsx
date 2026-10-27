@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, FormProvider, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -66,7 +66,10 @@ export default function NacimientoFormPage() {
   // IMPORTANTE: Todos los hooks deben estar ANTES de cualquier early return
   const [activeStep, setActiveStep] = useState(0)
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [allowSubmit, setAllowSubmit] = useState(false)  // ← Flag de control de submit
+  // Ref mutable: indica si el submit fue disparado por un botón explícito del usuario.
+  // Se usa ref (no state) para que sea síncrono — el handler lo lee en el mismo ciclo
+  // en que handleSubmit lo llama, sin esperar un re-render.
+  const submitIntentRef = useRef(false)
   const [snackbar, setSnackbar] = useState<{
     open: boolean; message: string; severity: 'success' | 'error'
   }>({ open: false, message: '', severity: 'success' })
@@ -104,18 +107,18 @@ export default function NacimientoFormPage() {
       madrePrimerNombre: '',
       madrePrimerApellido: '',
       madreCuiCedula: '',
+      madreEstadoCivil: null as unknown as number,
+      madrePuebloPertenencia: null as unknown as number,
+      madreEscolaridad: null as unknown as number,
     },
   })
 
   const { handleSubmit, reset, watch, formState: { isSubmitting } } = methods
   const formValues = watch()
 
-  // Logging de cambios de paso para diagnóstico
+  // Al cambiar de paso, resetear el intent de submit y hacer scroll al inicio
   useEffect(() => {
-    console.log(`[NacimientoForm] activeStep cambió a: ${activeStep} (${STEPS[activeStep]})`)
-    // CRÍTICO: Al cambiar de paso, resetear allowSubmit para prevenir auto-submit
-    setAllowSubmit(false)
-    // Scroll al inicio del contenido después de que React renderice el nuevo paso
+    submitIntentRef.current = false
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     })
@@ -231,17 +234,17 @@ export default function NacimientoFormPage() {
     // Validación especial paso 2 (Sección IV - Madre): Si NO hay DPI guatemalteco válido,
     // departamento y municipio deben seleccionarse manualmente
     if (activeStep === 2) {
-      const dpiMadre = currentValues.madreCuiCedula
+      const dpiMadre = currentValues.madreCuiCedula as string | undefined
       const esGuatemalteco = dpiMadre && dpiMadre.replace(/\s/g, '').length === 13 && cuiValido(dpiMadre)
       
       if (!esGuatemalteco) {
         // Sin DPI guatemalteco, validar que departamento y municipio estén completos
-        if (!currentValues.madreDepartamento || currentValues.madreDepartamento.trim() === '') {
+        if (!currentValues.madreDepartamento || (currentValues.madreDepartamento as string).trim() === '') {
           if (!missingFields.includes('Departamento de la madre')) {
             missingFields.push('Departamento de la madre')
           }
         }
-        if (!currentValues.madreMunicipio || currentValues.madreMunicipio.trim() === '') {
+        if (!currentValues.madreMunicipio || (currentValues.madreMunicipio as string).trim() === '') {
           if (!missingFields.includes('Municipio de la madre')) {
             missingFields.push('Municipio de la madre')
           }
@@ -267,53 +270,16 @@ export default function NacimientoFormPage() {
   }
 
   const onSubmit = async (data: NacimientoFormValues) => {
-    // ── LOGGING DE DIAGNÓSTICO ──────────────────────────────────────────────
-    console.log('═══════════════════════════════════════════════════════════')
-    console.log('[NacimientoForm] onSubmit EJECUTADO')
-    console.log('  - activeStep actual:', activeStep)
-    console.log('  - STEPS.length - 1 (último paso):', STEPS.length - 1)
-    console.log('  - editId:', editId)
-    console.log('  - allowSubmit:', allowSubmit)
-    console.log('  - Modo:', editId ? 'EDICIÓN' : 'CREACIÓN')
-    console.log('═══════════════════════════════════════════════════════════')
-
-    // ── PROTECCIÓN: Flag de control (para CREACIÓN y EDICIÓN) ──────────────
-    if (!allowSubmit) {
-      console.error(' [NacimientoForm] SUBMIT BLOQUEADO: allowSubmit es false')
-      console.error('   El usuario NO ha presionado el botón Guardar explícitamente')
-      return
-    }
-
-    // ── PROTECCIÓN 2: Validación de paso (SOLO para creación) ──────────────
-    if (!editId) {
-      // En creación: SOLO guardar si estamos exactamente en el último paso (activeStep === 3)
-      if (activeStep !== STEPS.length - 1) {
-        console.error(` [NacimientoForm] GUARDADO BLOQUEADO`)
-        console.error(`   Motivo: Intento de guardar en paso ${activeStep}, pero solo se permite en paso ${STEPS.length - 1}`)
-        console.error(`   Estado: Creación (sin editId)`)
-        setSnackbar({
-          open: true,
-          message: 'No se puede guardar en este paso. Avance hasta el paso final.',
-          severity: 'error'
-        })
-        return
-      }
-      console.log(' [NacimientoForm] Validación pasada: activeStep === último paso en modo creación')
-    } else {
-      console.log(' [NacimientoForm] Modo edición: permitido guardar en cualquier paso')
-    }
+    // Verificar que el submit fue iniciado por un botón explícito del usuario
+    if (!submitIntentRef.current) return
+    submitIntentRef.current = false
 
     try {
       if (editId) {
-        console.log(' [NacimientoForm] Ejecutando actualización...')
         await actualizar.mutateAsync({ id: editId, dto: data })
         setSnackbar({ open: true, message: 'Informe actualizado exitosamente', severity: 'success' })
-        // Solo navegar si estamos en el último paso — en pasos intermedios, quedarse
-        if (activeStep === STEPS.length - 1) {
-          setTimeout(() => navigate('/nacimientos'), 1500)
-        }
+        setTimeout(() => navigate('/nacimientos'), 1500)
       } else {
-        console.log(' [NacimientoForm] Ejecutando creación...')
         const saved = await crear.mutateAsync(data)
         if (saved.id) {
           await nacimientoApi.cambiarEstado(saved.id, 'COMPLETADO')
@@ -323,13 +289,7 @@ export default function NacimientoFormPage() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error al guardar el informe'
-      console.error(' [NacimientoForm] Error al guardar:', msg)
       setSnackbar({ open: true, message: msg, severity: 'error' })
-    } finally {
-      // Resetear el flag después del intento de guardado (solo en creación)
-      if (!editId) {
-        setAllowSubmit(false)
-      }
     }
   }
 
@@ -345,17 +305,11 @@ export default function NacimientoFormPage() {
   }
 
   const onInvalid = (errors: FieldErrors<NacimientoFormValues>) => {
-    // Log de todos los errores para diagnóstico
-    console.error('[NacimientoForm] Errores:', Object.entries(errors).map(([k, v]) => `${k}: ${(v as { message?: string })?.message}`))
-    console.error('[NacimientoForm] Errores detalle:', errors) // Log adicional para ver estructura completa
+    submitIntentRef.current = false
     const errorFields = Object.keys(errors) as (keyof NacimientoFormValues)[]
     const firstField = errorFields[0]
     const targetStep = firstField ? (FIELD_TO_STEP[firstField] ?? 0) : 0
-
-    // Navegar al paso con error
     setActiveStep(targetStep)
-
-    // Mostrar cuál campo tiene error
     const fieldLabels: Partial<Record<keyof NacimientoFormValues, string>> = {
       suscribeNombresApellidos: 'Nombres y apellidos',
       suscribeCuiCedula: 'DPI',
@@ -373,13 +327,11 @@ export default function NacimientoFormPage() {
       madreCuiCedula: 'DPI de la madre',
       madreEdad: 'Edad de la madre',
     }
-
     const label = firstField ? (fieldLabels[firstField] ?? firstField) : 'desconocido'
     const total = errorFields.length
     const msg = total === 1
       ? `Campo con error: ${label}`
       : `${total} campos con errores. Primero: ${label}`
-
     setSnackbar({ open: true, message: msg, severity: 'error' })
   }
 
@@ -391,11 +343,10 @@ export default function NacimientoFormPage() {
     <FormProvider {...methods}>
       <Box
         component="form"
-        onSubmit={handleSubmit(onSubmit, onInvalid)}
+        onSubmit={(e) => e.preventDefault()}
         noValidate
         onKeyDown={(e) => {
-          // PROTECCIÓN: Bloquear Enter en todo el formulario excepto en botones
-          // Esto previene que presionar Enter en un campo de texto dispare submit accidental
+          // Bloquear Enter para prevenir submit accidental
           if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'BUTTON') {
             e.preventDefault()
           }
@@ -532,14 +483,14 @@ export default function NacimientoFormPage() {
                 {/* En modo edición: Actualizar disponible en cada paso */}
                 {editId && (
                   <Button
-                    type="submit"
+                    type="button"
                     variant="outlined"
                     color="success"
                     startIcon={<SaveIcon />}
                     disabled={isSubmitting || actualizar.isPending}
                     onClick={() => {
-                      console.log('[NacimientoForm] 🔘 Botón ACTUALIZAR presionado. Activando allowSubmit.')
-                      setAllowSubmit(true)
+                      submitIntentRef.current = true
+                      handleSubmit(onSubmit, onInvalid)()
                     }}
                   >
                     Actualizar
@@ -561,15 +512,15 @@ export default function NacimientoFormPage() {
                   Vista previa
                 </Button>
                 <Button
-                  type="submit"
+                  type="button"
                   variant="contained"
                   color="success"
                   startIcon={<SaveIcon />}
                   disabled={isSubmitting || crear.isPending || actualizar.isPending}
                   size="large"
                   onClick={() => {
-                    console.log('[NacimientoForm] 🔘 Botón GUARDAR presionado. Activando allowSubmit.')
-                    setAllowSubmit(true)
+                    submitIntentRef.current = true
+                    handleSubmit(onSubmit, onInvalid)()
                   }}
                 >
                   {editId ? 'Actualizar' : 'Guardar'}

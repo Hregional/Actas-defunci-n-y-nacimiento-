@@ -4,7 +4,7 @@ import {
   Box, Button, TextField,
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Tooltip, Typography,
-  TablePagination, InputAdornment, Stack, Alert,
+  TablePagination, InputAdornment, Stack,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -28,7 +28,7 @@ export default function DefuncionListPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [previewId, setPreviewId] = useState<number | null>(null)
 
-  const { data, isError } = useDefuncionList({ search, page, size })
+  const { data} = useDefuncionList({ search, page, size })
   const { data: previewData } = useDefuncionById(previewId ?? undefined)
   const eliminar = useEliminarDefuncion()
 
@@ -67,8 +67,6 @@ export default function DefuncionListPage() {
           Nuevo Informe
         </Button>
       </Stack>
-
-      {isError && <Alert severity="error" sx={{ mb: 2 }}>Error al cargar los registros.</Alert>}
 
       <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2 }}>
         <Table size="small">

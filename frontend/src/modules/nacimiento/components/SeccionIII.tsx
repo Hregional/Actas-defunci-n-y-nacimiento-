@@ -66,23 +66,27 @@ export default function SeccionIII() {
     setValue('ninoHijosViven', viven, { shouldValidate: false })
   }, [totalHijos, nacidosMuertos, setValue])
 
-  // ── Conversión kg → lb al escribir en el campo kilogramos ───────────────
+  // ── Conversión de kg → libras y onzas por separado ─────────────────────
+  // La parte entera de los kg se convierte a libras.
+  // La parte decimal de los kg se convierte a onzas.
+  // Ejemplo: 3.121 kg
+  //   parte entera  3     kg × 2.2046 = 6.61 lb
+  //   parte decimal 0.121 kg × 35.274 = 4.3  oz
   const handlePesoKgChange = (v: string) => {
     setPesoKg(v)
     if (v === '' || v === '.') {
       setValue('ninoPesoLibras', null as unknown as number, { shouldValidate: false })
-      setValue('ninoPesoOnzas', null as unknown as number, { shouldValidate: false })
+      setValue('ninoPesoOnzas',  null as unknown as number, { shouldValidate: false })
       return
     }
-    const kg = parseFloat(v)
-    if (!isNaN(kg)) {
-      // Conversión directa kg → lb: 1 kg = 1/0.45359237 lb = 2.2046226218 lb
-      const lb = Math.round(kg * 2.2046226218 * 1000) / 1000
-      setValue('ninoPesoLibras', lb, { shouldValidate: true })
-      
-      // Conversión directa kg → oz: 1 kg = 35.27396195 oz (más preciso que lb×16)
-      const oz = Math.round(kg * 35.27396195 * 1000) / 1000
-      setValue('ninoPesoOnzas', oz, { shouldValidate: true })
+    const num = parseFloat(v)
+    if (!isNaN(num)) {
+      const kgEnteros  = Math.floor(num)          // parte entera en kg
+      const kgDecimal  = num - kgEnteros           // parte decimal en kg
+      const libras = Math.round(kgEnteros * 2.2046226218 * 10) / 10   // kg enteros → lb
+      const onzas  = Math.round(kgDecimal * 35.27396195 * 10) / 10    // kg decimal → oz
+      setValue('ninoPesoLibras', libras, { shouldValidate: true })
+      setValue('ninoPesoOnzas',  onzas,  { shouldValidate: true })
     }
   }
 
@@ -155,7 +159,7 @@ export default function SeccionIII() {
             fullWidth
             InputLabelProps={{ shrink: true }}
             inputProps={{ readOnly: true, style: { cursor: 'default' } }}
-            helperText={pesoLbForm != null ? 'Calculado desde kg' : 'Ingrese kg primero'}
+            helperText={pesoLbForm != null ? '' : 'Ingrese kg primero'}
             sx={{
               '& .MuiOutlinedInput-root': {
                 bgcolor: (theme) =>
@@ -185,7 +189,7 @@ export default function SeccionIII() {
             fullWidth
             InputLabelProps={{ shrink: true }}
             inputProps={{ readOnly: true, style: { cursor: 'default' } }}
-            helperText={pesoOzForm != null ? 'Calculado desde lb' : 'Ingrese kg primero'}
+            helperText={pesoOzForm != null ? '' : 'Ingrese kg primero'}
             sx={{
               '& .MuiOutlinedInput-root': {
                 bgcolor: (theme) =>

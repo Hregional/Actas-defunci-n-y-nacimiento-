@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!--
+        Agrega soporte multi-documento: DPI_GT, INE_MX, PASAPORTE, OTRO.
+        - Nuevas columnas xxx_doc_tipo y xxx_pais_pasaporte en ambas tablas.
+        - Amplía columnas de número de documento de VARCHAR(13) a VARCHAR(50)
+          para aceptar pasaportes y documentos de otros países.
+    -->
+    <changeSet id="006-documento-tipo" author="system">
+        <addColumn tableName="informe_nacimiento">
+            <column name="madre_doc_tipo" type="VARCHAR(20)" defaultValue="DPI_GT"/>
+            <column name="madre_pais_pasaporte" type="VARCHAR(10)"/>
+            <column name="padre_doc_tipo" type="VARCHAR(20)"/>
+            <column name="padre_pais_pasaporte" type="VARCHAR(10)"/>
+        </addColumn>
+        <modifyDataType
+            tableName="informe_nacimiento"
+            columnName="madre_cui_cedula"
+            newDataType="VARCHAR(50)"/>
+        <modifyDataType
+            tableName="informe_nacimiento"
+            columnName="padre_cui_cedula"
+            newDataType="VARCHAR(50)"/>
+        <addColumn tableName="informe_defuncion">
+            <column name="fallecido_doc_tipo" type="VARCHAR(20)" defaultValue="DPI_GT"/>
+            <column name="fallecido_pais_pasaporte" type="VARCHAR(10)"/>
+            <column name="mortinato_madre_doc_tipo" type="VARCHAR(20)"/>
+            <column name="mortinato_madre_pais_pasaporte" type="VARCHAR(10)"/>
+        </addColumn>
+        <modifyDataType
+            tableName="informe_defuncion"
+            columnName="fallecido_doc_numero"
+            newDataType="VARCHAR(50)"/>
+        <modifyDataType
+            tableName="informe_defuncion"
+            columnName="mortinato_madre_doc_numero"
+            newDataType="VARCHAR(50)"/>
+    </changeSet>
+</databaseChangeLog>

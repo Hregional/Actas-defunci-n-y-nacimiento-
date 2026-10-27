@@ -5,31 +5,24 @@ import {
 import { ESTADOS_MEXICO_MUN } from '@/shared/data/mexico'
 
 interface Props {
-  /** Valor del estado seleccionado */
   deptoValue: string
-  /** Valor del municipio seleccionado */
   muniValue: string
-  /** Callback cuando cambia el estado */
   onDeptoChange: (estado: string) => void
-  /** Callback cuando cambia el municipio */
   onMuniChange: (muni: string) => void
-  /** Mensaje de error para estado */
   deptoError?: string
-  /** Mensaje de error para municipio */
   muniError?: string
-  /** Tamaños de grid (por defecto mitad cada uno) */
   deptoGrid?: { xs?: number; sm?: number }
   muniGrid?: { xs?: number; sm?: number }
-  /** Labels personalizados */
   deptoLabel?: string
   muniLabel?: string
-  /** Si es requerido */
   required?: boolean
 }
 
+const ESTADOS = Object.keys(ESTADOS_MEXICO_MUN).sort()
+
 /**
- * Selector encadenado de Estado → Municipio de México.
- * Al cambiar el estado, el municipio se resetea automáticamente.
+ * Selector encadenado de Estado → Municipio/Alcaldía de México.
+ * Usa ESTADOS_MEXICO_MUN (Record<estado, municipios[]>).
  * Interfaz idéntica a DeptoMuniSelector para intercambio directo.
  */
 export default function DeptoMuniMexSelector({
@@ -42,12 +35,12 @@ export default function DeptoMuniMexSelector({
   deptoGrid = { xs: 12, sm: 6 },
   muniGrid = { xs: 12, sm: 6 },
   deptoLabel = 'Estado',
-  muniLabel = 'Municipio',
+  muniLabel = 'Municipio/Alcaldía',
   required = false,
 }: Props) {
   const municipios = useMemo(() => {
     if (!deptoValue) return []
-    return ESTADOS_MEXICO_MUN[deptoValue] || []
+    return ESTADOS_MEXICO_MUN[deptoValue] ?? []
   }, [deptoValue])
 
   const handleDeptoChange = (value: string) => {
@@ -65,7 +58,7 @@ export default function DeptoMuniMexSelector({
             label={`${deptoLabel}${required ? ' *' : ''}`}
             onChange={(e) => handleDeptoChange(e.target.value)}
           >
-            {Object.keys(ESTADOS_MEXICO_MUN).map(estado => (
+            {ESTADOS.map((estado) => (
               <MenuItem key={estado} value={estado}>{estado}</MenuItem>
             ))}
           </Select>
@@ -81,7 +74,7 @@ export default function DeptoMuniMexSelector({
             label={`${muniLabel}${required ? ' *' : ''}`}
             onChange={(e) => onMuniChange(e.target.value)}
           >
-            {municipios.map(m => (
+            {municipios.map((m) => (
               <MenuItem key={m} value={m}>{m}</MenuItem>
             ))}
           </Select>

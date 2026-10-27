@@ -69,7 +69,7 @@ public class InformeDefuncionDTO {
     @Min(1)
     private Integer fallecidoEdadAnos;
 
-    @Size(max = 100)
+    @Size(max = 50)
     private String fallecidoDocNumero;
 
     @Size(max = 50)
@@ -156,7 +156,7 @@ public class InformeDefuncionDTO {
     @Size(max = 255)
     private String mortinatoMadreNombre;
 
-    @Size(max = 100)
+    @Size(max = 50)
     private String mortinatoMadreDocNumero;
 
     @Size(max = 50)
@@ -244,4 +244,16 @@ public class InformeDefuncionDTO {
 
     @Min(1) @Max(9)
     private Integer otrosLugarDefuncion;
+
+    @Size(max = 20)
+    private String fallecidoDocTipo;
+
+    @Size(max = 10)
+    private String fallecidoPaisPasaporte;
+
+    @Size(max = 20)
+    private String mortinatoMadreDocTipo;
+
+    @Size(max = 10)
+    private String mortinatoMadrePaisPasaporte;
 }

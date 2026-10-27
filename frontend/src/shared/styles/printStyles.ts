@@ -70,6 +70,17 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════════════════
+   LÍMITE DE 2 PÁGINAS
+   Si el contenido excede las 2 páginas de oficio, escalar
+   para que quepa. Aplica solo en impresión.
+══════════════════════════════════════════════════════════ */
+@media print {
+  html, body {
+    max-height: 28in; /* 2 páginas oficio × 14in */
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
    HEADER DEL FORMULARIO
 ══════════════════════════════════════════════════════════ */
 .form-header {
@@ -244,6 +255,8 @@ html, body {
   gap: 10mm;
   align-items: stretch;
   min-height: 35mm;   /* más alto para que el sello sea usable */
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .sello-box, .timbre-box {
@@ -282,8 +295,14 @@ html, body {
 
 /* ══════════════════════════════════════════════════════════
    SALTO DE PÁGINA
+   Solo para forzar el reverso en documentos de 2 caras.
+   El contenido del frente fluye libremente — si desborda
+   la página 1 continúa en la página 2 antes de las huellas.
 ══════════════════════════════════════════════════════════ */
-.page-break { page-break-before: always; break-before: page; }
+.page-break {
+  page-break-before: always;
+  break-before: page;
+}
 
 @media screen {
   .page-break {
@@ -303,6 +322,10 @@ html, body {
   margin: 3mm 0 1mm 0;
   font-style: italic;
   line-height: 1.4;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  page-break-before: avoid;
+  break-before: avoid;
 }
 
 .continua {
@@ -326,6 +349,8 @@ html, body {
   gap: 10mm;
   margin: 6mm 0 8mm 0;
   align-items: flex-start;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 /* Columna izquierda — huella plantar grande */

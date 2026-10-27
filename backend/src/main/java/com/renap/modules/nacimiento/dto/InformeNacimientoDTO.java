@@ -84,7 +84,7 @@ public class InformeNacimientoDTO {
     @DecimalMin("0.0")
     private BigDecimal ninoPesoOnzas;
 
-    @DecimalMin("0.0")
+    @DecimalMin("20.0") @DecimalMax("100.0")
     private BigDecimal ninoTallaCm;
 
     @Min(20) @Max(45)
@@ -129,7 +129,7 @@ public class InformeNacimientoDTO {
     @Size(max = 100)
     private String madreApellidoCasada;
 
-    @Size(max = 100)
+    @Size(max = 50)
     private String madreCuiCedula;
 
     @Min(10) @Max(99)
@@ -175,7 +175,7 @@ public class InformeNacimientoDTO {
     @Size(max = 100)
     private String padreSegundoApellido;
 
-    @Size(max = 100)
+    @Size(max = 50)
     private String padreCuiCedula;
 
     @Min(10) @Max(99)
@@ -207,4 +207,16 @@ public class InformeNacimientoDTO {
 
     @Min(1) @Max(5)
     private Integer padreEscolaridad;
+
+    @Size(max = 20)
+    private String madreDocTipo;
+
+    @Size(max = 10)
+    private String madrePaisPasaporte;
+
+    @Size(max = 20)
+    private String padreDocTipo;
+
+    @Size(max = 10)
+    private String padrePaisPasaporte;
 }

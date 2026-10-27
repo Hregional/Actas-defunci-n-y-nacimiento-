@@ -1,24 +1,23 @@
 import { z } from 'zod'
 import { cuiValido } from '@/shared/utils/cuiValidator'
 
-// CUI requerido con validación oficial
+// CUI requerido con validación oficial — usado para el suscribe (doctor/enfermera/comadrona)
 const cuiReq = z
   .string()
   .min(13, 'El DPI debe tener 13 dígitos')
   .refine(cuiValido, { message: 'DPI inválido — verifique el número' })
 
 // CUI opcional (datos del padre) — solo valida si tiene contenido
+// La validación condicional de la madre está en el superRefine al final del schema
 const cuiOpt = z
   .string()
   .optional()
   .nullable()
-  .refine(
-    (val) => !val || val.trim() === '' || (val.length === 13 && cuiValido(val)),
-    { message: 'DPI inválido — debe tener 13 dígitos' }
-  )
   .transform(val => val && val.trim() !== '' ? val : undefined)
 
 const req = (msg = 'Requerido') => z.string().min(1, msg)
+
+const docTipoEnum = z.enum(['DPI_GT', 'INE_MX', 'PASAPORTE', 'OTRO'])
 
 export const nacimientoSchema = z.object({
   // ── Sección I — Datos del que suscribe ────────────────────
@@ -64,7 +63,9 @@ export const nacimientoSchema = z.object({
   madrePrimerApellido:    req('Primer apellido de la madre es requerido').max(100),
   madreSegundoApellido:   z.string().max(100).nullable().optional().or(z.literal('')),
   madreApellidoCasada:    z.string().max(100).nullable().optional().or(z.literal('')),
-  madreCuiCedula:         cuiReq,
+  madreDocTipo:           docTipoEnum.default('DPI_GT'),
+  madrePaisPasaporte:     z.string().max(10).optional().nullable(),
+  madreCuiCedula:         z.string().max(50),
   madreEdad:              z.number({ required_error: 'Edad es requerida' }).min(10, 'Mínimo 10 años').max(99),
   madreNacionalidad:      req('Nacionalidad es requerida').max(100),
   madreOcupacion:         req('Ocupación es requerida').max(150),
@@ -81,6 +82,8 @@ export const nacimientoSchema = z.object({
   padreSegundoNombre:     z.string().max(100).nullable().optional().or(z.literal('')),
   padrePrimerApellido:    z.string().max(100).nullable().optional().or(z.literal('')),
   padreSegundoApellido:   z.string().max(100).nullable().optional().or(z.literal('')),
+  padreDocTipo:           docTipoEnum.optional().nullable(),
+  padrePaisPasaporte:     z.string().max(10).optional().nullable(),
   padreCuiCedula:         cuiOpt,
   padreEdad:              z.number().min(10).max(99).optional().nullable(),
   padreNacionalidad:      z.string().max(100).nullable().optional().or(z.literal('')),
@@ -92,18 +95,37 @@ export const nacimientoSchema = z.object({
   padrePuebloPertenencia: z.number().min(1).max(5).optional().nullable(),
   padreEstadoCivil:       z.number().min(1).max(6).optional().nullable(),
   padreEscolaridad:       z.number().min(1).max(5).optional().nullable(),
-}).refine(
-  (data) => {
-    // Si es médico (tipo 1), el número de colegiado es obligatorio
-    if (data.suscribeQuienInforma === 1) {
-      return data.suscribeNoColegiado && data.suscribeNoColegiado.trim().length > 0
+}).superRefine((data, ctx) => {
+  const madreCui = data.madreCuiCedula as string | undefined
+  const padreCui = data.padreCuiCedula as string | undefined
+  const noColegiado = data.suscribeNoColegiado as string | null | undefined
+
+  // Validación condicional del documento de la madre
+  if (data.madreDocTipo === 'DPI_GT') {
+    if (!madreCui || madreCui.length !== 13) {
+      ctx.addIssue({ code: 'custom', path: ['madreCuiCedula'], message: 'DPI debe tener 13 dígitos' })
+    } else if (!cuiValido(madreCui)) {
+      ctx.addIssue({ code: 'custom', path: ['madreCuiCedula'], message: 'DPI inválido — verifique el número' })
     }
-    return true
-  },
-  {
-    message: 'El número de colegiado es requerido para médicos',
-    path: ['suscribeNoColegiado']
+  } else {
+    if (!madreCui || madreCui.trim() === '') {
+      ctx.addIssue({ code: 'custom', path: ['madreCuiCedula'], message: 'Número de documento requerido' })
+    }
   }
-)
+
+  // Validación condicional del documento del padre (opcional)
+  if (data.padreDocTipo === 'DPI_GT' && padreCui) {
+    if (padreCui.length !== 13 || !cuiValido(padreCui)) {
+      ctx.addIssue({ code: 'custom', path: ['padreCuiCedula'], message: 'DPI inválido — debe tener 13 dígitos' })
+    }
+  }
+
+  // Si es médico (tipo 1), el número de colegiado es obligatorio
+  if (data.suscribeQuienInforma === 1) {
+    if (!noColegiado || noColegiado.trim().length === 0) {
+      ctx.addIssue({ code: 'custom', path: ['suscribeNoColegiado'], message: 'El número de colegiado es requerido para médicos' })
+    }
+  }
+})
 
 export type NacimientoFormValues = z.infer<typeof nacimientoSchema>

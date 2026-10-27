@@ -154,7 +154,6 @@
           <source>21</source>
           <target>21</target>
           <compilerArgs>
-            <arg>-Xlint:none</arg>
             <arg>-parameters</arg>
           </compilerArgs>
           <annotationProcessorPaths>

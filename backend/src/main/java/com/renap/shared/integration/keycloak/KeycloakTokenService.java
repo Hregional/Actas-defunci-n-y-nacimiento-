@@ -1,6 +1,5 @@
 package com.renap.shared.integration.keycloak;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -23,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @SuppressWarnings("null")
 public class KeycloakTokenService {
 
@@ -38,7 +36,14 @@ public class KeycloakTokenService {
     /** Momento en que el token expira (según expires_in de la respuesta). */
     private volatile Instant tokenExpiresAt = Instant.EPOCH;
 
-    private final ReentrantLock lock = new ReentrantLock();
+    /** Lock para sincronizar acceso al token. */
+    private final ReentrantLock lock;
+
+    public KeycloakTokenService(KeycloakProperties props, RestTemplate restTemplate) {
+        this.props = props;
+        this.restTemplate = restTemplate;
+        this.lock = new ReentrantLock();
+    }
 
     /**
      * Devuelve un Bearer token válido.

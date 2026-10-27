@@ -1,12 +1,6 @@
 import { z } from 'zod'
 import { cuiValido } from '@/shared/utils/cuiValidator'
 
-// CUI requerido con validación oficial
-const cuiReq = z
-  .string()
-  .min(13, 'El DPI debe tener 13 dígitos')
-  .refine(cuiValido, { message: 'DPI inválido — verifique el número' })
-
 // CUI opcional (se valida solo si se ingresa)
 const cuiOpt = z
   .string()
@@ -17,6 +11,8 @@ const cuiOpt = z
   )
 
 const req = (msg = 'Requerido') => z.string().min(1, msg)
+
+const docTipoEnum = z.enum(['DPI_GT', 'INE_MX', 'PASAPORTE', 'OTRO'])
 
 export const defuncionSchema = z.object({
   // ── Sección I — Información General ────────────────────────
@@ -43,7 +39,9 @@ export const defuncionSchema = z.object({
   fallecidoEdadDias:          z.number().min(1).max(29).optional().nullable(),
   fallecidoEdadMeses:         z.number().min(1).max(11).optional().nullable(),
   fallecidoEdadAnos:          z.number().min(1).optional().nullable(),
-  fallecidoDocNumero:         cuiReq,
+  fallecidoDocTipo:           docTipoEnum.default('DPI_GT'),
+  fallecidoPaisPasaporte:     z.string().max(10).optional().nullable(),
+  fallecidoDocNumero:         z.string().max(50).min(1, 'Requerido'),
   fallecidoDocLibro:          z.string().max(50).nullable().optional().or(z.literal('')),
   fallecidoDocFolio:          z.string().max(50).nullable().optional().or(z.literal('')),
   fallecidoDocPartida:        z.string().max(50).nullable().optional().or(z.literal('')),
@@ -89,6 +87,8 @@ export const defuncionSchema = z.object({
   // ── Sección VI — Mortinato: Datos de la madre ────────────
   // Esta sección solo aplica si la muerte es fetal
   mortinatoMadreNombre:    z.string().max(255).nullable().optional().or(z.literal('')),
+  mortinatoMadreDocTipo:   docTipoEnum.optional().nullable(),
+  mortinatoMadrePaisPasaporte: z.string().max(10).optional().nullable(),
   mortinatoMadreDocNumero: cuiOpt,
   mortinatoMadreDocLibro:  z.string().max(50).nullable().optional().or(z.literal('')),
   mortinatoMadreDocFolio:  z.string().max(50).nullable().optional().or(z.literal('')),
@@ -123,18 +123,37 @@ export const defuncionSchema = z.object({
   otrosHuboNecropsia:    z.number({ required_error: 'Indique si hubo necropsia' }).min(1).max(2),
   otrosClaseAsistencia:  z.number({ required_error: 'Seleccione clase de asistencia' }).min(1).max(9),
   otrosLugarDefuncion:   z.number({ required_error: 'Seleccione lugar de defunción' }).min(1).max(9),
-}).refine(
-  (data) => {
-    // Si es médico (tipo 1), el número de colegiado es obligatorio
-    if (data.infoQuienInformaTipo === 1) {
-      return data.infoNoColegiado && data.infoNoColegiado.trim().length > 0
+}).superRefine((data, ctx) => {
+  const fallecidoDoc = data.fallecidoDocNumero as string | undefined
+  const mortinatoDoc = data.mortinatoMadreDocNumero as string | undefined
+  const noColegiado = data.infoNoColegiado as string | undefined
+
+  // Validación condicional del documento del fallecido
+  if (data.fallecidoDocTipo === 'DPI_GT') {
+    if (!fallecidoDoc || fallecidoDoc.length !== 13) {
+      ctx.addIssue({ code: 'custom', path: ['fallecidoDocNumero'], message: 'DPI debe tener 13 dígitos' })
+    } else if (!cuiValido(fallecidoDoc)) {
+      ctx.addIssue({ code: 'custom', path: ['fallecidoDocNumero'], message: 'DPI inválido — verifique el número' })
     }
-    return true
-  },
-  {
-    message: 'El número de colegiado es requerido para médicos',
-    path: ['infoNoColegiado']
+  } else {
+    if (!fallecidoDoc || fallecidoDoc.trim() === '') {
+      ctx.addIssue({ code: 'custom', path: ['fallecidoDocNumero'], message: 'Número de documento requerido' })
+    }
   }
-)
+
+  // Validación condicional del documento de la madre del mortinato (opcional)
+  if (data.mortinatoMadreDocTipo === 'DPI_GT' && mortinatoDoc) {
+    if (mortinatoDoc.length !== 13 || !cuiValido(mortinatoDoc)) {
+      ctx.addIssue({ code: 'custom', path: ['mortinatoMadreDocNumero'], message: 'DPI inválido — debe tener 13 dígitos' })
+    }
+  }
+
+  // Si es médico (tipo 1), el número de colegiado es obligatorio
+  if (data.infoQuienInformaTipo === 1) {
+    if (!noColegiado || noColegiado.trim().length === 0) {
+      ctx.addIssue({ code: 'custom', path: ['infoNoColegiado'], message: 'El número de colegiado es requerido para médicos' })
+    }
+  }
+})
 
 export type DefuncionFormValues = z.infer<typeof defuncionSchema>

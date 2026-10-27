@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -64,7 +64,10 @@ export default function DefuncionFormPage() {
   // IMPORTANTE: Todos los hooks deben estar ANTES de cualquier early return
   const [activeStep, setActiveStep] = useState(0)
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [allowSubmit, setAllowSubmit] = useState(false)  // ← Flag de control de submit
+  // Ref mutable: indica si el submit fue disparado por un botón explícito del usuario.
+  // Se usa ref (no state) para que sea síncrono — el handler lo lee en el mismo ciclo
+  // en que handleSubmit lo llama, sin esperar un re-render.
+  const submitIntentRef = useRef(false)
   const [snackbar, setSnackbar] = useState<{
     open: boolean; message: string; severity: 'success' | 'error'
   }>({ open: false, message: '', severity: 'success' })
@@ -81,12 +84,18 @@ export default function DefuncionFormPage() {
       infoQuienInformaNombres: '',
       infoFechaDefuncion: '',
       fallecidoNombreCompleto: '',
-      infoQuienInformaTipo: 1,  // Médico por defecto
-      infoTipoMuerte: 1,  // Defunción Normal por defecto
-      // Valores por defecto para Sección VII (requeridos por schema)
-      otrosHuboNecropsia: undefined as any,
-      otrosClaseAsistencia: undefined as any,
-      otrosLugarDefuncion: undefined as any,
+      infoQuienInformaTipo: 1,
+      infoTipoMuerte: 1,
+      // Valores por defecto para campos de selección (CardOptionGroup)
+      // null evita que RHF los resetee al re-renderizar
+      fallecidoSexo: null as unknown as number,
+      fallecidoEstadoCivil: null as unknown as number,
+      fallecidoPuebloPertenencia: null as unknown as number,
+      fallecidoEscolaridad: null as unknown as number,
+      // Sección VII
+      otrosHuboNecropsia: null as unknown as number,
+      otrosClaseAsistencia: null as unknown as number,
+      otrosLugarDefuncion: null as unknown as number,
     },
   })
 
@@ -110,24 +119,15 @@ export default function DefuncionFormPage() {
       'VII. Otros',
     ], [tipoMuerte])
 
-  // Resetear allowSubmit y limpiar errores al cambiar de paso
+  // Resetear intent y limpiar errores al cambiar de paso
   useEffect(() => {
-    console.log(`[DefuncionForm] activeStep cambió a: ${activeStep} (${STEPS[activeStep]})`)
-    setAllowSubmit(false)
-    clearErrors() // Limpiar todos los errores al navegar
-    setSnackbar({ open: false, message: '', severity: 'success' }) // Cerrar snackbar de errores previos
-    // Scroll al inicio del contenido después de que React renderice el nuevo paso
+    submitIntentRef.current = false
+    clearErrors()
+    setSnackbar({ open: false, message: '', severity: 'success' })
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     })
-
-    // IMPORTANTE: En el último paso NO validar automáticamente
-    // Solo validar cuando el usuario presione "Guardar" o "Actualizar"
-    const esUltimoPaso = activeStep === STEPS.length - 1
-    if (esUltimoPaso) {
-      console.log(`[DefuncionForm] Último paso alcanzado. NO se validará automáticamente.`)
-    }
-  }, [activeStep, clearErrors]) // STEPS removido para evitar bucle infinito
+  }, [activeStep, clearErrors])
 
   // Resetear paso activo si cambia el tipo de muerte y el paso actual ya no existe
   useEffect(() => {
@@ -242,6 +242,7 @@ export default function DefuncionFormPage() {
 
     // Si el paso no tiene campos requeridos, avanzar directamente
     if (fields.length === 0) {
+      clearErrors() // Limpiar errores antes de cambiar paso
       setActiveStep((prev) => prev + 1)
       return
     }
@@ -329,6 +330,7 @@ export default function DefuncionFormPage() {
 
     // ── 4. Validación pasada, avanzar ─────────────────────────────────────
     console.log(`[DefuncionForm] Validación pasada. Avanzando de paso ${activeStep} a ${activeStep + 1}`)
+    clearErrors() // Limpiar errores acumulados antes de mostrar el siguiente paso
     setActiveStep((prev) => prev + 1)
   }
 
@@ -337,26 +339,14 @@ export default function DefuncionFormPage() {
   }
 
   const onSubmit = async (data: DefuncionFormValues) => {
-    console.log('[DefuncionForm] onSubmit EJECUTADO')
-    console.log('  - editId:', editId)
-    console.log('  - allowSubmit:', allowSubmit)
-    console.log('  - Modo:', editId ? 'EDICIÓN' : 'CREACIÓN')
-
-    // ── PROTECCIÓN: Flag de control (para CREACIÓN y EDICIÓN) ──────────────
-    if (!allowSubmit) {
-      console.error(' [DefuncionForm] SUBMIT BLOQUEADO: allowSubmit es false')
-      console.error('   El usuario NO ha presionado el botón Guardar explícitamente')
-      return
-    }
+    if (!submitIntentRef.current) return
+    submitIntentRef.current = false
 
     try {
       if (editId) {
         await actualizar.mutateAsync({ id: editId, dto: data })
         setSnackbar({ open: true, message: 'Informe actualizado exitosamente', severity: 'success' })
-        // Solo navegar si estamos en el último paso — en pasos intermedios, quedarse
-        if (activeStep === STEPS.length - 1) {
-          setTimeout(() => navigate('/defunciones'), 1500)
-        }
+        setTimeout(() => navigate('/defunciones'), 1500)
       } else {
         const saved = await crear.mutateAsync(data)
         if (saved.id) {
@@ -372,6 +362,7 @@ export default function DefuncionFormPage() {
   }
 
   const onInvalid = (errors: Record<string, unknown>) => {
+    submitIntentRef.current = false
     const errorFields = Object.keys(errors) as (keyof DefuncionFormValues)[]
     const firstField = errorFields[0]
     const targetStep = firstField ? (FIELD_TO_STEP[firstField] ?? 0) : 0
@@ -390,7 +381,7 @@ export default function DefuncionFormPage() {
 
   return (
     <FormProvider {...methods}>
-      <Box component="form" onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
+      <Box component="form" onSubmit={(e) => e.preventDefault()} noValidate>
         {/* Header */}
         <Paper
           elevation={0}
@@ -519,12 +510,15 @@ export default function DefuncionFormPage() {
                 {/* En modo edición: Actualizar disponible en cada paso SOLO si el registro ya estaba completo */}
                 {editId && existing?.otrosHuboNecropsia && (
                   <Button
-                    type="submit"
+                    type="button"
                     variant="outlined"
                     color="success"
                     startIcon={<SaveIcon />}
                     disabled={isSubmitting || actualizar.isPending}
-                    onClick={() => setAllowSubmit(true)}
+                    onClick={() => {
+                      submitIntentRef.current = true
+                      handleSubmit(onSubmit, onInvalid)()
+                    }}
                   >
                     Actualizar
                   </Button>
@@ -545,13 +539,16 @@ export default function DefuncionFormPage() {
                   Vista previa
                 </Button>
                 <Button
-                  type="submit"
+                  type="button"
                   variant="contained"
                   color="success"
                   startIcon={<SaveIcon />}
                   disabled={isSubmitting || crear.isPending || actualizar.isPending}
                   size="large"
-                  onClick={() => setAllowSubmit(true)}
+                  onClick={() => {
+                    submitIntentRef.current = true
+                    handleSubmit(onSubmit, onInvalid)()
+                  }}
                 >
                   {editId ? 'Actualizar' : 'Guardar'}
                 </Button>

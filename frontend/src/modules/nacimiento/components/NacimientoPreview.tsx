@@ -55,7 +55,7 @@ function SB({ t }: { t: string }) {
 interface Props { open: boolean; onClose: () => void; data: NacimientoFormValues }
 
 export default function NacimientoPreview({ open, onClose, data }: Props) {
-  const { printRef, print } = usePrint('Informe de Nacimiento — HRO')
+  const { printRef, print } = usePrint('Informe de Nacimiento — HRO', PRINT_CSS_NACIMIENTO)
   const fecha = data.ninoFechaNacimiento ? dayjs(data.ninoFechaNacimiento).format('DD/MM/YYYY') : ''
 
   return (
@@ -232,6 +232,7 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
           </p>
 
           {/* ════════════ REVERSO — PÁGINA 2 ════════════ */}
+          {/* page-break antes del bloque de huellas para que siempre vaya al reverso */}
           <div className="page-break" />
 
           {/* Header reverso */}
@@ -246,7 +247,7 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
             </div>
           </div>
 
-          {/* Huellas */}
+          {/* Huellas — siempre en el reverso */}
           <div className="huellas-wrap">
             {/* Columna izquierda: huella plantar grande */}
             <div className="fp-plantar-col">
@@ -262,79 +263,6 @@ export default function NacimientoPreview({ open, onClose, data }: Props) {
               <div className="fp-small-item">
                 <p className="fp-small-lbl">Impresión del dedo pulgar derecho<br />de la madre</p>
                 <div className="fp-small" />
-              </div>
-            </div>
-          </div>
-
-          {/* Instrucciones completas tal cual el PDF */}
-          <div className="rev-wrap">
-            <div className="rev-title">INSTRUCCIONES PARA EL LLENADO DEL INFORME DE NACIMIENTO</div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">I. DATOS DEL QUE SUSCRIBE:</div>
-              <div className="rev-body">
-                El médico o persona que suscribe el nacimiento, deberá anotar su nombre completo y número de documento
-                personal de identificación -CUI-/Cédula de vecindad, número de colegiado (si es profesional) o número
-                de registro (si es comadrona). Anote además en el recuadro el número que corresponde a la persona que
-                suscribe el nacimiento.
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">II. DATOS DEL LUGAR DE NACIMIENTO:</div>
-              <div className="rev-body">
-                <div className="rev-item">1. DEPARTAMENTO: Anote el nombre del departamento donde ocurrió el nacimiento.</div>
-                <div className="rev-item">2. MUNICIPIO: Anote el nombre del municipio donde sucedió el nacimiento.</div>
-                <div className="rev-item">3. DIRECCIÓN: Escriba la dirección exacta, además pregunte si esta corresponde a una ciudad, pueblo, aldea, caserío o finca.</div>
-                <div className="rev-item">4. LUGAR DONDE OCURRIÓ EL NACIMIENTO: Anote en la casilla el número que corresponda, según el lugar del nacimiento.</div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">III. DATOS DEL NIÑO(A) Y DEL NACIMIENTO:</div>
-              <div className="rev-body">
-                <div className="rev-item">5. NOMBRE: Anote los nombres del niño(a) en los espacios correspondientes, también anote el apellido paterno y materno.</div>
-                <div className="rev-item">6. FECHA DE NACIMIENTO: Anote la fecha en que ocurrió el nacimiento en el orden siguiente: día, mes y año.</div>
-                <div className="rev-item">7. HORA: Anote la hora (en formato de 24 horas) y minutos del nacimiento.</div>
-                <div className="rev-item">8. SEXO: Anote en la casilla el número correspondiente al sexo del recién nacido.</div>
-                <div className="rev-item">9. PESO AL NACER: Anote el peso del niño(a) en libras y onzas.</div>
-                <div className="rev-item">10. TALLA: Anote la talla del niño(a) en centímetros.</div>
-                <div className="rev-item">11. EDAD GESTACIONAL: Anote el número de semanas que el niño(a) estuvo en el vientre de la madre.</div>
-                <div className="rev-item">12. ANOMALÍAS CONGÉNITAS VISIBLES: Anote el número según corresponda, si el niño(a) nació o no con alguna anomalía.</div>
-                <div className="rev-item">13. TIPO DE PARTO: Anote el número que corresponda en la casilla para indicar si el nacimiento fue por parto normal o cesárea.</div>
-                <div className="rev-item">14. NÚMERO DE HIJOS(AS) NACIDOS(AS) EN EL PARTO: Anote cuántos hijos ha tenido la madre durante el parto. Cuando el parto ha sido doble, triple o más, asegúrese de registrar por separado cada nacimiento vivo. Todos los niños y niñas nacidos vivos deben registrarse, así mueran después del parto.</div>
-                <div className="rev-item">15. PERSONA QUE ATENDIÓ EL PARTO: Anote en la casilla el número que corresponda para indicar la profesión de la persona que atendió el parto.</div>
-                <div className="rev-item">16. NÚMERO DE HIJOS(AS) QUE HA TENIDO LA MADRE INCLUYENDO LOS NACIDOS MUERTOS Y EL QUE AHORA SE REGISTRA: Anote la cantidad de hijos(as) que ha tenido la madre independientemente si nacieron vivos o muertos, así también escriba por separado el número de hijos nacidos muertos. Anote además el número de hijos vivos que tiene actualmente la madre, debe contarse también el que se está registrando.</div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">IV. DATOS DE LA MADRE:</div>
-              <div className="rev-body">
-                <div className="rev-item">17. NOMBRE: Anote los nombres de la madre del niño(a) seguidos por el apellido paterno, materno y de casada si lo hubiera.</div>
-                <div className="rev-item">18. DOCUMENTO PERSONAL DE IDENTIFICACIÓN –CUI-/CÉDULA DE VECINDAD: Anote el número del documento de identificación de la madre.</div>
-                <div className="rev-item">19. EDAD: Anote la edad de la madre en años cumplidos.</div>
-                <div className="rev-item">20. NACIONALIDAD: Registre la nacionalidad de la madre.</div>
-                <div className="rev-item">21. OCUPACIÓN U OFICIO: Anote la ocupación principal de la madre (se considera ocupación principal aquella actividad que durante el mes anterior generó mayores ingresos).</div>
-                <div className="rev-item">22. DIRECCIÓN DE RESIDENCIA ACTUAL: Anote la dirección donde reside actualmente la madre del niño(a), la zona, municipio y departamento.</div>
-                <div className="rev-item">23. PUEBLO DE PERTENENCIA: Anote en la casilla el número correspondiente al pueblo de pertenencia de la madre, respetando el derecho individual a la autoidentificación.</div>
-                <div className="rev-item">24. ESTADO CIVIL: Anote en la casilla el código correspondiente al estado civil de la madre.</div>
-                <div className="rev-item">25. ESCOLARIDAD: Anote en la casilla el código que corresponda al grado de escolaridad de la madre.</div>
-              </div>
-            </div>
-
-            <div className="rev-section">
-              <div className="rev-sec-title">V. DATOS DEL PADRE:</div>
-              <div className="rev-body">
-                <div className="rev-item">26. NOMBRE: Anote los nombres del padre del niño(a) seguidos por el apellido paterno y materno.</div>
-                <div className="rev-item">27. DOCUMENTO PERSONAL DE IDENTIFICACIÓN –CUI-/CÉDULA DE VECINDAD: Anote el número del documento de identificación del padre.</div>
-                <div className="rev-item">28. EDAD: Anote la edad del padre en años cumplidos.</div>
-                <div className="rev-item">29. NACIONALIDAD: Registre la nacionalidad del padre.</div>
-                <div className="rev-item">30. OCUPACIÓN U OFICIO: Anote la ocupación principal del padre.</div>
-                <div className="rev-item">31. DIRECCIÓN DE RESIDENCIA ACTUAL: Anote la dirección donde reside actualmente el padre del niño(a), la zona, municipio y departamento.</div>
-                <div className="rev-item">32. PUEBLO DE PERTENENCIA: Anote en la casilla el número correspondiente al pueblo de pertenencia del padre, respetando el derecho individual a la autoidentificación.</div>
-                <div className="rev-item">33. ESTADO CIVIL: Anote en la casilla el código correspondiente al estado civil del padre.</div>
-                <div className="rev-item">34. ESCOLARIDAD: Anote en la casilla el código que corresponda al grado de escolaridad del padre.</div>
               </div>
             </div>
           </div>

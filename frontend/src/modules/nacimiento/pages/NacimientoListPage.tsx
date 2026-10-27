@@ -4,7 +4,7 @@ import {
   Box, Button, TextField,
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Tooltip, Typography,
-  TablePagination, InputAdornment, Stack, Alert,
+  TablePagination, InputAdornment, Stack,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -28,7 +28,7 @@ export default function NacimientoListPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [previewId, setPreviewId] = useState<number | null>(null)
 
-  const { data, isError } = useNacimientoList({ search, page, size })
+  const { data} = useNacimientoList({ search, page, size })
   const { data: previewData } = useNacimientoById(previewId ?? undefined)
   const eliminar = useEliminarNacimiento()
 
@@ -68,8 +68,6 @@ export default function NacimientoListPage() {
         </Button>
       </Stack>
 
-      {isError && <Alert severity="error" sx={{ mb: 2 }}>Error al cargar los registros.</Alert>}
-
       <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2 }}>
         <Table size="small">
           <TableHead>
@@ -78,7 +76,7 @@ export default function NacimientoListPage() {
               <TableCell>Fecha Nacimiento</TableCell>
               <TableCell>Género</TableCell>
               <TableCell>Madre</TableCell>
-              <TableCell>DPI Madre</TableCell>
+              <TableCell>DOC. Idenntificación madre</TableCell>
               <TableCell>Quien Registró</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Registrado</TableCell>

@@ -1,11 +1,20 @@
 import { useFormContext, Controller } from 'react-hook-form'
 import {
   Grid, TextField, FormControl, InputLabel, Select, MenuItem,
-  FormHelperText, FormLabel, RadioGroup, FormControlLabel, Radio,
-  Alert,
+  FormHelperText, Alert,
 } from '@mui/material'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import SectionCard from '@/shared/components/common/SectionCard'
+import CardOptionGroup from '@/shared/components/common/CardOptionGroup'
 import type { DefuncionFormValues } from '../schemas/defuncion.schema'
+
+const SI_NO_IGNORADO = [
+  { value: 1, label: 'Sí',      icon: <CheckCircleIcon sx={{ fontSize: 20 }} />, color: '#4CAF50' },
+  { value: 2, label: 'No',      icon: <CancelIcon       sx={{ fontSize: 20 }} />, color: '#F44336' },
+  { value: 9, label: 'Ignorado',icon: <HelpOutlineIcon  sx={{ fontSize: 18 }} />, color: '#9E9E9E' },
+]
 
 const PRESUNTO_OPTIONS = [
   { value: 1, label: 'Suicidio' },
@@ -92,17 +101,17 @@ export default function DefSeccionV() {
           <Controller
             name="accidentalOcurrioTrabajo"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>
-                  19.2 Ocurrió en el desempeño de su trabajo
-                </FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label="19.2 Ocurrió en el desempeño de su trabajo"
+                options={SI_NO_IGNORADO}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="sm"
+              />
             )}
           />
         </Grid>
@@ -111,17 +120,17 @@ export default function DefSeccionV() {
           <Controller
             name="accidentalFueTransito"
             control={control}
-            render={({ field }) => (
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ fontSize: '0.8rem' }}>
-                  19.3 Fue accidente de tránsito
-                </FormLabel>
-                <RadioGroup row {...field} value={field.value ?? ''} onChange={(e) => field.onChange(Number(e.target.value))}>
-                  <FormControlLabel value={1} control={<Radio size="small" />} label="Sí" />
-                  <FormControlLabel value={2} control={<Radio size="small" />} label="No" />
-                  <FormControlLabel value={9} control={<Radio size="small" />} label="Ignorado" />
-                </RadioGroup>
-              </FormControl>
+            render={({ field, fieldState }) => (
+              <CardOptionGroup
+                label="19.3 Fue accidente de tránsito"
+                options={SI_NO_IGNORADO}
+                value={field.value ?? null}
+                onChange={(v) => field.onChange(Number(v))}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                direction="row"
+                size="sm"
+              />
             )}
           />
         </Grid>

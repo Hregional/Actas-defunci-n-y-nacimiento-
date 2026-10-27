@@ -92,7 +92,7 @@ public class InformeNacimiento {
     @Column(name = "nino_peso_onzas", precision = 5, scale = 2)
     private BigDecimal ninoPesoOnzas;
 
-    @Column(name = "nino_talla_cm", precision = 5, scale = 2)
+    @Column(name = "nino_talla_cm", precision = 4, scale = 1)
     private BigDecimal ninoTallaCm;
 
     @Column(name = "nino_edad_gestacional_semanas")
@@ -135,7 +135,7 @@ public class InformeNacimiento {
     @Column(name = "madre_apellido_casada", length = 100)
     private String madreApellidoCasada;
 
-    @Column(name = "madre_cui_cedula", length = 13)
+    @Column(name = "madre_cui_cedula", length = 50)
     private String madreCuiCedula;
 
     @Column(name = "madre_edad")
@@ -181,7 +181,7 @@ public class InformeNacimiento {
     @Column(name = "padre_segundo_apellido", length = 100)
     private String padreSegundoApellido;
 
-    @Column(name = "padre_cui_cedula", length = 13)
+    @Column(name = "padre_cui_cedula", length = 50)
     private String padreCuiCedula;
 
     @Column(name = "padre_edad")
@@ -213,4 +213,16 @@ public class InformeNacimiento {
 
     @Column(name = "padre_escolaridad")
     private Integer padreEscolaridad;
+
+    @Column(name = "madre_doc_tipo", length = 20)
+    private String madreDocTipo;
+
+    @Column(name = "madre_pais_pasaporte", length = 10)
+    private String madrePaisPasaporte;
+
+    @Column(name = "padre_doc_tipo", length = 20)
+    private String padreDocTipo;
+
+    @Column(name = "padre_pais_pasaporte", length = 10)
+    private String padrePaisPasaporte;
 }
